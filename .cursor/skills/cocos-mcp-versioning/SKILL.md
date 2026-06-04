@@ -151,6 +151,14 @@ git status   # 无漏提交的 DEV/README 改动
 
 - `npm run build` 后 `initialize` 的 `serverInfo.version` 与 `package.json` 一致（读 `PACKAGE_VERSION`）
 
+**一键审查（推荐）**
+
+```bash
+npm run review:version              # 仅审查，失败 exit 1
+npm run review:version -- --commit  # 审查通过后若有改动则自动 git commit
+npm run review:version -- --commit --message "Release vX.Y.Z: …"
+```
+
 ## 参考
 
 - 项目现状示例：[DEV.md § 版本说明](../../DEV.md#版本说明)、[README.md § 更新日志](../../README.md#更新日志)

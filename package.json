@@ -12,7 +12,8 @@
         "watch": "tsc -w",
         "publish": "npm run build && node ./scripts/publish.js",
         "deploy-mcp": "node ./scripts/deploy-mcp.js",
-        "check:identity": "node ./scripts/check-identity-keywords.js"
+        "check:identity": "node ./scripts/check-identity-keywords.js",
+        "review:version": "node ./scripts/review-version.js"
     },
     "description": "i18n:cocos-mcp-server.description",
     "main": "./dist/main.js",
