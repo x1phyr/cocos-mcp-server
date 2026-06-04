@@ -11,13 +11,18 @@
 [<img width="503" height="351" alt="image" src="https://github.com/user-attachments/assets/f186ce14-9ffc-4a29-8761-48bdd7c1ea16" />](https://www.bilibili.com/video/BV1mB8dzfEw8?spm_id_from=333.788.recommend_more_video.0&vd_source=6b1ff659dd5f04a92cc6d14061e8bb92)
 
 
-##快速链接
+## 快速链接
 
-- **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** - Detailed documentation for all 158 tools（待补充）
-- **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** - 所有158工具的详细文档（待补充）
+- **[开发指南 DEV.md](./DEV.md)** — `publish`、`deploy-mcp`、本地配置
+- **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** — 工具详细说明（待补充）
+- **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** — 工具详细说明（待补充）
 
 
 ## 更新日志
+
+### v1.4.1 - 2026年6月3日（当前版本）
+
+本地开发工作流：`publish` 同步扩展、`deploy-mcp` 配置 AI 客户端、默认端口 **28473**。详见 **[DEV.md](./DEV.md)**。
 
 ## 🚀 重大更新 v1.5.0（2024年7月29日）（已经在cocos 商城更新，github版本将在下个版本同步更新）
 
@@ -66,7 +71,7 @@ cocos store：https://store.cocos.com/app/detail/7941
 - **broadcast_message**：消息广播
 
 
-### v1.4.0 - 2025年7月26日（当前github版本）
+### v1.4.0 - 2025年7月26日（上游基线）
 
 #### 🎯 重大功能修复
 - **完全修复预制体创建功能**: 彻底解决了预制体创建时组件/节点/资源类型引用丢失的问题
@@ -146,10 +151,12 @@ cocos store：https://store.cocos.com/app/detail/7941
 
 ## 快速使用
 
+> 开发发布与 `deploy-mcp` 见 **[DEV.md](./DEV.md)**。下面为手动配置 MCP 的参考（默认端口 **28473**）。
+
 **Claude cli配置：**
 
 ```
-claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp（使用你自己配置的端口号）
+claude mcp add --transport http cocos-creator http://127.0.0.1:28473/mcp（默认端口 28473，可在扩展面板修改）
 ```
 
 **Claude客户端配置：**
@@ -163,7 +170,7 @@ claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp（使用
 
  		"type": "http",
 
-		"url": "http://127.0.0.1:3000/mcp"
+		"url": "http://127.0.0.1:28473/mcp"
 
 		 }
 
@@ -180,7 +187,7 @@ claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp（使用
   "mcpServers": { 
 
    "cocos-creator": {
-      "url": "http://localhost:3000/mcp"
+      "url": "http://localhost:28473/mcp"
    }
   }
 
@@ -289,6 +296,8 @@ cd extensions/cocos-mcp-server
 npm install
 ```
 
+从扩展开发仓库发布到工程，见 **[DEV.md](./DEV.md)** 中的 `npm run publish`。
+
 ### 3. 构建插件
 
 ```bash
@@ -307,7 +316,7 @@ npm run build
 
 1. 从 `扩展 > Cocos MCP Server` 打开 MCP 服务器面板
 2. 配置设置：
-   - **端口**: HTTP 服务器端口（默认：3000）
+   - **端口**: HTTP 服务器端口（默认：28473）
    - **自动启动**: 编辑器启动时自动启动服务器
    - **调试日志**: 启用详细日志以便开发调试
    - **最大连接数**: 允许的最大并发连接数
@@ -316,12 +325,13 @@ npm run build
 
 ### 连接 AI 助手
 
-服务器在 `http://localhost:3000/mcp`（或您配置的端口）上提供 HTTP 端点。
+服务器在 `http://localhost:28473/mcp`（或您配置的端口）上提供 HTTP 端点。须先在 Creator 面板**启动服务器**；客户端配置可用 [DEV.md](./DEV.md) 中的 `deploy-mcp`。
 
 AI 助手可以使用 MCP 协议连接并访问所有可用工具。
 
-
 ## 开发
+
+发布扩展、部署 MCP 客户端配置 → **[DEV.md](./DEV.md)**。
 
 ### 项目结构
 ```
@@ -357,15 +367,11 @@ cocos-mcp-server/
 ### 从源码构建
 
 ```bash
-# 安装依赖
 npm install
-
-# 开发构建（监视模式）
-npm run watch
-
-# 生产构建
-npm run build
+npm run build    # 或 npm run watch
 ```
+
+（发布到 Cocos 工程见 [DEV.md](./DEV.md)。）
 
 ### 添加新工具
 

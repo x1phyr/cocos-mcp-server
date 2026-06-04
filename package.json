@@ -2,13 +2,17 @@
     "$schema": "./@types/schema/package/index.json",
     "package_version": 2,
     "name": "cocos-mcp-server",
-    "version": "1.4.0",
+    "version": "1.4.1",
+    "mcpDefaultPort": 28473,
     "author": "LiDaxian",
     "editor": ">=3.8.6",
     "scripts": {
         "preinstall": "node ./scripts/preinstall.js",
         "build": "tsc",
-        "watch": "tsc -w"
+        "watch": "tsc -w",
+        "publish": "npm run build && node ./scripts/publish.js",
+        "deploy-mcp": "node ./scripts/deploy-mcp.js",
+        "check:identity": "node ./scripts/check-identity-keywords.js"
     },
     "description": "i18n:cocos-mcp-server.description",
     "main": "./dist/main.js",

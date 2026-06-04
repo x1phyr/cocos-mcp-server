@@ -14,11 +14,16 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Quick Links
 
-- **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** - Detailed documentation for all 50 tools (to be completed)
-- **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** - All 50 tools detailed documentation (to be completed)
+- **[DEV.md](./DEV.md)** — `publish`, `deploy-mcp`, local config (Chinese)
+- **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** — Tool reference (to be completed)
+- **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** — Tool reference (to be completed)
 
 
 ## Changelog
+
+### v1.4.1 - June 3, 2026 (Current version)
+
+Local workflow: `publish`, `deploy-mcp`, default port **28473**. See **[DEV.md](./DEV.md)** (Chinese).
 
 ## 🚀 Major Update v1.5.0 (July 29, 2024) (Already updated in Cocos Store, GitHub version will be synchronized in next version)
 
@@ -67,7 +72,7 @@ Cocos store: https://store.cocos.com/app/detail/7941
 - **broadcast_message**: Message broadcasting
 
 
-### v1.4.0 - July 26, 2025 (Current github version)
+### v1.4.0 - July 26, 2025 (Upstream baseline)
 
 #### 🎯 Major Functionality Fixes
 - **Complete Prefab Creation Fix**: Thoroughly resolved the issue of component/node/resource type reference loss during prefab creation
@@ -147,10 +152,12 @@ Cocos store: https://store.cocos.com/app/detail/7941
 
 ## Quick Usage
 
+> Publishing and `deploy-mcp`: see **[DEV.md](./DEV.md)**. Manual MCP setup below (default port **28473**).
+
 **Claude CLI configuration:**
 
 ```
-claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp (use your configured port number)
+claude mcp add --transport http cocos-creator http://127.0.0.1:28473/mcp (default port 28473; change in extension panel if needed)
 ```
 
 **Claude client configuration:**
@@ -164,7 +171,7 @@ claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp (use you
 
  		"type": "http",
 
-		"url": "http://127.0.0.1:3000/mcp"
+		"url": "http://127.0.0.1:28473/mcp"
 
 		 }
 
@@ -181,7 +188,7 @@ claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp (use you
   "mcpServers": { 
 
    "cocos-creator": {
-      "url": "http://localhost:3000/mcp"
+      "url": "http://localhost:28473/mcp"
    }
   }
 
@@ -290,6 +297,8 @@ cd extensions/cocos-mcp-server
 npm install
 ```
 
+Publishing from the extension repo: see **[DEV.md](./DEV.md)** (`npm run publish`).
+
 ### 3. Build the Plugin
 
 ```bash
@@ -308,7 +317,7 @@ npm run build
 
 1. Open the MCP Server panel from `Extension > Cocos MCP Server`
 2. Configure settings:
-   - **Port**: HTTP server port (default: 3000)
+   - **Port**: HTTP server port (default: 28473)
    - **Auto Start**: Automatically start server when editor opens
    - **Debug Logging**: Enable detailed logging for development
    - **Max Connections**: Maximum concurrent connections allowed
@@ -317,12 +326,13 @@ npm run build
 
 ### Connecting AI Assistants
 
-The server exposes an HTTP endpoint at `http://localhost:3000/mcp` (or your configured port).
+The server exposes an HTTP endpoint at `http://localhost:28473/mcp` (or your configured port). Start the server in the Creator panel first; use `deploy-mcp` from [DEV.md](./DEV.md) for client configs.
 
 AI assistants can connect using the MCP protocol and access all available tools.
 
-
 ## Development
+
+Publish and deploy-mcp: **[DEV.md](./DEV.md)** (Chinese).
 
 ### Project Structure
 ```
@@ -358,15 +368,11 @@ cocos-mcp-server/
 ### Building from Source
 
 ```bash
-# Install dependencies
 npm install
-
-# Build for development with watch mode
-npm run watch
-
-# Build for production
-npm run build
+npm run build    # or npm run watch
 ```
+
+(Publish to a Cocos project: [DEV.md](./DEV.md).)
 
 ### Adding New Tools
 

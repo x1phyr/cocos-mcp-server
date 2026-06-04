@@ -2,6 +2,7 @@
 
 import { readFileSync } from 'fs-extra';
 import { join } from 'path';
+import { DEFAULT_MCP_PORT } from '../../constants';
 import { createApp, App, defineComponent, ref, computed, onMounted, watch, nextTick } from 'vue';
 
 const panelDataMap = new WeakMap<any, App>();
@@ -64,7 +65,7 @@ module.exports = Editor.Panel.define({
                     const isProcessing = ref(false);
                     
                     const settings = ref<ServerSettings>({
-                        port: 3000,
+                        port: DEFAULT_MCP_PORT,
                         autoStart: false,
                         debugLog: false,
                         maxConnections: 10
@@ -300,7 +301,7 @@ module.exports = Editor.Panel.define({
                             const serverStatus = await Editor.Message.request('cocos-mcp-server', 'get-server-status');
                             if (serverStatus && serverStatus.settings) {
                                 settings.value = {
-                                    port: serverStatus.settings.port || 3000,
+                                    port: serverStatus.settings.port || DEFAULT_MCP_PORT,
                                     autoStart: serverStatus.settings.autoStart || false,
                                     debugLog: serverStatus.settings.enableDebugLog || false,
                                     maxConnections: serverStatus.settings.maxConnections || 10

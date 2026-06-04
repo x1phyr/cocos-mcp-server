@@ -1,1 +1,4 @@
 node_modules/
+local.env.json
+.cursor/identity-keywords.local.txt
+.cursor/rules/*.local.mdc

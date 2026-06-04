@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { DEFAULT_MCP_PORT } from './constants';
 import { MCPServerSettings, ToolManagerSettings, ToolConfiguration, ToolConfig } from './types';
 
 const DEFAULT_SETTINGS: MCPServerSettings = {
-    port: 3000,
+    port: DEFAULT_MCP_PORT,
     autoStart: false,
     enableDebugLog: false,
     allowedOrigins: ['*'],

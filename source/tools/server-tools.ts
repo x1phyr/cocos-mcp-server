@@ -1,3 +1,4 @@
+import { readSettings } from '../settings';
 import { ToolDefinition, ToolResponse, ToolExecutor } from '../types';
 
 export class ServerTools implements ToolExecutor {
@@ -160,7 +161,7 @@ export class ServerTools implements ToolExecutor {
                 }
 
                 // Add additional server info
-                status.mcpServerPort = 3000; // Our MCP server port
+                status.mcpServerPort = readSettings().port;
                 status.editorVersion = (Editor as any).versions?.cocos || 'Unknown';
                 status.platform = process.platform;
                 status.nodeVersion = process.version;
