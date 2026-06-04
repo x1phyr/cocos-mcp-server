@@ -11,6 +11,7 @@ import { DebugTools } from './tools/debug-tools';
 import { PreferencesTools } from './tools/preferences-tools';
 import { ServerTools } from './tools/server-tools';
 import { BroadcastTools } from './tools/broadcast-tools';
+import { PACKAGE_VERSION } from './constants';
 import { SceneAdvancedTools } from './tools/scene-advanced-tools';
 import { SceneViewTools } from './tools/scene-view-tools';
 import { ReferenceImageTools } from './tools/reference-image-tools';
@@ -267,7 +268,7 @@ export class MCPServer {
                         },
                         serverInfo: {
                             name: 'cocos-mcp-server',
-                            version: '1.0.0'
+                            version: PACKAGE_VERSION
                         }
                     };
                     break;

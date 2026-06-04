@@ -13,14 +13,22 @@
 
 ## 快速链接
 
-- **[开发指南 DEV.md](./DEV.md)** — `publish`、`deploy-mcp`、本地配置
+- **[开发指南 DEV.md](./DEV.md)** — `publish`、`deploy-mcp`、本地配置、[版本规划](./DEV.md#版本规划)、[版本维护 skill](.cursor/skills/cocos-mcp-versioning/SKILL.md)
 - **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** — 工具详细说明（待补充）
 - **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** — 工具详细说明（待补充）
 
 
 ## 更新日志
 
-### v1.4.1 - 2026年6月3日（当前版本）
+### v1.4.2 - 2026年6月3日（当前版本）
+
+- **Added**：`DEV.md` § 版本规划（Git v1.5 / v1.6 草案）；项目 skill `.cursor/skills/cocos-mcp-versioning`（SemVer + Keep a Changelog + 文档分工）。
+- **Changed**：版本说明与更新日志分工（已发布 → README，规划 → DEV）；README 链到版本规划。
+- **Fixed**：MCP `initialize` 的 `serverInfo.version` 与 `package.json` 一致；`package-lock.json` 版本字段同步。
+
+**后续规划（本仓库 Git，未实现）**：v1.5 扩展注册 MCP 工具、v1.6 面板 UI — 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
+
+### v1.4.1 - 2026年6月3日
 
 本地开发工作流：`publish` 同步扩展、`deploy-mcp` 配置 AI 客户端、默认端口 **28473**。详见 **[DEV.md](./DEV.md)**。
 

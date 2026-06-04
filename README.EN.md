@@ -14,14 +14,22 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Quick Links
 
-- **[DEV.md](./DEV.md)** — `publish`, `deploy-mcp`, local config (Chinese)
+- **[DEV.md](./DEV.md)** — `publish`, `deploy-mcp`, local config, [roadmap](./DEV.md#版本规划), [versioning skill](.cursor/skills/cocos-mcp-versioning/SKILL.md) (Chinese)
 - **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** — Tool reference (to be completed)
 - **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** — Tool reference (to be completed)
 
 
 ## Changelog
 
-### v1.4.1 - June 3, 2026 (Current version)
+### v1.4.2 - June 3, 2026 (Current version)
+
+- **Added**: `DEV.md` § 版本规划 (planned Git v1.5 / v1.6); project skill `.cursor/skills/cocos-mcp-versioning` (SemVer, Keep a Changelog, doc roles).
+- **Changed**: Released history in README; roadmap draft only in DEV; README links to version planning.
+- **Fixed**: MCP `initialize` `serverInfo.version` matches `package.json`; `package-lock.json` version fields aligned.
+
+**Planned (this Git repo, not shipped)**: v1.5 external tool registration, v1.6 panel UI — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
+
+### v1.4.1 - June 3, 2026
 
 Local workflow: `publish`, `deploy-mcp`, default port **28473**. See **[DEV.md](./DEV.md)** (Chinese).
 
