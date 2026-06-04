@@ -6,6 +6,7 @@ import * as path from 'path';
 export class ToolManager {
     private settings: ToolManagerSettings;
     private availableTools: ToolConfig[] = [];
+    private builtInTools: ToolConfig[] = [];
 
     constructor() {
         this.settings = this.readToolManagerSettings();
@@ -129,6 +130,7 @@ export class ToolManager {
                 });
             }
 
+            this.builtInTools = this.availableTools.map((tool) => ({ ...tool }));
             console.log(`[ToolManager] Initialized ${this.availableTools.length} tools from MCP server`);
         } catch (error) {
             console.error('[ToolManager] Failed to initialize tools from MCP server:', error);
@@ -232,7 +234,51 @@ export class ToolManager {
             });
         });
 
+        this.builtInTools = this.availableTools.map((tool) => ({ ...tool }));
         console.log(`[ToolManager] Initialized ${this.availableTools.length} default tools`);
+    }
+
+    /**
+     * Merge external MCP tools from registry into availableTools and active configuration.
+     */
+    public syncExternalToolsFromRegistry(
+        externalConfigs: { category: string; name: string; description: string }[]
+    ): void {
+        const externalTools: ToolConfig[] = externalConfigs.map((config) => ({
+            category: config.category,
+            name: config.name,
+            enabled: true,
+            description: config.description,
+        }));
+
+        this.availableTools = [...this.builtInTools, ...externalTools];
+
+        const externalKey = (c: { category: string; name: string }) => `${c.category}\0${c.name}`;
+        const externalKeySet = new Set(externalConfigs.map(externalKey));
+
+        for (const config of this.settings.configurations) {
+            config.tools = config.tools.filter((tool) => {
+                const isBuiltin = this.builtInTools.some(
+                    (b) => b.category === tool.category && b.name === tool.name
+                );
+                if (isBuiltin) {
+                    return true;
+                }
+                return externalKeySet.has(externalKey(tool));
+            });
+
+            for (const ext of externalTools) {
+                if (!config.tools.some((t) => t.category === ext.category && t.name === ext.name)) {
+                    config.tools.push({ ...ext });
+                }
+            }
+            config.updatedAt = new Date().toISOString();
+        }
+
+        this.saveSettings();
+        console.log(
+            `[ToolManager] Synced ${externalTools.length} external tool(s), ${this.availableTools.length} total available`
+        );
     }
 
     public getAvailableTools(): ToolConfig[] {

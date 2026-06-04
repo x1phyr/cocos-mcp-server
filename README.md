@@ -20,13 +20,21 @@
 
 ## 更新日志
 
-### v1.4.2 - 2026年6月3日（当前版本）
+### v1.5.0 - 2026年6月4日（当前版本）
 
-- **Added**：`DEV.md` § 版本规划（Git v1.5 / v1.6 草案）；项目 skill `.cursor/skills/cocos-mcp-versioning`（SemVer + Keep a Changelog + 文档分工）。
-- **Changed**：版本说明与更新日志分工（已发布 → README，规划 → DEV）；README 链到版本规划。
-- **Fixed**：MCP `initialize` 的 `serverInfo.version` 与 `package.json` 一致；`package-lock.json` 版本字段同步。
+- **Added**：其他 Cocos 扩展可通过 `Editor.Message` 向 MCP **动态注册/注销**工具（`mcp-register-tools` / `mcp-unregister-tools`）；`mcp-list-external-tools` 查询注册表；示例扩展 [examples/mcp-provider-demo](./examples/mcp-provider-demo)。
+- **Changed**：`tools/list` 与 `tools/call` 合并外部工具；`/health` 返回 `externalTools` / `externalProviders`；热注册无需重启 HTTP。
+- **Added**：`npm run test:registry` 注册表单元测试。
 
-**后续规划（本仓库 Git，未实现）**：v1.5 扩展注册 MCP 工具、v1.6 面板 UI — 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
+详见 **[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)**。
+
+**后续规划（未实现）**：v1.6 面板 UI — 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
+
+### v1.4.2 - 2026年6月3日
+
+- **Added**：版本规划文档与 `cocos-mcp-versioning` skill；`npm run review:version`。
+- **Changed**：已发布 changelog 与规划文档分工。
+- **Fixed**：`serverInfo.version` 与 `package.json` 同步。
 
 ### v1.4.1 - 2026年6月3日
 

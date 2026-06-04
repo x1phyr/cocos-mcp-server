@@ -17,6 +17,7 @@ import { SceneViewTools } from './tools/scene-view-tools';
 import { ReferenceImageTools } from './tools/reference-image-tools';
 import { AssetAdvancedTools } from './tools/asset-advanced-tools';
 import { ValidationTools } from './tools/validation-tools';
+import { ExternalToolRegistry, getExternalToolRegistry } from './registry/external-tool-registry';
 
 export class MCPServer {
     private settings: MCPServerSettings;
@@ -25,9 +26,11 @@ export class MCPServer {
     private tools: Record<string, any> = {};
     private toolsList: ToolDefinition[] = [];
     private enabledTools: any[] = []; // 存储启用的工具列表
+    private externalRegistry: ExternalToolRegistry;
 
-    constructor(settings: MCPServerSettings) {
+    constructor(settings: MCPServerSettings, externalRegistry?: ExternalToolRegistry) {
         this.settings = settings;
+        this.externalRegistry = externalRegistry ?? getExternalToolRegistry();
         this.initializeTools();
     }
 
@@ -91,39 +94,43 @@ export class MCPServer {
 
     private setupTools(): void {
         this.toolsList = [];
-        
-        // 如果没有启用工具配置，返回所有工具
-        if (!this.enabledTools || this.enabledTools.length === 0) {
-            for (const [category, toolSet] of Object.entries(this.tools)) {
-                const tools = toolSet.getTools();
-                for (const tool of tools) {
-                    this.toolsList.push({
-                        name: `${category}_${tool.name}`,
-                        description: tool.description,
-                        inputSchema: tool.inputSchema
-                    });
-                }
+        const enabledToolNames =
+            this.enabledTools && this.enabledTools.length > 0
+                ? new Set(this.enabledTools.map((tool) => `${tool.category}_${tool.name}`))
+                : null;
+
+        const appendTool = (def: ToolDefinition) => {
+            if (!enabledToolNames || enabledToolNames.has(def.name)) {
+                this.toolsList.push(def);
             }
-        } else {
-            // 根据启用的工具配置过滤
-            const enabledToolNames = new Set(this.enabledTools.map(tool => `${tool.category}_${tool.name}`));
-            
-            for (const [category, toolSet] of Object.entries(this.tools)) {
-                const tools = toolSet.getTools();
-                for (const tool of tools) {
-                    const toolName = `${category}_${tool.name}`;
-                    if (enabledToolNames.has(toolName)) {
-                        this.toolsList.push({
-                            name: toolName,
-                            description: tool.description,
-                            inputSchema: tool.inputSchema
-                        });
-                    }
-                }
+        };
+
+        for (const [category, toolSet] of Object.entries(this.tools)) {
+            const tools = toolSet.getTools();
+            for (const tool of tools) {
+                appendTool({
+                    name: `${category}_${tool.name}`,
+                    description: tool.description,
+                    inputSchema: tool.inputSchema,
+                });
             }
         }
-        
-        console.log(`[MCPServer] Setup tools: ${this.toolsList.length} tools available`);
+
+        for (const externalTool of this.externalRegistry.getMcpToolDefinitions()) {
+            appendTool(externalTool);
+        }
+
+        console.log(
+            `[MCPServer] Setup tools: ${this.toolsList.length} tools available (${this.externalRegistry.getMcpToolDefinitions().length} external)`
+        );
+    }
+
+    public refreshToolList(): void {
+        this.setupTools();
+    }
+
+    public getExternalRegistry(): ExternalToolRegistry {
+        return this.externalRegistry;
     }
 
     public getFilteredTools(enabledTools: any[]): ToolDefinition[] {
@@ -136,14 +143,18 @@ export class MCPServer {
     }
 
     public async executeToolCall(toolName: string, args: any): Promise<any> {
+        if (this.externalRegistry.resolveFullToolName(toolName)) {
+            return await this.externalRegistry.invokeExternalTool(toolName, args);
+        }
+
         const parts = toolName.split('_');
         const category = parts[0];
         const toolMethodName = parts.slice(1).join('_');
-        
+
         if (this.tools[category]) {
             return await this.tools[category].execute(toolMethodName, args);
         }
-        
+
         throw new Error(`Tool ${toolName} not found`);
     }
 
@@ -184,8 +195,17 @@ export class MCPServer {
             if (pathname === '/mcp' && req.method === 'POST') {
                 await this.handleMCPRequest(req, res);
             } else if (pathname === '/health' && req.method === 'GET') {
+                const externalCount = this.externalRegistry.getMcpToolDefinitions().length;
                 res.writeHead(200);
-                res.end(JSON.stringify({ status: 'ok', tools: this.toolsList.length }));
+                res.end(
+                    JSON.stringify({
+                        status: 'ok',
+                        version: PACKAGE_VERSION,
+                        tools: this.toolsList.length,
+                        externalTools: externalCount,
+                        externalProviders: this.externalRegistry.listProviders().length,
+                    })
+                );
             } else if (pathname?.startsWith('/api/') && req.method === 'POST') {
                 await this.handleSimpleAPIRequest(req, res, pathname);
             } else if (pathname === '/api/tools' && req.method === 'GET') {

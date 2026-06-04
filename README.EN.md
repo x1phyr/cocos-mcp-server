@@ -21,13 +21,21 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Changelog
 
-### v1.4.2 - June 3, 2026 (Current version)
+### v1.5.0 - June 4, 2026 (Current version)
 
-- **Added**: `DEV.md` § 版本规划 (planned Git v1.5 / v1.6); project skill `.cursor/skills/cocos-mcp-versioning` (SemVer, Keep a Changelog, doc roles).
-- **Changed**: Released history in README; roadmap draft only in DEV; README links to version planning.
-- **Fixed**: MCP `initialize` `serverInfo.version` matches `package.json`; `package-lock.json` version fields aligned.
+- **Added**: Other Cocos extensions can **register/unregister** MCP tools at runtime via `mcp-register-tools` / `mcp-unregister-tools`; `mcp-list-external-tools`; demo at [examples/mcp-provider-demo](./examples/mcp-provider-demo).
+- **Changed**: `tools/list` and `tools/call` include external tools; `/health` reports `externalTools` and `externalProviders`; hot registration without HTTP restart.
+- **Added**: `npm run test:registry` unit tests for the registry.
 
-**Planned (this Git repo, not shipped)**: v1.5 external tool registration, v1.6 panel UI — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
+See **[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)** (Chinese).
+
+**Planned (not shipped)**: v1.6 panel UI — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
+
+### v1.4.2 - June 3, 2026
+
+- **Added**: Version planning in DEV; `cocos-mcp-versioning` skill; `npm run review:version`.
+- **Changed**: Changelog vs roadmap doc split.
+- **Fixed**: `serverInfo.version` aligned with `package.json`.
 
 ### v1.4.1 - June 3, 2026
 

@@ -13,6 +13,7 @@ const PUBLISH_IGNORE = new Set([
     'local.env.json.example',
     'local.env.project.example.json',
     'DEV.md',
+    'examples',
 ]);
 
 function shouldPublish(relPath) {

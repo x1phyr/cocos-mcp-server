@@ -1485,6 +1485,18 @@ Cocos Creator 使用 `db://` 前缀的资源URL格式：
 
 ---
 
+## 第三方扩展 MCP 工具（v1.5.0+）
+
+其他 Cocos 扩展可向 `cocos-mcp-server` 注册工具，命名规则与内置一致：`{namespace}_{toolName}`。
+
+1. 在提供方扩展的 `load` 中调用 `Editor.Message.request('cocos-mcp-server', 'mcp-register-tools', { providerId, invokeMessage, tools })`。
+2. 在 `invokeMessage` 绑定的 method 中处理 `{ tool, args }` 并返回 `{ success, data?, error? }`。
+3. `unload` 时调用 `mcp-unregister-tools`。
+
+完整说明与示例：[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)、[examples/mcp-provider-demo](./examples/mcp-provider-demo)。
+
+---
+
 ## 技术支持
 
 如果您在使用过程中遇到问题，可以：
@@ -1496,4 +1508,4 @@ Cocos Creator 使用 `db://` 前缀的资源URL格式：
 
 ---
 
-*此文档基于 Cocos Creator MCP 服务器 v1.3.0 编写，如有更新请参考最新版本文档。*
+*此文档基于 Cocos Creator MCP 服务器 v1.5.0 编写，如有更新请参考最新版本文档。*

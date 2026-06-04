@@ -2,7 +2,7 @@
     "$schema": "./@types/schema/package/index.json",
     "package_version": 2,
     "name": "cocos-mcp-server",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "mcpDefaultPort": 28473,
     "author": "LiDaxian",
     "editor": ">=3.8.6",
@@ -13,7 +13,8 @@
         "publish": "npm run build && node ./scripts/publish.js",
         "deploy-mcp": "node ./scripts/deploy-mcp.js",
         "check:identity": "node ./scripts/check-identity-keywords.js",
-        "review:version": "node ./scripts/review-version.js"
+        "review:version": "node ./scripts/review-version.js",
+        "test:registry": "npm run build && node ./scripts/test-external-registry.js"
     },
     "description": "i18n:cocos-mcp-server.description",
     "main": "./dist/main.js",
@@ -140,6 +141,21 @@
             "getEnabledTools": {
                 "methods": [
                     "getEnabledTools"
+                ]
+            },
+            "mcp-register-tools": {
+                "methods": [
+                    "registerExternalTools"
+                ]
+            },
+            "mcp-unregister-tools": {
+                "methods": [
+                    "unregisterExternalTools"
+                ]
+            },
+            "mcp-list-external-tools": {
+                "methods": [
+                    "listExternalTools"
                 ]
             }
         },

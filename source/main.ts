@@ -2,9 +2,35 @@ import { MCPServer } from './mcp-server';
 import { readSettings, saveSettings } from './settings';
 import { MCPServerSettings } from './types';
 import { ToolManager } from './tools/tool-manager';
+import {
+    getExternalToolRegistry,
+    RegisterExternalToolsPayload,
+    RegisterResult,
+} from './registry/external-tool-registry';
 
 let mcpServer: MCPServer | null = null;
 let toolManager: ToolManager;
+
+function notifyToolsChanged(): void {
+    const broadcast = (Editor.Message as { broadcast?: (name: string, ...args: unknown[]) => void })
+        .broadcast;
+    if (typeof broadcast === 'function') {
+        broadcast.call(Editor.Message, 'mcp-tools-changed');
+    }
+}
+
+function applyExternalRegistryChange(): void {
+    const registry = getExternalToolRegistry();
+    if (toolManager) {
+        toolManager.syncExternalToolsFromRegistry(registry.getToolConfigsForManager());
+    }
+    if (mcpServer) {
+        const enabledTools = toolManager.getEnabledTools();
+        mcpServer.updateEnabledTools(enabledTools);
+        mcpServer.refreshToolList();
+    }
+    notifyToolsChanged();
+}
 
 /**
  * @en Registration method for the main process of Extension
@@ -214,7 +240,50 @@ export const methods: { [key: string]: (...any: any) => any } = {
 
     async getEnabledTools() {
         return toolManager.getEnabledTools();
-    }
+    },
+
+    /**
+     * @en Register external MCP tools from another extension
+     * @zh 注册其他扩展提供的 MCP 工具
+     */
+    registerExternalTools(payload: RegisterExternalToolsPayload): RegisterResult {
+        const registry = getExternalToolRegistry();
+        const result = registry.register(payload);
+        if (result.success) {
+            applyExternalRegistryChange();
+        }
+        return result;
+    },
+
+    /**
+     * @en Unregister all tools from an external provider
+     * @zh 注销外部扩展的全部工具
+     */
+    unregisterExternalTools(payload: { providerId: string }): { success: boolean; removed: boolean } {
+        if (!payload?.providerId) {
+            return { success: false, removed: false };
+        }
+        const removed = getExternalToolRegistry().unregister(payload.providerId);
+        if (removed) {
+            applyExternalRegistryChange();
+        }
+        return { success: true, removed };
+    },
+
+    /**
+     * @en List registered external tool providers
+     * @zh 列出已注册的外部工具提供方
+     */
+    listExternalTools(): {
+        providers: ReturnType<typeof getExternalToolRegistry.prototype.listProviders>;
+        tools: ReturnType<typeof getExternalToolRegistry.prototype.getMcpToolDefinitions>;
+    } {
+        const registry = getExternalToolRegistry();
+        return {
+            providers: registry.listProviders(),
+            tools: registry.getMcpToolDefinitions(),
+        };
+    },
 };
 
 /**

@@ -1,6 +1,6 @@
 # 开发指南
 
-**v1.4.2**
+**v1.5.0**
 
 ## 文档
 
@@ -119,6 +119,7 @@ Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 
 | `npm run watch` | 开发仓库 | 监听编译 |
 | `npm run publish` | 开发仓库 | `build` + 同步到 Cocos 扩展目录 |
 | `npm run deploy-mcp` | 开发仓库 **或** `extensions/cocos-mcp-server` | 写入 AI 客户端 MCP 配置 |
+| `npm run test:registry` | 开发仓库 | 外部工具注册表单元测试（无需 Creator） |
 
 ---
 
@@ -180,6 +181,54 @@ Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 
 
 ---
 
+## 第三方扩展接入
+
+其他 Cocos 扩展可在运行时向本插件注册 MCP 工具，无需改 `cocos-mcp-server` 源码。
+
+### 消息（`package.json` → `contributions.messages`）
+
+| Message | 方法 | 说明 |
+|---------|------|------|
+| `mcp-register-tools` | `registerExternalTools` | 注册或覆盖工具 |
+| `mcp-unregister-tools` | `unregisterExternalTools` | 按 `providerId` 注销 |
+| `mcp-list-external-tools` | `listExternalTools` | 查询注册表 |
+
+### 注册示例
+
+```ts
+Editor.Message.request('cocos-mcp-server', 'mcp-register-tools', {
+  providerId: 'my-game-tools',      // 建议与扩展 name 一致
+  invokeMessage: 'my-mcp-invoke',     // 本扩展 contributions.messages 中的 message
+  tools: [
+    {
+      name: 'hello',
+      description: '示例工具',
+      inputSchema: { type: 'object', properties: { name: { type: 'string' } } },
+    },
+  ],
+});
+```
+
+提供方在 `invokeMessage` 对应 method 中处理 `{ tool, args }`，返回 `{ success, data?, error? }`（同内置 `ToolResponse`）。
+
+### 工具命名
+
+- AI 可见全名：`{namespace}_{toolName}`，默认 `namespace === providerId`。
+- `namespace` 不得与内置 category（`scene`、`node` 等）冲突。
+- 同一 `providerId` 再次注册会**覆盖**旧工具列表。
+
+### 示例扩展
+
+将 [examples/mcp-provider-demo](./examples/mcp-provider-demo) 复制到工程的 `extensions/`，与 `cocos-mcp-server` 一并启用。注册后可用 MCP 调用 `mcp-provider-demo_hello`。
+
+### 测试
+
+```bash
+npm run test:registry
+```
+
+---
+
 ## 版本说明
 
 维护本仓库版本号与更新日志时，须遵循项目 skill：**[.cursor/skills/cocos-mcp-versioning/SKILL.md](.cursor/skills/cocos-mcp-versioning/SKILL.md)**（SemVer + Keep a Changelog + 下文分工）。
@@ -188,141 +237,29 @@ Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 
 
 | 文档 | 内容 |
 |------|------|
-| [README.md § 更新日志](./README.md#更新日志) | **已发布**版本全文（v1.4.2、v1.4.1、v1.4.0…及 Cocos 商城说明） |
-| 下文 [§ 版本规划](#版本规划) | **本仓库 Git 下一版**草案（v1.5 / v1.6，未实现） |
+| [README.md § 更新日志](./README.md#更新日志) | **已发布**版本全文（v1.5.0、v1.4.x…及 Cocos 商城说明） |
+| 下文 [§ 版本规划](#版本规划) | **未发布**功能草案（当前仅 v1.6） |
 
-**本仓库 Git 当前**：v1.4.2（`package.json` 的 `version` 字段）。
+**本仓库 Git 当前**：v1.5.0（`package.json` 的 `version` 字段）。
 
-> **版本号勿混用**：README 里「商城 v1.5.0（2024-07）」是 Cocos 商店渠道的大版本（50 工具重构等）；下文 **v1.5.0** 指本仓库**下一功能迭代**（扩展注册 MCP 工具），二者无关。
+> **版本号勿混用**：README 里「商城 v1.5.0（2024-07）」是 Cocos 商店渠道大版本；本仓库 **Git v1.5.0** 为扩展注册 MCP 工具，二者无关。
 
 ---
 
 ## 版本规划
 
-以下为目标与接口**草案**，实现时可能调整命名与字段。
-
 ### 总览
 
 ```mermaid
 flowchart LR
-  A[v1.4.2 当前] --> B[v1.5 外部扩展注册工具]
-  B --> C[v1.6 UI 优化]
-  B --> D[示例扩展 + 接入文档]
-  C --> E[面板展示外部工具来源]
+  A[v1.5.0 已发布] --> B[v1.6 UI 优化]
+  B --> C[面板展示外部工具来源]
 ```
 
 | 版本 | 主题 | 状态 |
 |------|------|------|
-| **v1.5.0** | 其他 Cocos 扩展通过 `Editor.Message` 向 MCP 注册工具 | 规划中 |
-| **v1.6.0** | Creator 面板 UI 优化（含外部工具展示） | 规划中，依赖 v1.5 |
-
-### v1.5.0 — 扩展动态注册 MCP 工具
-
-**目标**
-
-- 任意已启用的 Cocos 扩展可在运行时向 `cocos-mcp-server` **注册 / 注销** MCP 工具元数据。
-- MCP HTTP 的 `tools/list`、`tools/call`（及 `/api/...`）能列出并**转发调用**到提供方扩展。
-- 服务运行中热注册，**无需**重启 HTTP 服务。
-- 与现有内置工具命名规则一致：`{namespace}_{toolName}`。
-
-**现状（v1.4.2）**
-
-- 工具在 `MCPServer.initializeTools()` 中硬编码为 14 个 `*Tools` 类。
-- `executeToolCall` 按 `category` 前缀路由到 `this.tools[category].execute()`。
-- `broadcast-tools` 仅用于监听 Creator 广播，**不是**扩展间工具注册。
-
-**架构（规划）**
-
-```
-第三方扩展                    cocos-mcp-server (主进程)
-    │                              │
-    │  Editor.Message.request      │
-    │  ('cocos-mcp-server',        │
-    │   'mcp-register-tools', ...) │
-    ├─────────────────────────────►│ ExternalToolRegistry
-    │                              │        │
-    │                              │        ▼
-    │                              │ MCPServer.setupTools()
-    │                              │   内置 tools + 外部 tools
-    │                              │
-AI ──HTTP tools/call──────────────►│ executeToolCall
-    │                              │   ├─ 内置 → *Tools.execute
-    │                              │   └─ 外部 → Editor.Message.request
-    │                              │         (providerId, invokeMessage, ...)
-    │◄─────────────────────────────┤
-    │  Editor.Message.request      │
-    │  (providerId, invokeMessage) │
-    ◄──────────────────────────────┤
-```
-
-**消息协议（草案）**
-
-在 `cocos-mcp-server` 的 `package.json` → `contributions.messages` 中新增（名称以实现为准）：
-
-| Message | 调用方 | 说明 |
-|---------|--------|------|
-| `mcp-register-tools` | 第三方扩展 | 注册或覆盖一批工具 |
-| `mcp-unregister-tools` | 第三方扩展 | 按 `providerId` 注销 |
-| `mcp-list-external-tools` | 面板 / 调试 | 查询当前外部注册表 |
-| `mcp-tools-changed`（可选） | MCP → 广播 | 注册表变更，供面板刷新 |
-
-注册参数 `mcp-register-tools`：
-
-```ts
-interface RegisterExternalToolsPayload {
-  providerId: string;       // 扩展 package name，全局唯一
-  namespace?: string;       // 默认 = providerId；不得与内置 category 冲突
-  invokeMessage: string;    // 提供方扩展内用于执行的 message
-  tools: Array<{
-    name: string;
-    description: string;
-    inputSchema: object;
-  }>;
-}
-```
-
-注销：`{ providerId: string }`。执行转发由 MCP 发起：`Editor.Message.request(providerId, invokeMessage, { tool, args })`，返回形状同 `source/types/index.ts` 的 `ToolResponse`。
-
-**命名与冲突**
-
-| 规则 | 说明 |
-|------|------|
-| 默认 `namespace` | 等于 `providerId` |
-| 重复注册 | 同一 `providerId` 覆盖（幂等） |
-| 卸载 | 扩展 disable 或 `mcp-unregister-tools` |
-
-**第三方扩展示例（草案）**
-
-```json
-{
-  "name": "my-game-tools",
-  "contributions": {
-    "messages": {
-      "my-mcp-invoke": { "methods": ["invokeMcpTool"] }
-    }
-  }
-}
-```
-
-```ts
-// load
-Editor.Message.request('cocos-mcp-server', 'mcp-register-tools', {
-  providerId: 'my-game-tools',
-  invokeMessage: 'my-mcp-invoke',
-  tools: [{ name: 'hello', description: '示例', inputSchema: { type: 'object', properties: {} } }],
-});
-
-// unload
-Editor.Message.request('cocos-mcp-server', 'mcp-unregister-tools', { providerId: 'my-game-tools' });
-```
-
-AI 可见工具名：`my-game-tools_hello`（`namespace` 省略时）。
-
-**计划改动**：`external-tool-registry.ts`、`mcp-server.ts`、`main.ts`、`package.json` messages、`tool-manager.ts`；v1.5 落地后在 `FEATURE_GUIDE_CN.md` 补「第三方接入」。
-
-**建议 PR**：PR-A Registry + 路由；PR-B ToolManager + 示例文档。
-
-**验收**：注册后 `tools/list` 含外部工具；`tools/call` 可转发；热注册无需重启 HTTP；`npm run check:identity` 通过。
+| **v1.5.0** | 外部扩展注册 MCP 工具 | 已发布（见 [§ 第三方扩展接入](#第三方扩展接入)） |
+| **v1.6.0** | Creator 面板 UI 优化（含外部工具展示） | 规划中 |
 
 ### v1.6.0 — UI 优化
 
@@ -335,4 +272,4 @@ AI 可见工具名：`my-game-tools_hello`（`namespace` 省略时）。
 
 **技术项**：拆分 `panels/default/index.ts`；订阅 `mcp-tools-changed` 减少轮询。
 
-**English (planned)**：v1.5 — extensions register tools via `mcp-register-tools` / `mcp-unregister-tools`; v1.6 — panel UX. Unrelated to Cocos Store v1.5.0 in README.
+**English (planned)**：v1.6 — panel UX for built-in vs external tools. Git v1.5.0 (external registration) is shipped; unrelated to Cocos Store v1.5.0 in README.
