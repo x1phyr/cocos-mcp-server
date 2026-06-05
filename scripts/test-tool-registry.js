@@ -75,7 +75,7 @@ async function main() {
         assert.ok(err && err.includes('built-in'));
     });
 
-    test('ToolRegistry sync and invoke', async () => {
+    await testAsync('ToolRegistry sync and invoke', async () => {
         const registry = new ToolRegistry(async (providerId, shortName) => {
             assert.strictEqual(providerId, 'mock-provider');
             assert.strictEqual(shortName, 'ping');
@@ -102,7 +102,7 @@ async function main() {
         assert.strictEqual(registry.getMcpToolDefinitions().length, 0);
     });
 
-    test('CapabilityManager builtin mock plugin', async () => {
+    await testAsync('CapabilityManager builtin mock plugin', async () => {
         const manager = new CapabilityManager();
         const plugin = createMockPlugin(
             'cocos-builtin-mock',

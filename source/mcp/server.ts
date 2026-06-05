@@ -13,6 +13,8 @@ export class MCPServer {
     private activeConnections = 0;
     private toolsList: ToolDefinition[] = [];
     private enabledTools: any[] = [];
+    /** True after ToolManager sync; empty enabledTools then means block all, not allow all. */
+    private enabledToolsConfigured = false;
     private capabilityManager: CapabilityManager;
 
     constructor(settings: MCPServerSettings, capabilityManager: CapabilityManager) {
@@ -60,13 +62,10 @@ export class MCPServer {
 
     private setupTools(): void {
         this.toolsList = [];
-        const enabledToolNames =
-            this.enabledTools && this.enabledTools.length > 0
-                ? new Set(this.enabledTools.map((tool) => `${tool.category}_${tool.name}`))
-                : null;
+        const enabledToolNames = this.getEnabledToolNameSet();
 
         const appendTool = (def: ToolDefinition) => {
-            if (!enabledToolNames || enabledToolNames.has(def.name)) {
+            if (enabledToolNames === null || enabledToolNames.has(def.name)) {
                 this.toolsList.push(def);
             }
         };
@@ -85,9 +84,12 @@ export class MCPServer {
         this.setupTools();
     }
 
-    public getFilteredTools(enabledTools: any[]): ToolDefinition[] {
-        if (!enabledTools || enabledTools.length === 0) {
+    public getFilteredTools(enabledTools: any[], configured = true): ToolDefinition[] {
+        if (!configured) {
             return this.toolsList;
+        }
+        if (!enabledTools || enabledTools.length === 0) {
+            return [];
         }
 
         const enabledToolNames = new Set(enabledTools.map((tool) => `${tool.category}_${tool.name}`));
@@ -102,7 +104,7 @@ export class MCPServer {
     }
 
     private getEnabledToolNameSet(): Set<string> | null {
-        if (!this.enabledTools || this.enabledTools.length === 0) {
+        if (!this.enabledToolsConfigured) {
             return null;
         }
         return new Set(this.enabledTools.map((tool) => `${tool.category}_${tool.name}`));
@@ -110,7 +112,7 @@ export class MCPServer {
 
     private isToolEnabled(fullName: string): boolean {
         const enabledSet = this.getEnabledToolNameSet();
-        if (!enabledSet) {
+        if (enabledSet === null) {
             return true;
         }
         return enabledSet.has(fullName);
@@ -126,6 +128,7 @@ export class MCPServer {
     public updateEnabledTools(enabledTools: any[]): void {
         console.log(`[MCPServer] Updating enabled tools: ${enabledTools.length} tools`);
         this.enabledTools = enabledTools;
+        this.enabledToolsConfigured = true;
         this.setupTools();
     }
 
@@ -223,12 +226,6 @@ export class MCPServer {
             }
             res.writeHead(200);
             res.end();
-            return;
-        }
-
-        if (req.headers.origin && !this.isOriginAllowed(req.headers.origin)) {
-            res.writeHead(403);
-            res.end(JSON.stringify({ error: 'Origin not allowed' }));
             return;
         }
 

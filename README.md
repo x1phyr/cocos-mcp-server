@@ -21,13 +21,20 @@
 
 ## 更新日志
 
-### v1.7.3 - 2026年6月5日（当前版本）
+### v1.7.4 - 2026年6月5日（当前版本）
+
+- **Fixed**：Tool Manager 全部禁用工具后 MCP 仍暴露/可调用所有工具（空列表不再视为「无过滤」）。
+- **Fixed**：外部工具 re-sync 时保留用户已保存的 `enabled` 状态。
+- **Fixed**：`test-tool-registry` 中 async 用例改为 `testAsync`，避免假通过。
+- **Fixed**：MCP HTTP handler 重复的 Origin 检查。
+
+**后续规划（未实现）**：v1.8 工具热更新（`tools/list_changed`）— 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
+
+### v1.7.3 - 2026年6月5日
 
 - **Added**：默认面板启停 loading、端口/连接数校验与保存反馈；内置/外部工具分区展示与外部 provider 摘要。
 - **Changed**：面板订阅 `mcp-tools-changed` 刷新工具列表；服务器状态轮询仅在服务器页且非 processing 时进行。
 - **Fixed**：面板保存设置时 `enableDebugLog` 字段映射错误。
-
-**后续规划（未实现）**：v1.8 工具热更新（`tools/list_changed`）— 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
 
 ### v1.7.2 - 2026年6月5日
 

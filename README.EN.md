@@ -22,13 +22,20 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Changelog
 
-### v1.7.3 - June 5, 2026 (Current version)
+### v1.7.4 - June 5, 2026 (Current version)
+
+- **Fixed**: Disabling all tools in Tool Manager no longer exposes every tool on MCP (`[]` is block-all, not allow-all).
+- **Fixed**: External tool re-sync preserves saved `enabled` flags in configurations.
+- **Fixed**: Async cases in `test-tool-registry` use `testAsync` so assertions actually run.
+- **Fixed**: Removed duplicate Origin check in the MCP HTTP handler.
+
+**Planned (not shipped)**: v1.8 tool hot-reload (`tools/list_changed`) — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
+
+### v1.7.3 - June 5, 2026
 
 - **Added**: Default panel start/stop loading, port/connection validation with save feedback, and built-in vs external tool sections with provider summary.
 - **Changed**: Panel listens for `mcp-tools-changed` to refresh tools; status polling runs on the server tab only when idle.
 - **Fixed**: Panel save settings now maps `enableDebugLog` correctly.
-
-**Planned (not shipped)**: v1.8 tool hot-reload (`tools/list_changed`) — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
 
 ### v1.7.2 - June 5, 2026
 

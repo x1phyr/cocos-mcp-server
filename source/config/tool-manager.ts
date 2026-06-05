@@ -159,17 +159,37 @@ export class ToolManager {
     public syncExternalToolsFromRegistry(
         externalConfigs: { category: string; name: string; description: string }[]
     ): void {
+        const toolKey = (c: { category: string; name: string }) => `${c.category}\0${c.name}`;
+        const previousExternalKeys = new Set(
+            this.availableTools
+                .filter(
+                    (tool) =>
+                        !this.builtInTools.some(
+                            (b) => b.category === tool.category && b.name === tool.name
+                        )
+                )
+                .map(toolKey)
+        );
+        const enabledByKey = new Map<string, boolean>();
+
+        for (const config of this.settings.configurations) {
+            for (const tool of config.tools) {
+                if (previousExternalKeys.has(toolKey(tool))) {
+                    enabledByKey.set(toolKey(tool), tool.enabled);
+                }
+            }
+        }
+
         const externalTools: ToolConfig[] = externalConfigs.map((config) => ({
             category: config.category,
             name: config.name,
-            enabled: true,
+            enabled: enabledByKey.get(toolKey(config)) ?? true,
             description: config.description,
         }));
 
         this.availableTools = [...this.builtInTools, ...externalTools];
 
-        const externalKey = (c: { category: string; name: string }) => `${c.category}\0${c.name}`;
-        const externalKeySet = new Set(externalConfigs.map(externalKey));
+        const externalKeySet = new Set(externalConfigs.map(toolKey));
 
         for (const config of this.settings.configurations) {
             config.tools = config.tools.filter((tool) => {
@@ -179,7 +199,7 @@ export class ToolManager {
                 if (isBuiltin) {
                     return true;
                 }
-                return externalKeySet.has(externalKey(tool));
+                return externalKeySet.has(toolKey(tool));
             });
 
             for (const ext of externalTools) {
