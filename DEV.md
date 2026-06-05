@@ -373,7 +373,7 @@ AI  tools/call("scene_get_scene_hierarchy", args)
 | 文档 | 内容 |
 |------|------|
 | [README.md § 更新日志](./README.md#更新日志) | **已发布**版本全文（v1.5.0、v1.4.x…及 Cocos 商城说明） |
-| 下文 [§ 版本规划](#版本规划) | **未发布**功能草案（当前仅 v1.6） |
+| 下文 [§ 版本规划](#版本规划) | **未发布**功能草案（当前仅 v1.8） |
 
 **本仓库 Git 当前**：v1.7.3（`package.json` 的 `version` 字段）。
 
@@ -387,33 +387,34 @@ AI  tools/call("scene_get_scene_hierarchy", args)
 
 ```mermaid
 flowchart LR
-  A[v1.5.0 已发布] --> B[v1.7 在线能力提供者]
-  B --> C[v1.6 面板 UI]
-  B --> D[v1.8 工具热更新]
+  A[v1.5.0 已发布] --> B[v1.7 Bridge]
+  B --> C[v1.7.3 面板 P0 已交付]
+  C --> D[v1.8 工具热更新 规划中]
 ```
 
 | 版本 | 主题 | 状态 |
 |------|------|------|
 | **v1.5.0** | 外部扩展注册 MCP 工具 | 已发布（见 [§ 第三方扩展接入](#第三方扩展接入)） |
 | **v1.7.0** | 在线能力提供者（进程内架构重构） | 已发布（见 [§ 架构：在线能力提供者](#架构在线能力提供者)） |
+| **v1.7.1** | Registry/MCP 原子 sync 与 invoke 契约 | 已发布（见 README 更新日志） |
 | **v1.7.2** | registry/面板/MCP 安全与契约修复 | 已发布（见 README 更新日志） |
 | **v1.7.3** | 默认面板 UI（启停 loading、校验、内置/外部区分） | 已发布（见 README 更新日志） |
 | **v1.8.0** | `tools/list_changed` 与状态探针工具 | 规划中（可选） |
 
 > 与 Cocos 商城「v1.5.0（2024-07）」无关；Git 版本以 `package.json` 为准。
 
-### v1.6.0 — 面板 UI 优化（规划代号，已于 v1.7.3 交付 P0）
+### 面板 UI（历史规划代号 v1.6 → 已于 v1.7.3 交付 P0）
 
 **目标**：面板更易用；清晰区分内置 / 外部工具（依赖 v1.5）。
 
-| P0 | P1 | P2 |
-|----|----|----|
-| 运行状态、启停 loading ✅ | 工具搜索 / 分类全选 | 外部工具按 `providerId` 分组 |
-| 端口校验与保存反馈 ✅ | 启用数统计 ✅ | 错误提示、主题间距 |
+| 优先级 | 项 | 状态 |
+|--------|-----|------|
+| P0 | 运行状态、启停 loading；端口校验与保存反馈 | ✅ v1.7.3 |
+| P0 | 内置/外部分区、外部 provider 摘要；`mcp-tools-changed` 刷新 | ✅ v1.7.3 |
+| P1 | 工具搜索 / 分类全选；启用数统计 | 未交付（后续 patch 或 v1.8 前） |
+| P2 | 外部工具按 `providerId` 分组；错误提示、主题间距 | 未交付 |
 
-**技术项**：拆分 `panel/default/index.ts`；订阅 `mcp-tools-changed` 减少轮询。
-
-**可并行**：与 v1.7 无硬依赖，可与 Phase 1 并行开发。
+> **版本号说明**：内部曾用「v1.6」指面板 UX 迭代；SemVer 上 P0 以 **v1.7.3** 发布，与 Git v1.6.x 无对应 tag。
 
 ### v1.8.0 — 工具热更新（可选）
 
@@ -425,4 +426,4 @@ flowchart LR
 | 工具 | `server_status` 或新增探针：当前 `providerId`、工程路径、在线工具数 |
 | 前置 | v1.7 `ToolRegistry` 在 sync/remove 时触发 notifier |
 
-**English (planned)**：v1.7 — in-process Online Capability Provider; v1.6 — panel UX. Git releases unrelated to Cocos Store v1.5.0 in README.
+**English**：Shipped — v1.7.x Capability Bridge; v1.7.3 default panel P0. Planned — v1.8 tool hot-reload. Git releases unrelated to Cocos Store v1.5.0 in README.

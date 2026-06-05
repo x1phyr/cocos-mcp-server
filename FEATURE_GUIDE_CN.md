@@ -1508,4 +1508,4 @@ Cocos Creator 使用 `db://` 前缀的资源URL格式：
 
 ---
 
-*此文档基于 Cocos Creator MCP 服务器 v1.5.0 编写，如有更新请参考最新版本文档。*
+*此文档基于 Cocos Creator MCP 服务器 v1.7.3 编写，如有更新请参考 [README 更新日志](./README.md#更新日志)。*

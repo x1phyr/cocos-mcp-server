@@ -28,6 +28,8 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 - **Changed**: Panel listens for `mcp-tools-changed` to refresh tools; status polling runs on the server tab only when idle.
 - **Fixed**: Panel save settings now maps `enableDebugLog` correctly.
 
+**Planned (not shipped)**: v1.8 tool hot-reload (`tools/list_changed`) — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
+
 ### v1.7.2 - June 5, 2026
 
 - **Fixed**: Block external extensions from using `cocos-builtin-*` provider IDs; enforce enabled-tool checks on `tools/call` and Simple API.
@@ -50,8 +52,6 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 - **Changed**: `/health` includes a `providers` list; extension `unload` / `stopServer` clear the runtime registry; `ToolManager` receives built-in tool metadata from the Bridge.
 
 See **[DEV.md § 架构：在线能力提供者](./DEV.md#架构在线能力提供者)** (Chinese). Third-party APIs (`mcp-register-tools`, etc.) are unchanged.
-
-**Planned (not shipped)**: v1.6 panel UI, v1.8 tool hot-reload — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
 
 ### v1.5.0 - June 4, 2026
 

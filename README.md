@@ -27,6 +27,8 @@
 - **Changed**：面板订阅 `mcp-tools-changed` 刷新工具列表；服务器状态轮询仅在服务器页且非 processing 时进行。
 - **Fixed**：面板保存设置时 `enableDebugLog` 字段映射错误。
 
+**后续规划（未实现）**：v1.8 工具热更新（`tools/list_changed`）— 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
+
 ### v1.7.2 - 2026年6月5日
 
 - **Fixed**：禁止外部扩展占用 `cocos-builtin-*` providerId；`tools/call` 与 Simple API 校验工具启用状态。
@@ -49,8 +51,6 @@
 - **Changed**：`/health` 增加 `providers` 列表；扩展 `unload` / `stopServer` 清理运行时注册表；`ToolManager` 从 Bridge 注入内置工具元数据。
 
 详见 **[DEV.md § 架构：在线能力提供者](./DEV.md#架构在线能力提供者)**。第三方扩展 API（`mcp-register-tools` 等）不变。
-
-**后续规划（未实现）**：v1.6 面板 UI、v1.8 工具热更新 — 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
 
 ### v1.5.0 - 2026年6月4日
 
