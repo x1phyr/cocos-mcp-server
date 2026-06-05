@@ -140,8 +140,9 @@
                                 <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">EXT</span>
                             </h5>
                             <div class="category-controls" @click.stop>
-                                <ui-button @click="toggleCategoryTools(category, true)" class="small">全选</ui-button>
-                                <ui-button @click="toggleCategoryTools(category, false)" class="small">取消</ui-button>
+                                <span class="category-toggle-link" @click="toggleCategoryTools(category, true)">全选</span>
+                                <span class="category-toggle-divider">|</span>
+                                <span class="category-toggle-link" @click="toggleCategoryTools(category, false)">清空</span>
                             </div>
                         </div>
                         <div class="tool-items" v-show="!isCategoryCollapsed(category)">

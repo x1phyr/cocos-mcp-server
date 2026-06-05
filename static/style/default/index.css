@@ -599,7 +599,27 @@ ui-prop {
 
 .category-controls {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 6px;
+}
+
+.category-toggle-link {
+    font-size: 11px;
+    color: var(--mcp-text-tertiary);
+    cursor: pointer;
+    transition: color var(--mcp-transition);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.category-toggle-link:hover {
+    color: var(--mcp-accent);
+    background: var(--mcp-accent-dim);
+}
+
+.category-toggle-divider {
+    font-size: 10px;
+    color: var(--mcp-border-emphasis);
 }
 
 .category-name {
