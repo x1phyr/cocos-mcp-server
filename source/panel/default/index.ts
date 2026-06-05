@@ -142,7 +142,8 @@ module.exports = Editor.Panel.define({
                                     serverStatus.value = result.running ? '运行中' : '已停止';
                                     connectedClients.value = result.clients || 0;
                                     httpUrl.value = result.running ? `http://127.0.0.1:${result.port}` : '';
-                                    if (result.settings) {
+                                    // 仅在用户未修改设置时，才从服务端同步设置（避免覆盖用户未保存的修改）
+                                    if (result.settings && !settingsChanged.value) {
                                         isLoadingSettings = true;
                                         settings.value = {
                                             port: result.settings.port || DEFAULT_MCP_PORT,
@@ -151,7 +152,6 @@ module.exports = Editor.Panel.define({
                                             maxConnections: result.settings.maxConnections || 10,
                                         };
                                         settingsChanged.value = false;
-                                        // nextTick 确保 watch 被跳过
                                         setTimeout(() => { isLoadingSettings = false; }, 0);
                                     }
                                 }
