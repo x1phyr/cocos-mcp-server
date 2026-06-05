@@ -16,6 +16,9 @@ export class MCPServer {
     /** True after ToolManager sync; empty enabledTools then means block all, not allow all. */
     private enabledToolsConfigured = false;
     private capabilityManager: CapabilityManager;
+    /** 最近活跃的客户端（按远程地址记录最后活动时间） */
+    private recentClients = new Map<string, number>();
+    private static readonly CLIENT_TIMEOUT_MS = 30000; // 30 秒无活动视为断开
 
     constructor(settings: MCPServerSettings, capabilityManager: CapabilityManager) {
         this.settings = settings;
@@ -224,6 +227,10 @@ export class MCPServer {
         const pathname = parsedUrl.pathname;
 
         this.debug(`${req.method} ${pathname}`, req.headers.origin || '');
+
+        // 记录客户端活动
+        const clientId = req.socket.remoteAddress || 'unknown';
+        this.recentClients.set(clientId, Date.now());
 
         this.setCorsHeaders(req, res);
 
@@ -441,13 +448,21 @@ export class MCPServer {
 
         this.toolsList = [];
         this.activeConnections = 0;
+        this.recentClients.clear();
     }
 
     public getStatus(): ServerStatus {
+        // 清理超时客户端，计算活跃数
+        const now = Date.now();
+        for (const [clientId, lastActive] of this.recentClients) {
+            if (now - lastActive > MCPServer.CLIENT_TIMEOUT_MS) {
+                this.recentClients.delete(clientId);
+            }
+        }
         return {
             running: !!this.httpServer,
             port: this.settings.port,
-            clients: this.activeConnections,
+            clients: this.recentClients.size,
         };
     }
 
