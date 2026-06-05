@@ -320,6 +320,7 @@ export function load() {
     toolManager = new ToolManager(capabilityManager.exportBuiltinToolConfigs());
 
     const settings = readSettings();
+    console.log('[MCP插件] 读取设置:', JSON.stringify(settings));
     mcpServer = createMcpServer(settings);
 
     applyRegistryChange();
@@ -328,9 +329,14 @@ export function load() {
     mcpServer.updateEnabledTools(enabledTools);
 
     if (settings.autoStart) {
-        mcpServer.start().catch((err) => {
-            console.error('Failed to auto-start MCP server:', err);
+        console.log('[MCP插件] autoStart=true，正在自动启动服务器...');
+        mcpServer.start().then(() => {
+            console.log('[MCP插件] ✅ 服务器自动启动成功');
+        }).catch((err) => {
+            console.error('[MCP插件] ❌ 自动启动失败:', err);
         });
+    } else {
+        console.log('[MCP插件] autoStart=false，跳过自动启动');
     }
 }
 

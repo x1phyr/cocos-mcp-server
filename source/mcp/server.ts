@@ -22,6 +22,13 @@ export class MCPServer {
         this.capabilityManager = capabilityManager;
     }
 
+    /** 调试日志——仅在 enableDebugLog 开启时输出 */
+    private debug(...args: any[]) {
+        if (this.settings.enableDebugLog) {
+            console.log('[MCPServer:DEBUG]', ...args);
+        }
+    }
+
     public getCapabilityManager(): CapabilityManager {
         return this.capabilityManager;
     }
@@ -216,6 +223,8 @@ export class MCPServer {
         const parsedUrl = url.parse(req.url || '', true);
         const pathname = parsedUrl.pathname;
 
+        this.debug(`${req.method} ${pathname}`, req.headers.origin || '');
+
         this.setCorsHeaders(req, res);
 
         if (req.method === 'OPTIONS') {
@@ -360,15 +369,19 @@ export class MCPServer {
     private async handleMessage(message: any): Promise<any> {
         const { id, method, params } = message;
 
+        this.debug(`消息: method=${method}, id=${id}`);
+
         try {
             let result: any;
 
             switch (method) {
                 case 'tools/list':
                     result = { tools: this.getAvailableTools() };
+                    this.debug(`tools/list 返回 ${result.tools.length} 个工具`);
                     break;
                 case 'tools/call': {
                     const { name, arguments: args } = params;
+                    this.debug(`tools/call: ${name}`, JSON.stringify(args).substring(0, 200));
                     const toolResult = await this.executeToolCall(name, args);
                     result = { content: [{ type: 'text', text: JSON.stringify(toolResult) }] };
                     break;
