@@ -487,8 +487,15 @@ ui-prop {
 
 .tools-section-controls {
     display: flex;
-    gap: var(--mcp-spacing-sm);
+    gap: 6px;
     align-items: center;
+}
+
+/* 展开/折叠按钮行 */
+.tools-list-actions {
+    display: flex;
+    gap: 6px;
+    margin-bottom: var(--mcp-spacing-sm);
 }
 
 /* ============================================================

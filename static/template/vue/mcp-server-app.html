@@ -116,12 +116,17 @@
                         </div>
                     </div>
                     <div class="tools-section-controls">
-                        <ui-button @click="expandAllCategories" class="small">展开</ui-button>
-                        <ui-button @click="collapseAllCategories" class="small">折叠</ui-button>
                         <ui-button @click="selectAllTools" class="small">全选</ui-button>
-                        <ui-button @click="deselectAllTools" class="small">取消</ui-button>
+                        <ui-button @click="deselectAllTools" class="small">清空</ui-button>
                         <ui-button @click="loadToolManagerState" class="small">刷新</ui-button>
-                        <ui-button @click="saveChanges" class="primary">保存</ui-button>
+                        <ui-button @click="saveChanges" class="small primary">保存</ui-button>
+                    </div>
+                </div>
+
+                <div class="tools-list-actions">
+                    <ui-button @click="expandAllCategories" class="small secondary">展开全部</ui-button>
+                    <ui-button @click="collapseAllCategories" class="small secondary">折叠全部</ui-button>
+                </div>
                     </div>
                 </div>
 
