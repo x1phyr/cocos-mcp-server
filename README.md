@@ -21,7 +21,13 @@
 
 ## 更新日志
 
-### v1.7.5 - 2026年6月5日（当前版本）
+### v1.7.6 - 2026年6月5日（当前版本）
+
+- **UI**：Tool Manager 面板移除硬编码 CSS，改用 Cocos Creator 主题变量，支持明暗主题自动适配
+- **UI**：默认面板增加状态指示灯（绿色/红色圆点）和类别工具计数徽章
+- **UI**：模态框使用 CSS class 控制显示，优化布局和间距
+
+### v1.7.5 - 2026年6月5日
 
 - **Fixed**：修复 async Promise 构造器反模式（node/component/prefab/project/asset-advanced 等模块）
 - **Fixed**：修复 createNode 中重复添加组件问题

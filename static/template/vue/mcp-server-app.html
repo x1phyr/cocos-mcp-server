@@ -8,7 +8,7 @@
             <span>工具管理</span>
         </button>
     </div>
-    
+
     <!-- 服务器选项卡 -->
     <div class="tab-content" v-show="activeTab === 'server'">
         <section class="server-status">
@@ -16,7 +16,10 @@
             <div class="status-info">
                 <ui-prop>
                     <ui-label slot="label">状态</ui-label>
-                    <ui-label slot="content" class="status-value" :class="statusClass">{{ serverStatus }}</ui-label>
+                    <ui-label slot="content" class="status-value" :class="statusClass">
+                        <span class="status-dot" :class="{ 'status-dot-running': serverRunning, 'status-dot-stopped': !serverRunning }"></span>
+                        {{ serverStatus }}
+                    </ui-label>
                 </ui-prop>
                 <ui-prop v-if="serverRunning">
                     <ui-label slot="label">连接数</ui-label>
@@ -72,7 +75,7 @@
             <p v-if="settingsFeedback" class="feedback" :class="settingsFeedbackKind === 'success' ? 'feedback-success' : 'feedback-error'">{{ settingsFeedback }}</p>
         </footer>
     </div>
-    
+
     <!-- 工具管理选项卡 -->
     <div class="tab-content" v-show="activeTab === 'tools'">
         <section class="tool-manager">
@@ -95,7 +98,7 @@
                     </li>
                 </ul>
             </div>
-            
+
             <div class="tools-section">
                 <div class="tools-section-header">
                     <div class="tools-section-title">
@@ -112,12 +115,13 @@
                         <ui-button @click="saveChanges" class="primary">保存更改</ui-button>
                     </div>
                 </div>
-                
+
                 <div class="tools-container">
                     <div v-for="category in sortedToolCategories" :key="category" class="tool-category" :class="{ 'tool-category-external': isExternalCategory(category) }">
                         <div class="category-header">
                             <h5>
                                 {{ getCategoryDisplayName(category) }}
+                                <span class="category-count">({{ getToolsByCategory(category).length }})</span>
                                 <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">外部</span>
                             </h5>
                             <div class="category-controls">
@@ -127,7 +131,7 @@
                         </div>
                         <div class="tool-items">
                             <div v-for="tool in getToolsByCategory(category)" :key="tool.name" class="tool-item">
-                                <ui-checkbox 
+                                <ui-checkbox
                                     :value="tool.enabled"
                                     @change="(event) => updateToolStatus(category, tool.name, event.target.checked)"
                                 ></ui-checkbox>

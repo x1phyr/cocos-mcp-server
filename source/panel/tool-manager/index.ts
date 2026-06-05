@@ -549,11 +549,11 @@ module.exports = Editor.Panel.define({
         },
 
         showModal(this: any, modalId: string) {
-            this.$[modalId].style.display = 'block';
+            this.$[modalId].classList.add('show');
         },
 
         hideModal(this: any, modalId: string) {
-            this.$[modalId].style.display = 'none';
+            this.$[modalId].classList.remove('show');
         },
 
         showError(this: any, message: string) {

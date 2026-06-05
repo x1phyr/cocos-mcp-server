@@ -22,7 +22,29 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Changelog
 
-### v1.7.4 - June 5, 2026 (Current version)
+### v1.7.6 - June 5, 2026 (Current version)
+
+- **UI**: Tool Manager panel removed hardcoded CSS, now uses Cocos Creator theme variables for automatic light/dark theme support
+- **UI**: Default panel added status indicator dot (green/red) and category tool count badges
+- **UI**: Modal dialogs now use CSS class control, optimized layout and spacing
+
+### v1.7.5 - June 5, 2026
+
+- **Fixed**: Async Promise constructor anti-pattern across 5 capability modules
+- **Fixed**: Duplicate component addition in createNode
+- **Fixed**: Broken JSON fix regex that corrupted valid JSON
+- **Fixed**: setComponentProperty returning success before async operations complete
+- **Fixed**: Hardcoded developer-specific filesystem paths
+- **Fixed**: Hardcoded port in validation curl and prefab MCP self-call
+- **Fixed**: selectAll/deselectAll rollback destroying prior mixed state
+- **Fixed**: Request body size check using string length instead of byte length
+- **Fixed**: Marked dead-code tools as unavailable with clear descriptions
+- **Fixed**: innerHTML injection without sanitization in tool-manager panel
+- **Fixed**: Added timeout for external provider Editor.Message.request calls
+- **Docs**: FEATURE_GUIDE_CN/EN updated to match 157 tools across 14 categories
+- **Docs**: README tool count corrected (50 → 157)
+
+### v1.7.4 - June 5, 2026
 
 - **Fixed**: Disabling all tools in Tool Manager no longer exposes every tool on MCP (`[]` is block-all, not allow-all).
 - **Fixed**: External tool re-sync preserves saved `enabled` flags in configurations.
