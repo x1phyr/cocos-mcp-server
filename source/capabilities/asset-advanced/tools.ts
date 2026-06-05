@@ -5,17 +5,17 @@ export class AssetAdvancedTools implements ToolExecutor {
         return [
             {
                 name: 'save_asset_meta',
-                description: 'Save asset meta information',
+                description: '保存资源 Meta 信息',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         urlOrUUID: {
                             type: 'string',
-                            description: 'Asset URL or UUID'
+                            description: '资源 URL 或 UUID'
                         },
                         content: {
                             type: 'string',
-                            description: 'Asset meta serialized content string'
+                            description: '资源 Meta 序列化内容字符串'
                         }
                     },
                     required: ['urlOrUUID', 'content']
@@ -23,13 +23,13 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'generate_available_url',
-                description: 'Generate an available URL based on input URL',
+                description: '根据输入 URL 生成可用的 URL',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL to generate available URL for'
+                            description: '要生成可用 URL 的资源 URL'
                         }
                     },
                     required: ['url']
@@ -37,7 +37,7 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'query_asset_db_ready',
-                description: 'Check if asset database is ready',
+                description: '检查资源数据库是否就绪',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -45,13 +45,13 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'open_asset_external',
-                description: 'Open asset with external program',
+                description: '使用外部程序打开资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         urlOrUUID: {
                             type: 'string',
-                            description: 'Asset URL or UUID to open'
+                            description: '要打开的资源 URL 或 UUID'
                         }
                     },
                     required: ['urlOrUUID']
@@ -59,32 +59,32 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'batch_import_assets',
-                description: 'Import multiple assets in batch',
+                description: '批量导入多个资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         sourceDirectory: {
                             type: 'string',
-                            description: 'Source directory path'
+                            description: '源目录路径'
                         },
                         targetDirectory: {
                             type: 'string',
-                            description: 'Target directory URL'
+                            description: '目标目录 URL'
                         },
                         fileFilter: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'File extensions to include (e.g., [".png", ".jpg"])',
+                            description: '要包含的文件扩展名（如 [".png", ".jpg"]）',
                             default: []
                         },
                         recursive: {
                             type: 'boolean',
-                            description: 'Include subdirectories',
+                            description: '是否包含子目录',
                             default: false
                         },
                         overwrite: {
                             type: 'boolean',
-                            description: 'Overwrite existing files',
+                            description: '是否覆盖已有文件',
                             default: false
                         }
                     },
@@ -93,14 +93,14 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'batch_delete_assets',
-                description: 'Delete multiple assets in batch',
+                description: '批量删除多个资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         urls: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'Array of asset URLs to delete'
+                            description: '要删除的资源 URL 数组'
                         }
                     },
                     required: ['urls']
@@ -108,13 +108,13 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'validate_asset_references',
-                description: 'Validate asset references and find broken links',
+                description: '检查缺失的资源引用',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         directory: {
                             type: 'string',
-                            description: 'Directory to validate (default: entire project)',
+                            description: '要验证的目录（默认：整个项目）',
                             default: 'db://assets'
                         }
                     }
@@ -122,17 +122,17 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'get_asset_dependencies',
-                description: '[NOT AVAILABLE] Get asset dependency tree. Requires scene analysis APIs not currently available in the Cocos Creator MCP implementation.',
+                description: '[不可用] 获取资源依赖树。需要当前 Cocos Creator MCP 实现中不可用的场景分析 API。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         urlOrUUID: {
                             type: 'string',
-                            description: 'Asset URL or UUID'
+                            description: '资源 URL 或 UUID'
                         },
                         direction: {
                             type: 'string',
-                            description: 'Dependency direction',
+                            description: '依赖方向',
                             enum: ['dependents', 'dependencies', 'both'],
                             default: 'dependencies'
                         }
@@ -142,19 +142,19 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'get_unused_assets',
-                description: '[NOT AVAILABLE] Find unused assets in project. Requires comprehensive project analysis APIs not currently available in the Cocos Creator MCP implementation.',
+                description: '[不可用] 查找项目中未使用的资源。需要当前 Cocos Creator MCP 实现中不可用的综合项目分析 API。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         directory: {
                             type: 'string',
-                            description: 'Directory to scan (default: entire project)',
+                            description: '要扫描的目录（默认：整个项目）',
                             default: 'db://assets'
                         },
                         excludeDirectories: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'Directories to exclude from scan',
+                            description: '要排除的目录',
                             default: []
                         }
                     }
@@ -162,24 +162,24 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'compress_textures',
-                description: '[NOT AVAILABLE] Batch compress texture assets. Requires image processing capabilities not currently available in the Cocos Creator MCP implementation.',
+                description: '[不可用] 批量压缩纹理资源。需要当前 Cocos Creator MCP 实现中不可用的图像处理能力。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         directory: {
                             type: 'string',
-                            description: 'Directory containing textures',
+                            description: '包含纹理的目录',
                             default: 'db://assets'
                         },
                         format: {
                             type: 'string',
-                            description: 'Compression format',
+                            description: '压缩格式',
                             enum: ['auto', 'jpg', 'png', 'webp'],
                             default: 'auto'
                         },
                         quality: {
                             type: 'number',
-                            description: 'Compression quality (0.1-1.0)',
+                            description: '压缩质量（0.1-1.0）',
                             minimum: 0.1,
                             maximum: 1.0,
                             default: 0.8
@@ -189,24 +189,24 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'export_asset_manifest',
-                description: 'Export asset manifest/inventory',
+                description: '导出资源清单',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         directory: {
                             type: 'string',
-                            description: 'Directory to export manifest for',
+                            description: '要导出清单的目录',
                             default: 'db://assets'
                         },
                         format: {
                             type: 'string',
-                            description: 'Export format',
+                            description: '导出格式',
                             enum: ['json', 'csv', 'xml'],
                             default: 'json'
                         },
                         includeMetadata: {
                             type: 'boolean',
-                            description: 'Include asset metadata',
+                            description: '是否包含资源元数据',
                             default: true
                         }
                     }

@@ -5,7 +5,7 @@ export class SceneTools implements ToolExecutor {
         return [
             {
                 name: 'get_current_scene',
-                description: 'Get current scene information',
+                description: '获取当前场景信息',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -13,7 +13,7 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'get_scene_list',
-                description: 'Get all scenes in the project',
+                description: '获取项目中所有场景',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -21,13 +21,13 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'open_scene',
-                description: 'Open a scene by path',
+                description: '按路径打开场景',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         scenePath: {
                             type: 'string',
-                            description: 'The scene file path'
+                            description: '场景文件路径'
                         }
                     },
                     required: ['scenePath']
@@ -35,7 +35,7 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'save_scene',
-                description: 'Save current scene',
+                description: '保存当前场景',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -43,17 +43,17 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'create_scene',
-                description: 'Create a new scene asset',
+                description: '创建新场景资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         sceneName: {
                             type: 'string',
-                            description: 'Name of the new scene'
+                            description: '新场景名称'
                         },
                         savePath: {
                             type: 'string',
-                            description: 'Path to save the scene (e.g., db://assets/scenes/NewScene.scene)'
+                            description: '场景保存路径（如 db://assets/scenes/NewScene.scene）'
                         }
                     },
                     required: ['sceneName', 'savePath']
@@ -61,13 +61,13 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'save_scene_as',
-                description: 'Save scene as new file',
+                description: '场景另存为',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         path: {
                             type: 'string',
-                            description: 'Path to save the scene'
+                            description: '场景保存路径'
                         }
                     },
                     required: ['path']
@@ -75,7 +75,7 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'close_scene',
-                description: 'Close current scene',
+                description: '关闭当前场景',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -83,13 +83,13 @@ export class SceneTools implements ToolExecutor {
             },
             {
                 name: 'get_scene_hierarchy',
-                description: 'Get the complete hierarchy of current scene',
+                description: '获取当前场景完整层级',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         includeComponents: {
                             type: 'boolean',
-                            description: 'Include component information',
+                            description: '是否包含组件信息',
                             default: false
                         }
                     }

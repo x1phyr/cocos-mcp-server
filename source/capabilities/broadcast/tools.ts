@@ -12,31 +12,31 @@ export class BroadcastTools implements ToolExecutor {
         return [
             {
                 name: 'get_broadcast_log',
-                description: '[SIMULATED ONLY] Get recent broadcast messages log. Data is always empty because Editor.Message.on listeners are not wired — no real broadcast events are captured.',
+                description: '[仅模拟] 获取近期广播消息日志。由于 Editor.Message.on 监听器未接入，数据始终为空——无法捕获真实广播事件。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         limit: {
                             type: 'number',
-                            description: 'Number of recent messages to return',
+                            description: '要返回的最近消息条数',
                             default: 50
                         },
                         messageType: {
                             type: 'string',
-                            description: 'Filter by message type (optional)'
+                            description: '按消息类型过滤（可选）'
                         }
                     }
                 }
             },
             {
                 name: 'listen_broadcast',
-                description: '[NOT AVAILABLE] Start listening for specific broadcast messages. Requires Editor.Message.on which is not wired in the current extension — real broadcast events cannot be captured.',
+                description: '[不可用] 开始监听特定广播消息。需要 Editor.Message.on，但当前扩展未接入——无法捕获真实广播事件。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         messageType: {
                             type: 'string',
-                            description: 'Message type to listen for'
+                            description: '要监听的消息类型'
                         }
                     },
                     required: ['messageType']
@@ -44,13 +44,13 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'stop_listening',
-                description: '[NOT AVAILABLE] Stop listening for specific broadcast messages. Requires Editor.Message.off which is not wired — listeners were never registered with the editor.',
+                description: '[不可用] 停止监听特定广播消息。需要 Editor.Message.off，但未接入——监听器从未在编辑器中注册。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         messageType: {
                             type: 'string',
-                            description: 'Message type to stop listening for'
+                            description: '要停止监听的消息类型'
                         }
                     },
                     required: ['messageType']
@@ -58,7 +58,7 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'clear_broadcast_log',
-                description: '[SIMULATED ONLY] Clear the broadcast messages log. Only clears the in-memory simulated log, which is always empty since real broadcast events are not captured.',
+                description: '[仅模拟] 清除广播消息日志。仅清除内存中的模拟日志，由于无法捕获真实广播事件，日志始终为空。',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -66,7 +66,7 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'get_active_listeners',
-                description: '[SIMULATED ONLY] Get list of active broadcast listeners. Returns only simulated listener registrations — no real Editor.Message.on listeners are active.',
+                description: '[仅模拟] 获取活跃广播监听器列表。仅返回模拟的监听器注册信息——没有真实的 Editor.Message.on 监听器处于活跃状态。',
                 inputSchema: {
                     type: 'object',
                     properties: {}

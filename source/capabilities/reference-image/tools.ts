@@ -5,14 +5,14 @@ export class ReferenceImageTools implements ToolExecutor {
         return [
             {
                 name: 'add_reference_image',
-                description: 'Add reference image(s) to scene',
+                description: '添加参考图片到场景',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         paths: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'Array of reference image absolute paths'
+                            description: '参考图片绝对路径数组'
                         }
                     },
                     required: ['paths']
@@ -20,31 +20,31 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'remove_reference_image',
-                description: 'Remove reference image(s)',
+                description: '移除参考图片',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         paths: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'Array of reference image paths to remove (optional, removes current if empty)'
+                            description: '要移除的参考图片路径数组（可选，为空时移除当前图片）'
                         }
                     }
                 }
             },
             {
                 name: 'switch_reference_image',
-                description: 'Switch to specific reference image',
+                description: '切换到指定参考图片',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         path: {
                             type: 'string',
-                            description: 'Reference image absolute path'
+                            description: '参考图片绝对路径'
                         },
                         sceneUUID: {
                             type: 'string',
-                            description: 'Specific scene UUID (optional)'
+                            description: '指定场景 UUID（可选）'
                         }
                     },
                     required: ['path']
@@ -52,17 +52,17 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'set_reference_image_data',
-                description: 'Set reference image transform and display properties',
+                description: '设置参考图片变换和显示属性',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         key: {
                             type: 'string',
-                            description: 'Property key',
+                            description: '属性键',
                             enum: ['path', 'x', 'y', 'sx', 'sy', 'opacity']
                         },
                         value: {
-                            description: 'Property value (path: string, x/y/sx/sy: number, opacity: number 0-1)'
+                            description: '属性值（path: 字符串, x/y/sx/sy: 数字, opacity: 数字 0-1）'
                         }
                     },
                     required: ['key', 'value']
@@ -70,7 +70,7 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'query_reference_image_config',
-                description: 'Query reference image configuration',
+                description: '查询参考图片配置',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -78,7 +78,7 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'query_current_reference_image',
-                description: 'Query current reference image data',
+                description: '查询当前参考图片数据',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -86,7 +86,7 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'refresh_reference_image',
-                description: 'Refresh reference image display',
+                description: '刷新参考图片显示',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -94,17 +94,17 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'set_reference_image_position',
-                description: 'Set reference image position',
+                description: '设置参考图片位置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         x: {
                             type: 'number',
-                            description: 'X offset'
+                            description: 'X 偏移'
                         },
                         y: {
                             type: 'number',
-                            description: 'Y offset'
+                            description: 'Y 偏移'
                         }
                     },
                     required: ['x', 'y']
@@ -112,19 +112,19 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'set_reference_image_scale',
-                description: 'Set reference image scale',
+                description: '设置参考图片缩放',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         sx: {
                             type: 'number',
-                            description: 'X scale',
+                            description: 'X 缩放',
                             minimum: 0.1,
                             maximum: 10
                         },
                         sy: {
                             type: 'number',
-                            description: 'Y scale',
+                            description: 'Y 缩放',
                             minimum: 0.1,
                             maximum: 10
                         }
@@ -134,13 +134,13 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'set_reference_image_opacity',
-                description: 'Set reference image opacity',
+                description: '设置参考图片透明度',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         opacity: {
                             type: 'number',
-                            description: 'Opacity (0.0 to 1.0)',
+                            description: '透明度（0.0 到 1.0）',
                             minimum: 0,
                             maximum: 1
                         }
@@ -150,7 +150,7 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'list_reference_images',
-                description: 'List all available reference images',
+                description: '列出所有可用参考图片',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -158,7 +158,7 @@ export class ReferenceImageTools implements ToolExecutor {
             },
             {
                 name: 'clear_all_reference_images',
-                description: 'Clear all reference images',
+                description: '清除所有参考图片',
                 inputSchema: {
                     type: 'object',
                     properties: {}

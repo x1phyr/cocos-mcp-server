@@ -33,18 +33,18 @@ export class DebugTools implements ToolExecutor {
         return [
             {
                 name: 'get_console_logs',
-                description: '[NOT AVAILABLE] Get editor console logs. Console capture is not wired — Editor.Message.addBroadcastListener for console events is not implemented, so no log data is captured.',
+                description: '[不可用] 获取编辑器控制台日志。控制台捕获未接入 - Editor.Message.addBroadcastListener 的控制台事件未实现，因此无法捕获日志数据。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         limit: {
                             type: 'number',
-                            description: 'Number of recent logs to retrieve',
+                            description: '要获取的最近日志条数',
                             default: 100
                         },
                         filter: {
                             type: 'string',
-                            description: 'Filter logs by type',
+                            description: '按类型过滤日志',
                             enum: ['all', 'log', 'warn', 'error', 'info'],
                             default: 'all'
                         }
@@ -53,7 +53,7 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'clear_console',
-                description: '[PARTIALLY AVAILABLE] Clear editor console. Clears the in-memory log buffer and sends Editor.Message.send(\'console\', \'clear\'), but may not reliably clear the editor console UI in all Cocos Creator versions.',
+                description: '[部分可用] 清除编辑器控制台。清除内存中的日志缓冲区并发送 Editor.Message.send(\'console\', \'clear\')，但在某些 Cocos Creator 版本中可能无法可靠地清除编辑器控制台界面。',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -61,13 +61,13 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'execute_script',
-                description: 'Execute JavaScript in scene context',
+                description: '在场景上下文中执行 JavaScript',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         script: {
                             type: 'string',
-                            description: 'JavaScript code to execute'
+                            description: '要执行的 JavaScript 代码'
                         }
                     },
                     required: ['script']
@@ -75,17 +75,17 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'get_node_tree',
-                description: 'Get detailed node tree for debugging',
+                description: '获取详细节点树用于调试',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         rootUuid: {
                             type: 'string',
-                            description: 'Root node UUID (optional, uses scene root if not provided)'
+                            description: '根节点 UUID（可选，未提供时使用场景根节点）'
                         },
                         maxDepth: {
                             type: 'number',
-                            description: 'Maximum tree depth',
+                            description: '最大树深度',
                             default: 10
                         }
                     }
@@ -93,7 +93,7 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'get_performance_stats',
-                description: 'Get performance statistics',
+                description: '获取性能统计',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -101,18 +101,18 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'validate_scene',
-                description: 'Validate current scene for issues',
+                description: '验证当前场景是否存在问题',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         checkMissingAssets: {
                             type: 'boolean',
-                            description: 'Check for missing asset references',
+                            description: '检查缺失的资源引用',
                             default: true
                         },
                         checkPerformance: {
                             type: 'boolean',
-                            description: 'Check for performance issues',
+                            description: '检查性能问题',
                             default: true
                         }
                     }
@@ -120,7 +120,7 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'get_editor_info',
-                description: 'Get editor and environment information',
+                description: '获取编辑器和环境信息',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -128,24 +128,24 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'get_project_logs',
-                description: 'Get project logs from temp/logs/project.log file',
+                description: '从 temp/logs/project.log 文件获取项目日志',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         lines: {
                             type: 'number',
-                            description: 'Number of lines to read from the end of the log file (default: 100)',
+                            description: '从末尾读取的行数（默认：100）',
                             default: 100,
                             minimum: 1,
                             maximum: 10000
                         },
                         filterKeyword: {
                             type: 'string',
-                            description: 'Filter logs containing specific keyword (optional)'
+                            description: '按特定关键词过滤日志（可选）'
                         },
                         logLevel: {
                             type: 'string',
-                            description: 'Filter by log level',
+                            description: '按日志级别过滤',
                             enum: ['ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE', 'ALL'],
                             default: 'ALL'
                         }
@@ -154,7 +154,7 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'get_log_file_info',
-                description: 'Get information about the project log file',
+                description: '获取项目日志文件信息',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -162,24 +162,24 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'search_project_logs',
-                description: 'Search for specific patterns or errors in project logs',
+                description: '在项目日志中搜索特定模式或错误',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         pattern: {
                             type: 'string',
-                            description: 'Search pattern (supports regex)'
+                            description: '搜索模式（支持正则表达式）'
                         },
                         maxResults: {
                             type: 'number',
-                            description: 'Maximum number of matching results',
+                            description: '最大匹配结果数',
                             default: 20,
                             minimum: 1,
                             maximum: 100
                         },
                         contextLines: {
                             type: 'number',
-                            description: 'Number of context lines to show around each match',
+                            description: '每个匹配结果周围显示的上下文行数',
                             default: 2,
                             minimum: 0,
                             maximum: 10

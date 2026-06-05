@@ -5,17 +5,17 @@ export class ValidationTools implements ToolExecutor {
         return [
             {
                 name: 'validate_json_params',
-                description: 'Validate and fix JSON parameters before sending to other tools',
+                description: '验证并修复 JSON 参数',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         jsonString: {
                             type: 'string',
-                            description: 'JSON string to validate and fix'
+                            description: '要验证和修复的 JSON 字符串'
                         },
                         expectedSchema: {
                             type: 'object',
-                            description: 'Expected parameter schema (optional)'
+                            description: '期望的参数 schema（可选）'
                         }
                     },
                     required: ['jsonString']
@@ -23,13 +23,13 @@ export class ValidationTools implements ToolExecutor {
             },
             {
                 name: 'safe_string_value',
-                description: 'Create a safe string value that won\'t cause JSON parsing issues',
+                description: '创建安全字符串值',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         value: {
                             type: 'string',
-                            description: 'String value to make safe'
+                            description: '要安全化的字符串值'
                         }
                     },
                     required: ['value']
@@ -37,17 +37,17 @@ export class ValidationTools implements ToolExecutor {
             },
             {
                 name: 'format_mcp_request',
-                description: 'Format a complete MCP request with proper JSON escaping',
+                description: '格式化完整 MCP 请求',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         toolName: {
                             type: 'string',
-                            description: 'Tool name to call'
+                            description: '工具名'
                         },
                         arguments: {
                             type: 'object',
-                            description: 'Tool arguments'
+                            description: '工具参数'
                         }
                     },
                     required: ['toolName', 'arguments']

@@ -5,13 +5,13 @@ export class PrefabTools implements ToolExecutor {
         return [
             {
                 name: 'get_prefab_list',
-                description: 'Get all prefabs in the project',
+                description: '获取项目中所有预制体',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         folder: {
                             type: 'string',
-                            description: 'Folder path to search (optional)',
+                            description: '搜索的文件夹路径（可选）',
                             default: 'db://assets'
                         }
                     }
@@ -19,13 +19,13 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'load_prefab',
-                description: 'Load a prefab by path',
+                description: '按路径加载预制体',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         prefabPath: {
                             type: 'string',
-                            description: 'Prefab asset path'
+                            description: '预制体资源路径'
                         }
                     },
                     required: ['prefabPath']
@@ -33,21 +33,21 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'instantiate_prefab',
-                description: 'Instantiate a prefab in the scene',
+                description: '在场景中实例化预制体',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         prefabPath: {
                             type: 'string',
-                            description: 'Prefab asset path'
+                            description: '预制体资源路径'
                         },
                         parentUuid: {
                             type: 'string',
-                            description: 'Parent node UUID (optional)'
+                            description: '父节点 UUID（可选）'
                         },
                         position: {
                             type: 'object',
-                            description: 'Initial position',
+                            description: '初始位置',
                             properties: {
                                 x: { type: 'number' },
                                 y: { type: 'number' },
@@ -60,21 +60,21 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'create_prefab',
-                description: 'Create a prefab from a node with all children and components',
+                description: '从节点创建预制体',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Source node UUID'
+                            description: '源节点 UUID'
                         },
                         savePath: {
                             type: 'string',
-                            description: 'Path to save the prefab (e.g., db://assets/prefabs/MyPrefab.prefab)'
+                            description: '预制体保存路径（例如 db://assets/prefabs/MyPrefab.prefab）'
                         },
                         prefabName: {
                             type: 'string',
-                            description: 'Prefab name'
+                            description: '预制体名称'
                         }
                     },
                     required: ['nodeUuid', 'savePath', 'prefabName']
@@ -82,17 +82,17 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'update_prefab',
-                description: 'Update an existing prefab',
+                description: '更新现有预制体',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         prefabPath: {
                             type: 'string',
-                            description: 'Prefab asset path'
+                            description: '预制体资源路径'
                         },
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID with changes'
+                            description: '包含变更的节点 UUID'
                         }
                     },
                     required: ['prefabPath', 'nodeUuid']
@@ -100,13 +100,13 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'revert_prefab',
-                description: 'Revert prefab instance to original',
+                description: '将预制体实例还原为原始版本',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Prefab instance node UUID'
+                            description: '预制体实例节点 UUID'
                         }
                     },
                     required: ['nodeUuid']
@@ -114,13 +114,13 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'get_prefab_info',
-                description: 'Get detailed prefab information',
+                description: '获取预制体详细信息',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         prefabPath: {
                             type: 'string',
-                            description: 'Prefab asset path'
+                            description: '预制体资源路径'
                         }
                     },
                     required: ['prefabPath']
@@ -128,13 +128,13 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'validate_prefab',
-                description: 'Validate a prefab file format',
+                description: '验证预制体文件格式',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         prefabPath: {
                             type: 'string',
-                            description: 'Prefab asset path'
+                            description: '预制体资源路径'
                         }
                     },
                     required: ['prefabPath']
@@ -142,21 +142,21 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'duplicate_prefab',
-                description: 'Duplicate an existing prefab',
+                description: '复制预制体',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         sourcePrefabPath: {
                             type: 'string',
-                            description: 'Source prefab path'
+                            description: '源预制体路径'
                         },
                         targetPrefabPath: {
                             type: 'string',
-                            description: 'Target prefab path'
+                            description: '目标预制体路径'
                         },
                         newPrefabName: {
                             type: 'string',
-                            description: 'New prefab name'
+                            description: '新预制体名称'
                         }
                     },
                     required: ['sourcePrefabPath', 'targetPrefabPath']
@@ -164,17 +164,17 @@ export class PrefabTools implements ToolExecutor {
             },
             {
                 name: 'restore_prefab_node',
-                description: 'Restore prefab node using prefab asset (built-in undo record)',
+                description: '从资源恢复预制体实例',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Prefab instance node UUID'
+                            description: '预制体实例节点 UUID'
                         },
                         assetUuid: {
                             type: 'string',
-                            description: 'Prefab asset UUID'
+                            description: '预制体资源 UUID'
                         }
                     },
                     required: ['nodeUuid', 'assetUuid']

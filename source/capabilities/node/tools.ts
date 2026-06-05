@@ -7,50 +7,50 @@ export class NodeTools implements ToolExecutor {
         return [
             {
                 name: 'create_node',
-                description: 'Create a new node in the scene. Supports creating empty nodes, nodes with components, or instantiating from assets (prefabs, etc.). IMPORTANT: You should always provide parentUuid to specify where to create the node.',
+                description: '在场景中创建新节点。支持创建空节点、带组件的节点或从资源（预制体等）实例化。重要：应始终提供 parentUuid 来指定创建位置。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Node name'
+                            description: '节点名称'
                         },
                         parentUuid: {
                             type: 'string',
-                            description: 'Parent node UUID. STRONGLY RECOMMENDED: Always provide this parameter. Use get_current_scene or get_all_nodes to find parent UUIDs. If not provided, node will be created at scene root.'
+                            description: '父节点 UUID。强烈建议：始终提供此参数。使用 get_current_scene 或 get_all_nodes 查找父节点 UUID。若未提供，节点将创建在场景根节点下。'
                         },
                         nodeType: {
                             type: 'string',
-                            description: 'Node type: Node, 2DNode, 3DNode',
+                            description: '节点类型：Node、2DNode、3DNode',
                             enum: ['Node', '2DNode', '3DNode'],
                             default: 'Node'
                         },
                         siblingIndex: {
                             type: 'number',
-                            description: 'Sibling index for ordering (-1 means append at end)',
+                            description: '兄弟节点排序索引（-1 表示追加到末尾）',
                             default: -1
                         },
                         assetUuid: {
                             type: 'string',
-                            description: 'Asset UUID to instantiate from (e.g., prefab UUID). When provided, creates a node instance from the asset instead of an empty node.'
+                            description: '要实例化的资源 UUID（如预制体 UUID）。提供后将从资源创建节点实例而非空节点。'
                         },
                         assetPath: {
                             type: 'string',
-                            description: 'Asset path to instantiate from (e.g., "db://assets/prefabs/MyPrefab.prefab"). Alternative to assetUuid.'
+                            description: '要实例化的资源路径（如 "db://assets/prefabs/MyPrefab.prefab"）。可替代 assetUuid 使用。'
                         },
                         components: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'Array of component type names to add to the new node (e.g., ["cc.Sprite", "cc.Button"])'
+                            description: '要添加到新节点的组件类型名称数组（如 ["cc.Sprite", "cc.Button"]）'
                         },
                         unlinkPrefab: {
                             type: 'boolean',
-                            description: 'If true and creating from prefab, unlink from prefab to create a regular node',
+                            description: '若为 true 且从预制体创建，则取消预制体关联以创建普通节点',
                             default: false
                         },
                         keepWorldTransform: {
                             type: 'boolean',
-                            description: 'Whether to keep world transform when creating the node',
+                            description: '创建节点时是否保持世界坐标',
                             default: false
                         },
                         initialTransform: {
@@ -81,7 +81,7 @@ export class NodeTools implements ToolExecutor {
                                     }
                                 }
                             },
-                            description: 'Initial transform to apply to the created node'
+                            description: '创建节点时应用的初始变换'
                         }
                     },
                     required: ['name']
@@ -89,13 +89,13 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'get_node_info',
-                description: 'Get node information by UUID',
+                description: '按 UUID 获取节点信息',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         }
                     },
                     required: ['uuid']
@@ -103,17 +103,17 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'find_nodes',
-                description: 'Find nodes by name pattern',
+                description: '按名称模式查找节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         pattern: {
                             type: 'string',
-                            description: 'Name pattern to search'
+                            description: '要搜索的名称模式'
                         },
                         exactMatch: {
                             type: 'boolean',
-                            description: 'Exact match or partial match',
+                            description: '是否精确匹配名称',
                             default: false
                         }
                     },
@@ -122,13 +122,13 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'find_node_by_name',
-                description: 'Find first node by exact name',
+                description: '按名称精确查找首个节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Node name to find'
+                            description: '要查找的节点名称'
                         }
                     },
                     required: ['name']
@@ -136,7 +136,7 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'get_all_nodes',
-                description: 'Get all nodes in the scene with their UUIDs',
+                description: '获取场景中所有节点及其 UUID',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -144,20 +144,20 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'set_node_property',
-                description: 'Set node property value (prefer using set_node_transform for active/layer/mobility/position/rotation/scale)',
+                description: '设置节点属性值（设置 active/layer/mobility/position/rotation/scale 时建议使用 set_node_transform）',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         property: {
                             type: 'string',
-                            description: 'Property name (e.g., active, name, layer)'
+                            description: '属性名（如 active、name、layer）'
                         },
                         value: {
-                            description: 'Property value'
+                            description: '属性值'
                         }
                     },
                     required: ['uuid', 'property', 'value']
@@ -165,40 +165,40 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'set_node_transform',
-                description: 'Set node transform properties (position, rotation, scale) with unified interface. Automatically handles 2D/3D node differences.',
+                description: '设置节点变换属性（位置/旋转/缩放），统一接口，自动处理 2D/3D 节点差异。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         position: {
                             type: 'object',
                             properties: {
                                 x: { type: 'number' },
                                 y: { type: 'number' },
-                                z: { type: 'number', description: 'Z coordinate (ignored for 2D nodes)' }
+                                z: { type: 'number', description: 'Z 坐标（2D 节点忽略此值）' }
                             },
-                            description: 'Node position. For 2D nodes, only x,y are used; z is ignored. For 3D nodes, all coordinates are used.'
+                            description: '节点位置。2D 节点仅使用 x、y，z 被忽略；3D 节点使用全部坐标。'
                         },
                         rotation: {
                             type: 'object',
                             properties: {
-                                x: { type: 'number', description: 'X rotation (ignored for 2D nodes)' },
-                                y: { type: 'number', description: 'Y rotation (ignored for 2D nodes)' },
-                                z: { type: 'number', description: 'Z rotation (main rotation axis for 2D nodes)' }
+                                x: { type: 'number', description: 'X 旋转（2D 节点忽略此值）' },
+                                y: { type: 'number', description: 'Y 旋转（2D 节点忽略此值）' },
+                                z: { type: 'number', description: 'Z 旋转（2D 节点的主旋转轴）' }
                             },
-                            description: 'Node rotation in euler angles. For 2D nodes, only z rotation is used. For 3D nodes, all axes are used.'
+                            description: '节点欧拉角旋转。2D 节点仅使用 z 旋转；3D 节点使用全部轴。'
                         },
                         scale: {
                             type: 'object',
                             properties: {
                                 x: { type: 'number' },
                                 y: { type: 'number' },
-                                z: { type: 'number', description: 'Z scale (usually 1 for 2D nodes)' }
+                                z: { type: 'number', description: 'Z 缩放（2D 节点通常为 1）' }
                             },
-                            description: 'Node scale. For 2D nodes, z is typically 1. For 3D nodes, all axes are used.'
+                            description: '节点缩放。2D 节点的 z 通常为 1；3D 节点使用全部轴。'
                         }
                     },
                     required: ['uuid']
@@ -206,13 +206,13 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'delete_node',
-                description: 'Delete a node from scene',
+                description: '从场景中删除节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID to delete'
+                            description: '要删除的节点 UUID'
                         }
                     },
                     required: ['uuid']
@@ -220,21 +220,21 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'move_node',
-                description: 'Move node to new parent',
+                description: '移动节点到新父节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID to move'
+                            description: '要移动的节点 UUID'
                         },
                         newParentUuid: {
                             type: 'string',
-                            description: 'New parent node UUID'
+                            description: '新父节点 UUID'
                         },
                         siblingIndex: {
                             type: 'number',
-                            description: 'Sibling index in new parent',
+                            description: '在新父节点中的兄弟索引',
                             default: -1
                         }
                     },
@@ -243,17 +243,17 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'duplicate_node',
-                description: 'Duplicate a node',
+                description: '复制节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID to duplicate'
+                            description: '要复制的节点 UUID'
                         },
                         includeChildren: {
                             type: 'boolean',
-                            description: 'Include children nodes',
+                            description: '是否包含子节点',
                             default: true
                         }
                     },
@@ -262,13 +262,13 @@ export class NodeTools implements ToolExecutor {
             },
             {
                 name: 'detect_node_type',
-                description: 'Detect if a node is 2D or 3D based on its components and properties',
+                description: '检测节点是 2D 还是 3D（基于组件和属性判断）',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID to analyze'
+                            description: '要分析的节点 UUID'
                         }
                     },
                     required: ['uuid']

@@ -5,40 +5,40 @@ export class PreferencesTools implements ToolExecutor {
         return [
             {
                 name: 'open_preferences_settings',
-                description: 'Open preferences settings panel',
+                description: '打开偏好设置面板',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         tab: {
                             type: 'string',
-                            description: 'Preferences tab to open (optional)',
+                            description: '要打开的偏好设置标签页（可选）',
                             enum: ['general', 'external-tools', 'data-editor', 'laboratory', 'extensions']
                         },
                         args: {
                             type: 'array',
-                            description: 'Additional arguments to pass to the tab'
+                            description: '传递给标签页的附加参数'
                         }
                     }
                 }
             },
             {
                 name: 'query_preferences_config',
-                description: 'Query preferences configuration',
+                description: '查询偏好设置配置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Plugin or category name',
+                            description: '插件或分类名称',
                             default: 'general'
                         },
                         path: {
                             type: 'string',
-                            description: 'Configuration path (optional)'
+                            description: '配置路径（可选）'
                         },
                         type: {
                             type: 'string',
-                            description: 'Configuration type',
+                            description: '配置类型',
                             enum: ['default', 'global', 'local'],
                             default: 'global'
                         }
@@ -48,24 +48,24 @@ export class PreferencesTools implements ToolExecutor {
             },
             {
                 name: 'set_preferences_config',
-                description: 'Set preferences configuration',
+                description: '设置偏好配置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Plugin name'
+                            description: '插件名'
                         },
                         path: {
                             type: 'string',
-                            description: 'Configuration path'
+                            description: '配置路径'
                         },
                         value: {
-                            description: 'Configuration value'
+                            description: '配置值'
                         },
                         type: {
                             type: 'string',
-                            description: 'Configuration type',
+                            description: '配置类型',
                             enum: ['default', 'global', 'local'],
                             default: 'global'
                         }
@@ -75,7 +75,7 @@ export class PreferencesTools implements ToolExecutor {
             },
             {
                 name: 'get_all_preferences',
-                description: 'Get all available preferences categories',
+                description: '获取所有可用偏好设置分类',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -83,17 +83,17 @@ export class PreferencesTools implements ToolExecutor {
             },
             {
                 name: 'reset_preferences',
-                description: 'Reset a specific preference category to default values. The name parameter is required — resetting all preferences at once is not supported.',
+                description: '将指定偏好设置分类重置为默认值。name 参数为必填项，不支持一次性重置所有偏好设置。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Preference category name to reset (required — resetting all is not supported)'
+                            description: '要重置的偏好设置分类名（必填，不支持重置全部）'
                         },
                         type: {
                             type: 'string',
-                            description: 'Configuration type to reset',
+                            description: '要重置的配置类型',
                             enum: ['global', 'local'],
                             default: 'global'
                         }
@@ -103,26 +103,26 @@ export class PreferencesTools implements ToolExecutor {
             },
             {
                 name: 'export_preferences',
-                description: 'Export current preferences configuration',
+                description: '导出当前偏好设置配置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         exportPath: {
                             type: 'string',
-                            description: 'Path to export preferences file (optional)'
+                            description: '偏好设置导出文件路径（可选）'
                         }
                     }
                 }
             },
             {
                 name: 'import_preferences',
-                description: '[NOT AVAILABLE] Import preferences configuration from file. Requires filesystem access which is not available in the current MCP extension context.',
+                description: '[不可用] 从文件导入偏好设置配置。需要文件系统访问权限，当前 MCP 扩展上下文中不可用。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         importPath: {
                             type: 'string',
-                            description: 'Path to import preferences file from'
+                            description: '偏好设置导入文件路径'
                         }
                     },
                     required: ['importPath']

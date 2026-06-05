@@ -5,17 +5,17 @@ export class ComponentTools implements ToolExecutor {
         return [
             {
                 name: 'add_component',
-                description: 'Add a component to a specific node. IMPORTANT: You must provide the nodeUuid parameter to specify which node to add the component to.',
+                description: '向指定节点添加组件。重要：必须提供 nodeUuid 参数来指定要添加组件的节点。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Target node UUID. REQUIRED: You must specify the exact node to add the component to. Use get_all_nodes or find_node_by_name to get the UUID of the desired node.'
+                            description: '目标节点 UUID。必填：必须指定要添加组件的确切节点。使用 get_all_nodes 或 find_node_by_name 获取目标节点的 UUID。'
                         },
                         componentType: {
                             type: 'string',
-                            description: 'Component type (e.g., cc.Sprite, cc.Label, cc.Button)'
+                            description: '组件类型（例如 cc.Sprite、cc.Label、cc.Button）'
                         }
                     },
                     required: ['nodeUuid', 'componentType']
@@ -23,17 +23,17 @@ export class ComponentTools implements ToolExecutor {
             },
             {
                 name: 'remove_component',
-                description: 'Remove a component from a node. componentType must be the component\'s classId (cid, i.e. the type field from getComponents), not the script name or class name. Use getComponents to get the correct cid.',
+                description: '从节点移除组件。componentType 必须是组件的 classId（cid，即 getComponents 返回的 type 字段），不能使用脚本名或类名。请使用 getComponents 获取正确的 cid。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         componentType: {
                             type: 'string',
-                            description: 'Component cid (type field from getComponents). Do NOT use script name or class name. Example: "cc.Sprite" or "9b4a7ueT9xD6aRE+AlOusy1"'
+                            description: '组件 cid（getComponents 返回的 type 字段）。请勿使用脚本名或类名。示例："cc.Sprite" 或 "9b4a7ueT9xD6aRE+AlOusy1"'
                         }
                     },
                     required: ['nodeUuid', 'componentType']
@@ -41,13 +41,13 @@ export class ComponentTools implements ToolExecutor {
             },
             {
                 name: 'get_components',
-                description: 'Get all components of a node',
+                description: '获取节点的所有组件',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         }
                     },
                     required: ['nodeUuid']
@@ -55,17 +55,17 @@ export class ComponentTools implements ToolExecutor {
             },
             {
                 name: 'get_component_info',
-                description: 'Get specific component information',
+                description: '获取特定组件信息',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         componentType: {
                             type: 'string',
-                            description: 'Component type to get info for'
+                            description: '要获取信息的组件类型'
                         }
                     },
                     required: ['nodeUuid', 'componentType']
@@ -73,31 +73,31 @@ export class ComponentTools implements ToolExecutor {
             },
             {
                 name: 'set_component_property',
-                description: 'Set component property values for UI components or custom script components. Supports setting properties of built-in UI components (e.g., cc.Label, cc.Sprite) and custom script components. Note: For node basic properties (name, active, layer, etc.), use set_node_property. For node transform properties (position, rotation, scale, etc.), use set_node_transform.',
+                description: '设置 UI 组件或自定义脚本组件的属性值。支持设置内置 UI 组件（如 cc.Label、cc.Sprite）和自定义脚本组件的属性。注意：节点基础属性（name、active、layer 等）请使用 set_node_property；节点变换属性（position、rotation、scale 等）请使用 set_node_transform。',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Target node UUID - Must specify the node to operate on'
+                            description: '目标节点 UUID - 必须指定要操作的节点'
                         },
                         componentType: {
                             type: 'string',
-                            description: 'Component type - Can be built-in components (e.g., cc.Label) or custom script components (e.g., MyScript). If unsure about component type, use get_components first to retrieve all components on the node.',
+                            description: '组件类型 - 可以是内置组件（如 cc.Label）或自定义脚本组件（如 MyScript）。如果不确定组件类型，请先使用 get_components 获取节点上的所有组件。',
                             // 移除enum限制，允许任意组件类型包括自定义脚本
                         },
                         property: {
                             type: 'string',
-                            description: 'Property name - The property to set. Common properties include:\n' +
-                                '• cc.Label: string (text content), fontSize (font size), color (text color)\n' +
-                                '• cc.Sprite: spriteFrame (sprite frame), color (tint color), sizeMode (size mode)\n' +
-                                '• cc.Button: normalColor (normal color), pressedColor (pressed color), target (target node)\n' +
-                                '• cc.UITransform: contentSize (content size), anchorPoint (anchor point)\n' +
-                                '• Custom Scripts: Based on properties defined in the script'
+                            description: '属性名 - 要设置的属性。常见属性包括：\n' +
+                                '• cc.Label: string（文本内容）、fontSize（字体大小）、color（文本颜色）\n' +
+                                '• cc.Sprite: spriteFrame（精灵帧）、color（着色颜色）、sizeMode（尺寸模式）\n' +
+                                '• cc.Button: normalColor（普通颜色）、pressedColor（按下颜色）、target（目标节点）\n' +
+                                '• cc.UITransform: contentSize（内容尺寸）、anchorPoint（锚点）\n' +
+                                '• 自定义脚本：根据脚本中定义的属性'
                         },
                         propertyType: {
                             type: 'string',
-                            description: 'Property type - Must explicitly specify the property data type for correct value conversion and validation',
+                            description: '属性类型 - 必须明确指定属性的数据类型，以便正确转换和验证值',
                             enum: [
                                 'string', 'number', 'boolean', 'integer', 'float',
                                 'color', 'vec2', 'vec3', 'size',
@@ -107,40 +107,40 @@ export class ComponentTools implements ToolExecutor {
                                                 },
 
                         value: {
-                            description: 'Property value - Use the corresponding data format based on propertyType:\n\n' +
-                                '📝 Basic Data Types:\n' +
-                                '• string: "Hello World" (text string)\n' +
-                                '• number/integer/float: 42 or 3.14 (numeric value)\n' +
-                                '• boolean: true or false (boolean value)\n\n' +
-                                '🎨 Color Type:\n' +
-                                '• color: {"r":255,"g":0,"b":0,"a":255} (RGBA values, range 0-255)\n' +
-                                '  - Alternative: "#FF0000" (hexadecimal format)\n' +
-                                '  - Transparency: a value controls opacity, 255 = fully opaque, 0 = fully transparent\n\n' +
-                                '📐 Vector and Size Types:\n' +
-                                '• vec2: {"x":100,"y":50} (2D vector)\n' +
-                                '• vec3: {"x":1,"y":2,"z":3} (3D vector)\n' +
-                                '• size: {"width":100,"height":50} (size dimensions)\n\n' +
-                                '🔗 Reference Types (using UUID strings):\n' +
-                                '• node: "target-node-uuid" (node reference)\n' +
-                                '  How to get: Use get_all_nodes or find_node_by_name to get node UUIDs\n' +
-                                '• component: "target-node-uuid" (component reference)\n' +
-                                '  How it works: \n' +
-                                '    1. Provide the UUID of the NODE that contains the target component\n' +
-                                '    2. System auto-detects required component type from property metadata\n' +
-                                '    3. Finds the component on target node and gets its scene __id__\n' +
-                                '    4. Sets reference using the scene __id__ (not node UUID)\n' +
-                                '  Example: value="label-node-uuid" will find cc.Label and use its scene ID\n' +
-                                '• spriteFrame: "spriteframe-uuid" (sprite frame asset)\n' +
-                                '  How to get: Check asset database or use asset browser\n' +
-                                '• prefab: "prefab-uuid" (prefab asset)\n' +
-                                '  How to get: Check asset database or use asset browser\n' +
-                                '• asset: "asset-uuid" (generic asset reference)\n' +
-                                '  How to get: Check asset database or use asset browser\n\n' +
-                                '📋 Array Types:\n' +
-                                '• nodeArray: ["uuid1","uuid2"] (array of node UUIDs)\n' +
-                                '• colorArray: [{"r":255,"g":0,"b":0,"a":255}] (array of colors)\n' +
-                                '• numberArray: [1,2,3,4,5] (array of numbers)\n' +
-                                '• stringArray: ["item1","item2"] (array of strings)'
+                            description: '属性值 - 根据 propertyType 使用对应的数据格式：\n\n' +
+                                '📝 基础数据类型：\n' +
+                                '• string: "Hello World"（文本字符串）\n' +
+                                '• number/integer/float: 42 或 3.14（数值）\n' +
+                                '• boolean: true 或 false（布尔值）\n\n' +
+                                '🎨 颜色类型：\n' +
+                                '• color: {"r":255,"g":0,"b":0,"a":255}（RGBA 值，范围 0-255）\n' +
+                                '  - 也支持："#FF0000"（十六进制格式）\n' +
+                                '  - 透明度：a 值控制不透明度，255 = 完全不透明，0 = 完全透明\n\n' +
+                                '📐 向量和尺寸类型：\n' +
+                                '• vec2: {"x":100,"y":50}（二维向量）\n' +
+                                '• vec3: {"x":1,"y":2,"z":3}（三维向量）\n' +
+                                '• size: {"width":100,"height":50}（尺寸）\n\n' +
+                                '🔗 引用类型（使用 UUID 字符串）：\n' +
+                                '• node: "target-node-uuid"（节点引用）\n' +
+                                '  获取方式：使用 get_all_nodes 或 find_node_by_name 获取节点 UUID\n' +
+                                '• component: "target-node-uuid"（组件引用）\n' +
+                                '  工作原理：\n' +
+                                '    1. 提供包含目标组件的节点 UUID\n' +
+                                '    2. 系统从属性元数据自动检测所需组件类型\n' +
+                                '    3. 在目标节点上查找该组件并获取其场景 __id__\n' +
+                                '    4. 使用场景 __id__（而非节点 UUID）设置引用\n' +
+                                '  示例：value="label-node-uuid" 将查找 cc.Label 并使用其场景 ID\n' +
+                                '• spriteFrame: "spriteframe-uuid"（精灵帧资源）\n' +
+                                '  获取方式：查看资源数据库或使用资源浏览器\n' +
+                                '• prefab: "prefab-uuid"（预制体资源）\n' +
+                                '  获取方式：查看资源数据库或使用资源浏览器\n' +
+                                '• asset: "asset-uuid"（通用资源引用）\n' +
+                                '  获取方式：查看资源数据库或使用资源浏览器\n\n' +
+                                '📋 数组类型：\n' +
+                                '• nodeArray: ["uuid1","uuid2"]（节点 UUID 数组）\n' +
+                                '• colorArray: [{"r":255,"g":0,"b":0,"a":255}]（颜色数组）\n' +
+                                '• numberArray: [1,2,3,4,5]（数字数组）\n' +
+                                '• stringArray: ["item1","item2"]（字符串数组）'
                         }
                     },
                     required: ['nodeUuid', 'componentType', 'property', 'propertyType', 'value']
@@ -148,17 +148,17 @@ export class ComponentTools implements ToolExecutor {
             },
             {
                 name: 'attach_script',
-                description: 'Attach a script component to a node',
+                description: '将脚本组件附加到节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         scriptPath: {
                             type: 'string',
-                            description: 'Script asset path (e.g., db://assets/scripts/MyScript.ts)'
+                            description: '脚本资源路径（例如 db://assets/scripts/MyScript.ts）'
                         }
                     },
                     required: ['nodeUuid', 'scriptPath']
@@ -166,13 +166,13 @@ export class ComponentTools implements ToolExecutor {
             },
             {
                 name: 'get_available_components',
-                description: 'Get list of available component types',
+                description: '获取可用组件类型列表',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         category: {
                             type: 'string',
-                            description: 'Component category filter',
+                            description: '组件分类过滤器',
                             enum: ['all', 'renderer', 'ui', 'physics', 'animation', 'audio'],
                             default: 'all'
                         }

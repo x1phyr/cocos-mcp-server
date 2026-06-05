@@ -105,8 +105,8 @@ export const methods: { [key: string]: (...any: any) => any } = {
     },
 
     /**
-     * @en Update server settings
-     * @zh 更新服务器设置
+     * @en Update server settings (save to disk; restart only if already running)
+     * @zh 更新服务器设置（保存到磁盘；仅在服务器运行中时重启）
      */
     updateSettings(settings: MCPServerSettings) {
         const validationError = validateMcpServerSettings(settings);
@@ -114,7 +114,8 @@ export const methods: { [key: string]: (...any: any) => any } = {
             throw new Error(validationError);
         }
         saveSettings(settings);
-        if (mcpServer) {
+        if (mcpServer && mcpServer.getStatus().running) {
+            // 服务器正在运行，用新设置重启
             mcpServer.stop();
             mcpServer = createMcpServer(settings);
             applyRegistryChange();
@@ -122,11 +123,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
                 console.error('[MCP插件] Failed to restart MCP server after settings update:', err);
             });
         } else {
+            // 服务器未运行，重建实例以使用新设置（下次 start 时生效）
             mcpServer = createMcpServer(settings);
             applyRegistryChange();
-            mcpServer.start().catch((err) => {
-                console.error('[MCP插件] Failed to start MCP server after settings update:', err);
-            });
         }
     },
 

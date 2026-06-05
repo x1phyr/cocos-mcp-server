@@ -6,7 +6,7 @@ export class ServerTools implements ToolExecutor {
         return [
             {
                 name: 'query_server_ip_list',
-                description: 'Query server IP list',
+                description: '查询服务器 IP 列表',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -14,7 +14,7 @@ export class ServerTools implements ToolExecutor {
             },
             {
                 name: 'query_sorted_server_ip_list',
-                description: 'Get sorted server IP list',
+                description: '获取排序后的服务器 IP 列表',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -22,7 +22,7 @@ export class ServerTools implements ToolExecutor {
             },
             {
                 name: 'query_server_port',
-                description: 'Query editor server current port',
+                description: '查询编辑器服务器当前端口',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -30,7 +30,7 @@ export class ServerTools implements ToolExecutor {
             },
             {
                 name: 'get_server_status',
-                description: 'Get comprehensive server status information',
+                description: '获取服务器综合状态信息',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -38,13 +38,13 @@ export class ServerTools implements ToolExecutor {
             },
             {
                 name: 'check_server_connectivity',
-                description: 'Check server connectivity and network status',
+                description: '检查服务器连通性和网络状态',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         timeout: {
                             type: 'number',
-                            description: 'Timeout in milliseconds',
+                            description: '超时时间（毫秒）',
                             default: 5000
                         }
                     }
@@ -52,7 +52,7 @@ export class ServerTools implements ToolExecutor {
             },
             {
                 name: 'get_network_interfaces',
-                description: 'Get available network interfaces',
+                description: '获取可用网络接口',
                 inputSchema: {
                     type: 'object',
                     properties: {}

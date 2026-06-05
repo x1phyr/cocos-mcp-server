@@ -1,5 +1,44 @@
+/* ============================================================
+   MCP Server Panel — Design System
+   Aesthetic: minimal dark, VS Code / Figma-like
+   ============================================================ */
+
+/* --- Design Tokens --- */
+:host {
+    --mcp-radius-sm: 4px;
+    --mcp-radius-md: 8px;
+    --mcp-radius-lg: 12px;
+    --mcp-radius-pill: 999px;
+    --mcp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+    --mcp-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --mcp-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --mcp-transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    --mcp-spacing-xs: 4px;
+    --mcp-spacing-sm: 8px;
+    --mcp-spacing-md: 16px;
+    --mcp-spacing-lg: 24px;
+    --mcp-spacing-xl: 32px;
+    --mcp-accent: #5b9bd5;
+    --mcp-accent-dim: rgba(91, 155, 213, 0.12);
+    --mcp-accent-glow: rgba(91, 155, 213, 0.25);
+    --mcp-success: #4ec9b0;
+    --mcp-success-dim: rgba(78, 201, 176, 0.12);
+    --mcp-warn: #d7ba7d;
+    --mcp-warn-dim: rgba(215, 186, 125, 0.12);
+    --mcp-danger: #f14c4c;
+    --mcp-surface-0: rgba(255, 255, 255, 0.02);
+    --mcp-surface-1: rgba(255, 255, 255, 0.04);
+    --mcp-surface-2: rgba(255, 255, 255, 0.06);
+    --mcp-border: rgba(255, 255, 255, 0.08);
+    --mcp-border-emphasis: rgba(255, 255, 255, 0.12);
+    --mcp-text-primary: rgba(255, 255, 255, 0.9);
+    --mcp-text-secondary: rgba(255, 255, 255, 0.55);
+    --mcp-text-tertiary: rgba(255, 255, 255, 0.35);
+}
+
+/* --- Base Panel --- */
 .mcp-server-panel {
-    padding: 20px;
+    padding: var(--mcp-spacing-lg);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -10,158 +49,408 @@
 }
 
 header h2 {
-    margin: 0 0 20px 0;
+    margin: 0 0 var(--mcp-spacing-lg) 0;
     font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
 }
 
-/* Vue3 应用样式 */
+/* --- Vue App Container --- */
 .mcp-app {
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* 选项卡导航样式 */
+/* ============================================================
+   Tab Navigation — pill-style segmented control
+   ============================================================ */
 .tab-navigation {
     display: flex;
-    border-bottom: 1px solid var(--color-normal-border);
-    margin-bottom: 20px;
-    background: var(--color-panel);
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: var(--mcp-spacing-lg);
+    background: var(--mcp-surface-1);
+    border-radius: var(--mcp-radius-md);
+    border: 1px solid var(--mcp-border);
 }
 
 .tab-button {
-    background: none;
+    flex: 1;
+    background: transparent;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    color: var(--color-normal-text);
-    font-size: 14px;
-    transition: all 0.2s ease;
-    border-radius: 4px 4px 0 0;
+    color: var(--mcp-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all var(--mcp-transition);
+    border-radius: 6px;
+    position: relative;
 }
 
 .tab-button:hover {
-    background: var(--color-normal-fill-emphasis);
+    color: var(--mcp-text-primary);
+    background: var(--mcp-surface-2);
 }
 
 .tab-button.active {
-    border-bottom-color: var(--color-primary);
-    color: var(--color-primary);
+    color: var(--mcp-text-primary);
+    background: var(--mcp-surface-2);
     font-weight: 600;
-    background: var(--color-panel);
+    box-shadow: var(--mcp-shadow-sm), inset 0 0 0 1px var(--mcp-border-emphasis);
 }
 
-/* 选项卡内容样式 */
+/* ============================================================
+   Tab Content
+   ============================================================ */
 .tab-content {
     display: flex;
     flex-direction: column;
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: var(--mcp-spacing-sm);
+    gap: var(--mcp-spacing-md);
 }
 
+/* ============================================================
+   Section Cards
+   ============================================================ */
 section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: var(--color-normal-fill-emphasis);
-    border-radius: 4px;
+    margin-bottom: 0;
+    padding: var(--mcp-spacing-md) var(--mcp-spacing-lg);
+    background: var(--mcp-surface-1);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-md);
+    transition: border-color var(--mcp-transition);
+}
+
+section:hover {
+    border-color: var(--mcp-border-emphasis);
 }
 
 section h3 {
-    margin: 0 0 15px 0;
+    margin: 0 0 var(--mcp-spacing-md) 0;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mcp-text-secondary);
+}
+
+/* ============================================================
+   Server Status
+   ============================================================ */
+.status-value,
+.status-label {
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--mcp-spacing-xs);
     font-size: 14px;
-    font-weight: 600;
 }
 
-.status-value {
-    font-weight: 600;
-}
-
+.status-label.running,
 .status-value.running {
-    color: var(--color-success-fill);
+    color: var(--mcp-success);
 }
 
+.status-label.stopped,
 .status-value.stopped {
-    color: var(--color-warn-fill);
+    color: var(--mcp-warn);
 }
 
-/* Status dot indicator */
+/* Status Indicator Dot */
 .status-dot {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin-right: 6px;
+    margin-right: 8px;
     vertical-align: middle;
+    transition: all var(--mcp-transition);
 }
 
 .status-dot-running {
-    background: var(--color-success-fill, #6cc644);
-    box-shadow: 0 0 4px var(--color-success-fill, #6cc644);
+    background: var(--mcp-success);
+    box-shadow: 0 0 6px var(--mcp-success), 0 0 12px rgba(78, 201, 176, 0.3);
+    animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .status-dot-stopped {
-    background: var(--color-warn-fill, #c9a227);
+    background: var(--mcp-warn);
+    opacity: 0.8;
 }
 
-/* Category count badge */
-.category-count {
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 6px var(--mcp-success), 0 0 12px rgba(78, 201, 176, 0.3); }
+    50% { box-shadow: 0 0 8px var(--mcp-success), 0 0 20px rgba(78, 201, 176, 0.5); }
+}
+
+/* ============================================================
+   Status Card — Hero section
+   ============================================================ */
+.status-card {
+    padding: var(--mcp-spacing-lg);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-lg);
+    background: linear-gradient(135deg, var(--mcp-surface-1) 0%, var(--mcp-surface-0) 100%);
+}
+
+.status-card-running {
+    border-color: rgba(78, 201, 176, 0.2);
+    background: linear-gradient(135deg, rgba(78, 201, 176, 0.04) 0%, var(--mcp-surface-0) 100%);
+}
+
+.status-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.status-card-meta {
+    display: flex;
+    gap: var(--mcp-spacing-lg);
+    margin-top: var(--mcp-spacing-md);
+    padding-top: var(--mcp-spacing-md);
+    border-top: 1px solid var(--mcp-border);
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 12px;
-    font-weight: 400;
-    color: var(--color-normal-text-secondary);
-    margin-left: 4px;
+    color: var(--mcp-text-secondary);
 }
 
+.meta-icon {
+    font-size: 14px;
+}
+
+/* ============================================================
+   Connection Card
+   ============================================================ */
+.connection-card {
+    padding: var(--mcp-spacing-md) var(--mcp-spacing-lg);
+}
+
+.url-display {
+    display: flex;
+    align-items: center;
+    gap: var(--mcp-spacing-sm);
+    background: var(--mcp-surface-2);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-sm);
+    padding: 8px 12px;
+}
+
+.url-text {
+    flex: 1;
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 12px;
+    color: var(--mcp-accent);
+    user-select: all;
+}
+
+/* ============================================================
+   Settings Card
+   ============================================================ */
+.settings-card {
+    padding: var(--mcp-spacing-lg);
+}
+
+.settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: var(--mcp-radius-sm);
+    transition: background var(--mcp-transition);
+}
+
+.setting-row:hover {
+    background: var(--mcp-surface-2);
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--mcp-text-primary);
+}
+
+.setting-icon {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+}
+
+.setting-input {
+    width: 100px;
+}
+
+/* ============================================================
+   Server Controls (legacy compat)
+   ============================================================ */
 .server-controls {
     display: flex;
-    justify-content: center;
-    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--mcp-spacing-lg);
+    gap: var(--mcp-spacing-sm);
 }
 
 .server-controls ui-button {
-    min-width: 150px;
+    min-width: 180px;
 }
 
 .connection-details {
-    margin-top: 10px;
+    margin-top: var(--mcp-spacing-sm);
 }
 
+/* ============================================================
+   Footer
+   ============================================================ */
 footer {
     margin-top: auto;
-    padding-top: 20px;
+    padding-top: var(--mcp-spacing-md);
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: var(--mcp-spacing-sm);
 }
 
 ui-prop {
-    margin-bottom: 10px;
+    margin-bottom: var(--mcp-spacing-sm);
 }
 
-/* 工具管理器样式 */
+/* ============================================================
+   Tools Tab — Summary Chips
+   ============================================================ */
+.tools-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--mcp-spacing-sm);
+    margin-bottom: var(--mcp-spacing-md);
+}
+
+.summary-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: var(--mcp-radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--mcp-surface-2);
+    border: 1px solid var(--mcp-border);
+    color: var(--mcp-text-secondary);
+    transition: all var(--mcp-transition);
+}
+
+.summary-chip:first-child {
+    border-color: var(--mcp-accent-dim);
+    color: var(--mcp-accent);
+    background: var(--mcp-accent-dim);
+}
+
+.summary-chip-external {
+    border-color: var(--mcp-warn-dim) !important;
+    color: var(--mcp-warn) !important;
+    background: var(--mcp-warn-dim) !important;
+}
+
+/* ============================================================
+   External Providers
+   ============================================================ */
+.external-providers {
+    margin-bottom: var(--mcp-spacing-md);
+    padding: var(--mcp-spacing-md);
+    border-radius: var(--mcp-radius-md);
+    background: var(--mcp-warn-dim);
+    border: 1px solid rgba(215, 186, 125, 0.15);
+}
+
+.external-providers h4 {
+    margin: 0 0 var(--mcp-spacing-sm);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mcp-warn);
+}
+
+.external-providers ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.external-providers li {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--mcp-text-secondary);
+}
+
+.provider-meta {
+    margin-left: 8px;
+    color: var(--mcp-text-tertiary);
+}
+
+/* ============================================================
+   Tool Manager — Main Layout
+   ============================================================ */
 .tool-manager {
     display: flex;
     flex-direction: column;
     height: 100%;
+    gap: var(--mcp-spacing-md);
+    background: transparent;
+    padding: 0;
+    border: none;
+}
+
+.tool-manager:hover {
+    border-color: transparent;
 }
 
 .tool-manager-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+}
+
+.tool-manager-header h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mcp-text-secondary);
 }
 
 .tool-manager-controls {
     display: flex;
-    gap: 10px;
+    gap: var(--mcp-spacing-sm);
 }
 
-.config-selector-section {
-    margin-bottom: 20px;
-}
-
+/* ============================================================
+   Tools Section — Header & Controls
+   ============================================================ */
 .tools-section {
     flex: 1;
     display: flex;
@@ -173,34 +462,38 @@ ui-prop {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--color-normal-border);
+    margin-bottom: var(--mcp-spacing-md);
+    padding-bottom: var(--mcp-spacing-md);
+    border-bottom: 1px solid var(--mcp-border);
 }
 
 .tools-section-title {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
 .tools-section-title h4 {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
+    color: var(--mcp-text-primary);
 }
 
 .tools-stats {
     font-size: 12px;
-    color: var(--color-normal-text-secondary);
+    color: var(--mcp-text-tertiary);
 }
 
 .tools-section-controls {
     display: flex;
-    gap: 10px;
+    gap: var(--mcp-spacing-sm);
     align-items: center;
 }
 
+/* ============================================================
+   Tools Container — Scrollable Area
+   ============================================================ */
 .tools-container {
     flex: 1;
     overflow-y: auto;
@@ -209,82 +502,156 @@ ui-prop {
 }
 
 .tools-container::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
 }
 
 .tools-container::-webkit-scrollbar-track {
-    background: var(--color-normal-fill-emphasis);
-    border-radius: 3px;
+    background: transparent;
 }
 
 .tools-container::-webkit-scrollbar-thumb {
-    background: var(--color-normal-border);
-    border-radius: 3px;
+    background: var(--mcp-border-emphasis);
+    border-radius: var(--mcp-radius-pill);
 }
 
 .tools-container::-webkit-scrollbar-thumb:hover {
-    background: var(--color-normal-text-secondary);
+    background: var(--mcp-text-tertiary);
 }
 
+/* ============================================================
+   Tool Category Card — Redesigned
+   ============================================================ */
 .tool-category {
-    margin-bottom: 20px;
-    background: var(--color-normal-fill);
-    border-radius: 6px;
+    margin-bottom: var(--mcp-spacing-md);
+    background: var(--mcp-surface-1);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-md);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all var(--mcp-transition);
 }
 
+.tool-category:hover {
+    border-color: var(--mcp-border-emphasis);
+    box-shadow: var(--mcp-shadow-sm);
+}
+
+.tool-category-external {
+    border-left: 3px solid var(--mcp-warn);
+}
+
+/* Category Header — clickable, with collapse arrow */
 .category-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 15px;
-    background: linear-gradient(135deg, var(--color-primary-fill) 0%, var(--color-primary-fill-emphasis) 100%);
-    color: var(--color-primary-text);
+    padding: 10px var(--mcp-spacing-md);
+    background: var(--mcp-surface-2);
+    border-bottom: 1px solid var(--mcp-border);
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--mcp-transition);
+}
+
+.category-header:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Collapsed state — no bottom border when content hidden */
+.tool-category-collapsed .category-header {
+    border-bottom-color: transparent;
+}
+
+/* Collapse Arrow */
+.collapse-arrow {
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 11px;
+    transition: transform var(--mcp-transition);
+    color: var(--mcp-text-tertiary);
+}
+
+.collapse-arrow-collapsed {
+    transform: rotate(-90deg);
+}
+
+.category-header h5 {
+    margin: 0;
+    font-size: 12px;
     font-weight: 600;
+    color: var(--mcp-text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--mcp-spacing-sm);
+}
+
+.category-count {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--mcp-text-tertiary);
+}
+
+.category-controls {
+    display: flex;
+    gap: 4px;
 }
 
 .category-name {
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .category-toggle {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--mcp-spacing-sm);
     font-size: 12px;
 }
 
-.tool-list {
-    padding: 10px 15px;
+/* ============================================================
+   Tool Items — Clean List
+   ============================================================ */
+.tool-list,
+.tool-items {
+    padding: var(--mcp-spacing-sm) var(--mcp-spacing-md);
 }
 
 .tool-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--color-normal-border);
+    align-items: flex-start;
+    gap: var(--mcp-spacing-sm);
+    padding: 8px var(--mcp-spacing-sm);
+    border-radius: var(--mcp-radius-sm);
+    transition: background var(--mcp-transition);
 }
 
-.tool-item:last-child {
-    border-bottom: none;
+.tool-item:hover {
+    background: var(--mcp-surface-2);
+}
+
+.tool-item + .tool-item {
+    border-top: 1px solid var(--mcp-border);
 }
 
 .tool-info {
     flex: 1;
+    min-width: 0;
 }
 
 .tool-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
-    color: var(--color-normal-text);
+    color: var(--mcp-text-primary);
+    line-height: 1.4;
 }
 
 .tool-description {
     font-size: 11px;
-    color: var(--color-normal-text-secondary);
+    color: var(--mcp-text-tertiary);
     margin-top: 2px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .tool-toggle {
@@ -298,10 +665,53 @@ ui-prop {
     cursor: pointer;
 }
 
+/* Tool Badges */
+.tool-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: var(--mcp-radius-sm);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.tool-badge-external {
+    background: var(--mcp-warn-dim);
+    color: var(--mcp-warn);
+}
+
+/* ============================================================
+   Feedback Messages
+   ============================================================ */
+.feedback {
+    margin: var(--mcp-spacing-sm) 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.feedback-success {
+    color: var(--mcp-success);
+}
+
+.feedback-error {
+    color: var(--mcp-danger);
+}
+
+/* ============================================================
+   Config Selector Section
+   ============================================================ */
+.config-selector-section {
+    margin-bottom: var(--mcp-spacing-lg);
+}
+
+/* ============================================================
+   Tool Manager Footer
+   ============================================================ */
 .tool-manager-footer {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid var(--color-normal-border);
+    margin-top: var(--mcp-spacing-lg);
+    padding-top: var(--mcp-spacing-md);
+    border-top: 1px solid var(--mcp-border);
 }
 
 .config-actions {
@@ -310,15 +720,17 @@ ui-prop {
     align-items: center;
 }
 
-/* 模态框样式 */
+/* ============================================================
+   Modals — Glassmorphism-lite
+   ============================================================ */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -326,240 +738,186 @@ ui-prop {
 }
 
 .modal-content {
-    background: var(--color-normal-fill);
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(8px);
+    background: var(--color-normal-fill, #1e1e1e);
+    border: 1px solid var(--mcp-border-emphasis);
+    border-radius: var(--mcp-radius-lg);
+    box-shadow: var(--mcp-shadow-lg);
     min-width: 400px;
     max-width: 600px;
     max-height: 80vh;
     overflow-y: auto;
+    animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 20px 0 20px;
-    border-bottom: 1px solid var(--color-normal-border);
-    padding-bottom: 15px;
+    padding: var(--mcp-spacing-lg);
+    border-bottom: 1px solid var(--mcp-border);
 }
 
 .modal-header h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
+    color: var(--mcp-text-primary);
+    text-transform: none;
+    letter-spacing: normal;
 }
 
 .modal-close {
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
-    color: var(--color-normal-text-secondary);
+    color: var(--mcp-text-tertiary);
     padding: 0;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--mcp-radius-sm);
+    transition: all var(--mcp-transition);
 }
 
 .modal-close:hover {
-    background: var(--color-normal-fill-emphasis);
-    color: var(--color-normal-text);
+    background: var(--mcp-surface-2);
+    color: var(--mcp-text-primary);
 }
 
 .modal-body {
-    padding: 20px;
+    padding: var(--mcp-spacing-lg);
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    padding: 0 20px 20px 20px;
-    border-top: 1px solid var(--color-normal-border);
-    padding-top: 15px;
+    gap: var(--mcp-spacing-sm);
+    padding: var(--mcp-spacing-md) var(--mcp-spacing-lg);
+    border-top: 1px solid var(--mcp-border);
 }
 
-/* 按钮样式 */
+/* ============================================================
+   Button Variants
+   ============================================================ */
 ui-button.small {
-    font-size: 12px;
-    padding: 4px 8px;
+    font-size: 11px;
+    padding: 3px 8px;
     min-width: auto;
 }
 
 ui-button.secondary {
-    background: var(--color-normal-fill-emphasis);
-    color: var(--color-normal-text);
-    border: 1px solid var(--color-normal-border);
+    background: var(--mcp-surface-2);
+    color: var(--mcp-text-secondary);
+    border: 1px solid var(--mcp-border);
 }
 
 ui-button.secondary:hover {
-    background: var(--color-normal-fill);
+    background: var(--mcp-surface-1);
+    color: var(--mcp-text-primary);
+    border-color: var(--mcp-border-emphasis);
 }
 
-/* 空状态样式 */
+/* ============================================================
+   Empty State
+   ============================================================ */
 .empty-state {
     text-align: center;
-    padding: 40px 20px;
-    color: var(--color-normal-text-secondary);
+    padding: 48px var(--mcp-spacing-lg);
+    color: var(--mcp-text-tertiary);
 }
 
 .empty-state h3 {
-    margin: 0 0 10px 0;
-    font-size: 16px;
+    margin: 0 0 var(--mcp-spacing-sm) 0;
+    font-size: 15px;
+    color: var(--mcp-text-secondary);
+    text-transform: none;
+    letter-spacing: normal;
 }
 
 .empty-state p {
     margin: 0;
-    font-size: 14px;
-}
-
-.feedback {
-    margin: 10px 0 0;
-    font-size: 12px;
-    line-height: 1.4;
-}
-
-.feedback-success {
-    color: var(--color-success, #6cc644);
-}
-
-.feedback-error {
-    color: var(--color-danger, #e74c3c);
-}
-
-.tools-summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.summary-chip {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    background: var(--color-normal-fill);
-    border: 1px solid var(--color-normal-border);
-}
-
-.summary-chip-external {
-    border-color: var(--color-warn-fill, #c9a227);
-}
-
-.external-providers {
-    margin-bottom: 16px;
-    padding: 12px;
-    border-radius: 4px;
-    background: var(--color-normal-fill);
-    border: 1px solid var(--color-normal-border);
-}
-
-.external-providers h4 {
-    margin: 0 0 8px;
     font-size: 13px;
 }
 
-.external-providers ul {
-    margin: 0;
-    padding-left: 18px;
-}
-
-.external-providers li {
-    margin-bottom: 6px;
-    font-size: 12px;
-}
-
-.provider-meta {
-    margin-left: 8px;
-    color: var(--color-normal-text-secondary);
-}
-
-.tool-category-external {
-    border-left: 3px solid var(--color-warn-fill, #c9a227);
-}
-
-.tool-badge {
-    display: inline-block;
-    margin-left: 8px;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 600;
-    vertical-align: middle;
-}
-
-.tool-badge-external {
-    background: var(--color-warn-fill, rgba(201, 162, 39, 0.2));
-    color: var(--color-warn-text, #8a6d1d);
-}
-
-/* ========== Tool Manager Panel Styles ========== */
-
+/* ============================================================
+   Tool Manager Panel (Standalone)
+   ============================================================ */
 .tool-manager-panel {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 16px;
-    gap: 16px;
+    padding: var(--mcp-spacing-lg);
+    gap: var(--mcp-spacing-md);
     overflow: hidden;
     box-sizing: border-box;
 }
 
-/* Header */
+/* TM Header */
 .tm-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--color-normal-border);
+    padding-bottom: var(--mcp-spacing-md);
+    border-bottom: 1px solid var(--mcp-border);
 }
 
 .tm-header h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    color: var(--color-normal-text);
+    color: var(--mcp-text-primary);
+    letter-spacing: -0.01em;
 }
 
 .tm-header-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--mcp-spacing-sm);
 }
 
-/* Config Section */
+/* TM Config Section */
 .tm-config-section {
-    background: var(--color-normal-fill-emphasis);
-    border-radius: 6px;
-    padding: 16px;
+    background: var(--mcp-surface-1);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-md);
+    padding: var(--mcp-spacing-md);
+    transition: border-color var(--mcp-transition);
+}
+
+.tm-config-section:hover {
+    border-color: var(--mcp-border-emphasis);
 }
 
 .tm-config-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: var(--mcp-spacing-sm);
 }
 
 .tm-config-title {
     font-weight: 600;
-    font-size: 14px;
-    color: var(--color-normal-text);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mcp-text-secondary);
 }
 
 .tm-config-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--mcp-spacing-sm);
 }
 
 .tm-config-selector {
     display: flex;
-    gap: 12px;
+    gap: var(--mcp-spacing-sm);
     align-items: center;
 }
 
@@ -567,38 +925,46 @@ ui-button.secondary:hover {
     flex: 1;
 }
 
-/* Tools Section */
+/* TM Tools Section */
 .tm-tools-section {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    background: var(--color-normal-fill-emphasis);
-    border-radius: 6px;
-    padding: 16px;
+    background: var(--mcp-surface-1);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-md);
+    padding: var(--mcp-spacing-md);
+    transition: border-color var(--mcp-transition);
+}
+
+.tm-tools-section:hover {
+    border-color: var(--mcp-border-emphasis);
 }
 
 .tm-tools-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--color-normal-border);
+    margin-bottom: var(--mcp-spacing-sm);
+    padding-bottom: var(--mcp-spacing-sm);
+    border-bottom: 1px solid var(--mcp-border);
 }
 
 .tm-tools-title {
     font-weight: 600;
-    font-size: 14px;
-    color: var(--color-normal-text);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mcp-text-secondary);
 }
 
 .tm-tools-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--mcp-spacing-sm);
 }
 
-/* Tools Container */
+/* TM Tools Container */
 .tm-tools-container {
     flex: 1;
     overflow-y: auto;
@@ -606,55 +972,54 @@ ui-button.secondary:hover {
 }
 
 .tm-tools-container::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
 }
 
 .tm-tools-container::-webkit-scrollbar-track {
-    background: var(--color-normal-fill);
-    border-radius: 3px;
+    background: transparent;
 }
 
 .tm-tools-container::-webkit-scrollbar-thumb {
-    background: var(--color-normal-border);
-    border-radius: 3px;
+    background: var(--mcp-border-emphasis);
+    border-radius: var(--mcp-radius-pill);
 }
 
 .tm-tools-container::-webkit-scrollbar-thumb:hover {
-    background: var(--color-normal-text-secondary);
+    background: var(--mcp-text-tertiary);
 }
 
-/* Status Bar */
+/* TM Status Bar */
 .tm-status-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    background: var(--color-normal-fill-emphasis);
-    border-radius: 6px;
-    border-top: 1px solid var(--color-normal-border);
+    padding: var(--mcp-spacing-sm) var(--mcp-spacing-md);
+    background: var(--mcp-surface-1);
+    border: 1px solid var(--mcp-border);
+    border-radius: var(--mcp-radius-md);
 }
 
 .tm-status-info {
     display: flex;
-    gap: 20px;
-    font-size: 13px;
-    color: var(--color-normal-text-secondary);
+    gap: var(--mcp-spacing-lg);
+    font-size: 12px;
+    color: var(--mcp-text-tertiary);
 }
 
 .tm-status-info strong {
-    color: var(--color-normal-text);
+    color: var(--mcp-text-primary);
     font-weight: 600;
 }
 
-/* Loading State */
+/* TM Loading State */
 .tm-loading {
     text-align: center;
-    padding: 40px 20px;
-    color: var(--color-normal-text-secondary);
-    font-size: 14px;
+    padding: 48px var(--mcp-spacing-lg);
+    color: var(--mcp-text-tertiary);
+    font-size: 13px;
 }
 
-/* Modal Styles */
+/* TM Modal */
 .tm-modal {
     position: fixed;
     top: 0;
@@ -662,10 +1027,11 @@ ui-button.secondary:hover {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    display: none;
 }
 
 .tm-modal.show {
@@ -673,65 +1039,68 @@ ui-button.secondary:hover {
 }
 
 .tm-modal-content {
-    background: var(--color-normal-fill);
-    border: 1px solid var(--color-normal-border);
-    border-radius: 8px;
+    background: var(--color-normal-fill, #1e1e1e);
+    border: 1px solid var(--mcp-border-emphasis);
+    border-radius: var(--mcp-radius-lg);
     min-width: 400px;
     max-width: 600px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--mcp-shadow-lg);
+    animation: modal-in 0.2s ease-out;
 }
 
 .tm-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--color-normal-border);
+    padding: var(--mcp-spacing-md) var(--mcp-spacing-lg);
+    border-bottom: 1px solid var(--mcp-border);
 }
 
 .tm-modal-header h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    color: var(--color-normal-text);
+    color: var(--mcp-text-primary);
 }
 
 .tm-modal-close {
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: 18px;
     cursor: pointer;
-    color: var(--color-normal-text-secondary);
+    color: var(--mcp-text-tertiary);
     padding: 0;
     width: 28px;
     height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    transition: all 0.2s;
+    border-radius: var(--mcp-radius-sm);
+    transition: all var(--mcp-transition);
 }
 
 .tm-modal-close:hover {
-    background: var(--color-normal-fill-emphasis);
-    color: var(--color-normal-text);
+    background: var(--mcp-surface-2);
+    color: var(--mcp-text-primary);
 }
 
-/* Form Styles */
+/* TM Form */
 .tm-form {
-    padding: 20px;
+    padding: var(--mcp-spacing-lg);
 }
 
 .tm-form-group {
-    margin-bottom: 16px;
+    margin-bottom: var(--mcp-spacing-md);
 }
 
 .tm-form-label {
     display: block;
     margin-bottom: 6px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
-    color: var(--color-normal-text);
+    color: var(--mcp-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .tm-form ui-input,
@@ -742,6 +1111,7 @@ ui-button.secondary:hover {
 .tm-modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 20px;
+    gap: var(--mcp-spacing-sm);
+    padding: var(--mcp-spacing-md) var(--mcp-spacing-lg);
+    border-top: 1px solid var(--mcp-border);
 }

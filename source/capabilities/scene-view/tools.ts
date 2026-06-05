@@ -5,13 +5,13 @@ export class SceneViewTools implements ToolExecutor {
         return [
             {
                 name: 'change_gizmo_tool',
-                description: 'Change Gizmo tool',
+                description: '切换 Gizmo 工具',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Tool name',
+                            description: '工具名称',
                             enum: ['position', 'rotation', 'scale', 'rect']
                         }
                     },
@@ -20,7 +20,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_gizmo_tool_name',
-                description: 'Get current Gizmo tool name',
+                description: '获取当前 Gizmo 工具名',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -28,13 +28,13 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'change_gizmo_pivot',
-                description: 'Change transform pivot point',
+                description: '切换变换中心点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Pivot point',
+                            description: '中心点',
                             enum: ['pivot', 'center']
                         }
                     },
@@ -43,7 +43,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_gizmo_pivot',
-                description: 'Get current Gizmo pivot point',
+                description: '获取当前 Gizmo 中心点',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -51,7 +51,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_gizmo_view_mode',
-                description: 'Query view mode (view/select)',
+                description: '查询视图模式（view/select）',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -59,13 +59,13 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'change_gizmo_coordinate',
-                description: 'Change coordinate system',
+                description: '切换坐标系统',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         type: {
                             type: 'string',
-                            description: 'Coordinate system',
+                            description: '坐标系统',
                             enum: ['local', 'global']
                         }
                     },
@@ -74,7 +74,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_gizmo_coordinate',
-                description: 'Get current coordinate system',
+                description: '获取当前坐标系统',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -82,13 +82,13 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'change_view_mode_2d_3d',
-                description: 'Change 2D/3D view mode',
+                description: '切换 2D/3D 视图模式',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         is2D: {
                             type: 'boolean',
-                            description: '2D/3D view mode (true for 2D, false for 3D)'
+                            description: '2D/3D 视图模式（true 为 2D，false 为 3D）'
                         }
                     },
                     required: ['is2D']
@@ -96,7 +96,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_view_mode_2d_3d',
-                description: 'Get current view mode',
+                description: '查询当前视图模式',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -104,13 +104,13 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'set_grid_visible',
-                description: 'Show/hide grid',
+                description: '显示/隐藏网格',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         visible: {
                             type: 'boolean',
-                            description: 'Grid visibility'
+                            description: '网格可见性'
                         }
                     },
                     required: ['visible']
@@ -118,7 +118,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_grid_visible',
-                description: 'Query grid visibility status',
+                description: '查询网格可见性',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -126,13 +126,13 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'set_icon_gizmo_3d',
-                description: 'Set IconGizmo to 3D or 2D mode',
+                description: '设置 IconGizmo 为 3D 或 2D 模式',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         is3D: {
                             type: 'boolean',
-                            description: '3D/2D IconGizmo (true for 3D, false for 2D)'
+                            description: '3D/2D IconGizmo（true 为 3D，false 为 2D）'
                         }
                     },
                     required: ['is3D']
@@ -140,7 +140,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_icon_gizmo_3d',
-                description: 'Query IconGizmo mode',
+                description: '查询 IconGizmo 模式',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -148,13 +148,13 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'set_icon_gizmo_size',
-                description: 'Set IconGizmo size',
+                description: '设置 IconGizmo 大小',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         size: {
                             type: 'number',
-                            description: 'IconGizmo size',
+                            description: 'IconGizmo 大小',
                             minimum: 10,
                             maximum: 100
                         }
@@ -164,7 +164,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'query_icon_gizmo_size',
-                description: 'Query IconGizmo size',
+                description: '查询 IconGizmo 大小',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -172,7 +172,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'focus_camera_on_nodes',
-                description: 'Focus scene camera on nodes',
+                description: '聚焦场景相机到节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -181,7 +181,7 @@ export class SceneViewTools implements ToolExecutor {
                                 { type: 'array', items: { type: 'string' } },
                                 { type: 'null' }
                             ],
-                            description: 'Node UUIDs to focus on (null for all)'
+                            description: '要聚焦的节点 UUID 列表（null 表示全部）'
                         }
                     },
                     required: ['uuids']
@@ -189,7 +189,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'align_camera_with_view',
-                description: 'Apply scene camera position and angle to selected node',
+                description: '将场景相机位置和角度应用到选中节点',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -197,7 +197,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'align_view_with_node',
-                description: 'Apply selected node position and angle to current view',
+                description: '将选中节点位置和角度应用到当前视图',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -205,7 +205,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'get_scene_view_status',
-                description: 'Get comprehensive scene view status',
+                description: '获取综合场景视图状态',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -213,7 +213,7 @@ export class SceneViewTools implements ToolExecutor {
             },
             {
                 name: 'reset_scene_view',
-                description: 'Reset scene view to default settings',
+                description: '重置场景视图为默认设置',
                 inputSchema: {
                     type: 'object',
                     properties: {}

@@ -5,17 +5,17 @@ export class SceneAdvancedTools implements ToolExecutor {
         return [
             {
                 name: 'reset_node_property',
-                description: 'Reset node property to default value',
+                description: '重置节点属性为默认值',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         path: {
                             type: 'string',
-                            description: 'Property path (e.g., position, rotation, scale)'
+                            description: '属性路径（如 position、rotation、scale）'
                         }
                     },
                     required: ['uuid', 'path']
@@ -23,25 +23,25 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'move_array_element',
-                description: 'Move array element position',
+                description: '移动数组元素位置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         path: {
                             type: 'string',
-                            description: 'Array property path (e.g., __comps__)'
+                            description: '数组属性路径（如 __comps__）'
                         },
                         target: {
                             type: 'number',
-                            description: 'Target item original index'
+                            description: '目标元素原始索引'
                         },
                         offset: {
                             type: 'number',
-                            description: 'Offset amount (positive or negative)'
+                            description: '偏移量（正数或负数）'
                         }
                     },
                     required: ['uuid', 'path', 'target', 'offset']
@@ -49,21 +49,21 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'remove_array_element',
-                description: 'Remove array element at specific index',
+                description: '移除指定索引的数组元素',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         path: {
                             type: 'string',
-                            description: 'Array property path'
+                            description: '数组属性路径'
                         },
                         index: {
                             type: 'number',
-                            description: 'Target item index to remove'
+                            description: '要移除的元素索引'
                         }
                     },
                     required: ['uuid', 'path', 'index']
@@ -71,7 +71,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'copy_node',
-                description: 'Copy node for later paste operation',
+                description: '复制节点以供后续粘贴操作',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -80,7 +80,7 @@ export class SceneAdvancedTools implements ToolExecutor {
                                 { type: 'string' },
                                 { type: 'array', items: { type: 'string' } }
                             ],
-                            description: 'Node UUID or array of UUIDs to copy'
+                            description: '要复制的节点 UUID 或 UUID 数组'
                         }
                     },
                     required: ['uuids']
@@ -88,24 +88,24 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'paste_node',
-                description: 'Paste previously copied nodes',
+                description: '粘贴之前复制的节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         target: {
                             type: 'string',
-                            description: 'Target parent node UUID'
+                            description: '目标父节点 UUID'
                         },
                         uuids: {
                             oneOf: [
                                 { type: 'string' },
                                 { type: 'array', items: { type: 'string' } }
                             ],
-                            description: 'Node UUIDs to paste'
+                            description: '要粘贴的节点 UUID'
                         },
                         keepWorldTransform: {
                             type: 'boolean',
-                            description: 'Keep world transform coordinates',
+                            description: '是否保持世界坐标变换',
                             default: false
                         }
                     },
@@ -114,7 +114,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'cut_node',
-                description: 'Cut node (copy + mark for move)',
+                description: '剪切节点（复制并标记为移动）',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -123,7 +123,7 @@ export class SceneAdvancedTools implements ToolExecutor {
                                 { type: 'string' },
                                 { type: 'array', items: { type: 'string' } }
                             ],
-                            description: 'Node UUID or array of UUIDs to cut'
+                            description: '要剪切的节点 UUID 或 UUID 数组'
                         }
                     },
                     required: ['uuids']
@@ -131,13 +131,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'reset_node_transform',
-                description: 'Reset node position, rotation and scale',
+                description: '重置节点位置、旋转和缩放',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         }
                     },
                     required: ['uuid']
@@ -145,13 +145,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'reset_component',
-                description: 'Reset component to default values',
+                description: '重置组件为默认值',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Component UUID'
+                            description: '组件 UUID'
                         }
                     },
                     required: ['uuid']
@@ -159,17 +159,17 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'restore_prefab',
-                description: 'Restore prefab instance from asset',
+                description: '从资源恢复预制体实例',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID'
+                            description: '节点 UUID'
                         },
                         assetUuid: {
                             type: 'string',
-                            description: 'Prefab asset UUID'
+                            description: '预制体资源 UUID'
                         }
                     },
                     required: ['nodeUuid', 'assetUuid']
@@ -177,21 +177,21 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'execute_component_method',
-                description: 'Execute method on component',
+                description: '执行组件方法',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Component UUID'
+                            description: '组件 UUID'
                         },
                         name: {
                             type: 'string',
-                            description: 'Method name'
+                            description: '方法名'
                         },
                         args: {
                             type: 'array',
-                            description: 'Method arguments',
+                            description: '方法参数',
                             default: []
                         }
                     },
@@ -200,21 +200,21 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'execute_scene_script',
-                description: 'Execute scene script method',
+                description: '执行场景脚本方法',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Plugin name'
+                            description: '插件名'
                         },
                         method: {
                             type: 'string',
-                            description: 'Method name'
+                            description: '方法名'
                         },
                         args: {
                             type: 'array',
-                            description: 'Method arguments',
+                            description: '方法参数',
                             default: []
                         }
                     },
@@ -223,7 +223,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'scene_snapshot',
-                description: 'Create scene state snapshot',
+                description: '创建场景状态快照',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -231,7 +231,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'scene_snapshot_abort',
-                description: 'Abort scene snapshot creation',
+                description: '中止场景快照创建',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -239,13 +239,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'begin_undo_recording',
-                description: 'Begin recording undo data',
+                description: '开始记录撤销数据',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         nodeUuid: {
                             type: 'string',
-                            description: 'Node UUID to record'
+                            description: '要记录的节点 UUID'
                         }
                     },
                     required: ['nodeUuid']
@@ -253,13 +253,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'end_undo_recording',
-                description: 'End recording undo data',
+                description: '结束记录撤销数据',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         undoId: {
                             type: 'string',
-                            description: 'Undo recording ID from begin_undo_recording'
+                            description: '来自 begin_undo_recording 的撤销记录 ID'
                         }
                     },
                     required: ['undoId']
@@ -267,13 +267,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'cancel_undo_recording',
-                description: 'Cancel undo recording',
+                description: '取消撤销记录',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         undoId: {
                             type: 'string',
-                            description: 'Undo recording ID to cancel'
+                            description: '要取消的撤销记录 ID'
                         }
                     },
                     required: ['undoId']
@@ -281,7 +281,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'soft_reload_scene',
-                description: 'Soft reload current scene',
+                description: '软重载当前场景',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -289,7 +289,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'query_scene_ready',
-                description: 'Check if scene is ready',
+                description: '查询场景是否就绪',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -297,7 +297,7 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'query_scene_dirty',
-                description: 'Check if scene has unsaved changes',
+                description: '查询场景是否有未保存的更改',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -305,20 +305,20 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'query_scene_classes',
-                description: 'Query all registered classes',
+                description: '查询所有已注册的类',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         extends: {
                             type: 'string',
-                            description: 'Filter classes that extend this base class'
+                            description: '筛选继承指定基类的类'
                         }
                     }
                 }
             },
             {
                 name: 'query_scene_components',
-                description: 'Query available scene components',
+                description: '查询可用场景组件',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -326,13 +326,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'query_component_has_script',
-                description: 'Check if component has script',
+                description: '查询组件是否有脚本',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         className: {
                             type: 'string',
-                            description: 'Script class name to check'
+                            description: '要检查的脚本类名'
                         }
                     },
                     required: ['className']
@@ -340,13 +340,13 @@ export class SceneAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'query_nodes_by_asset_uuid',
-                description: 'Find nodes that use specific asset UUID',
+                description: '查找使用指定资源 UUID 的节点',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         assetUuid: {
                             type: 'string',
-                            description: 'Asset UUID to search for'
+                            description: '要搜索的资源 UUID'
                         }
                     },
                     required: ['assetUuid']

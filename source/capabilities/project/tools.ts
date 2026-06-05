@@ -7,13 +7,13 @@ export class ProjectTools implements ToolExecutor {
         return [
             {
                 name: 'run_project',
-                description: 'Run the project in preview mode',
+                description: '以预览模式运行项目',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         platform: {
                             type: 'string',
-                            description: 'Target platform',
+                            description: '目标平台',
                             enum: ['browser', 'simulator', 'preview'],
                             default: 'browser'
                         }
@@ -22,18 +22,18 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'build_project',
-                description: 'Build the project',
+                description: '构建项目',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         platform: {
                             type: 'string',
-                            description: 'Build platform',
+                            description: '构建平台',
                             enum: ['web-mobile', 'web-desktop', 'ios', 'android', 'windows', 'mac']
                         },
                         debug: {
                             type: 'boolean',
-                            description: 'Debug build',
+                            description: '是否为调试构建',
                             default: true
                         }
                     },
@@ -42,7 +42,7 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'get_project_info',
-                description: 'Get project information',
+                description: '获取项目信息',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -50,13 +50,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'get_project_settings',
-                description: 'Get project settings',
+                description: '获取项目设置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         category: {
                             type: 'string',
-                            description: 'Settings category',
+                            description: '设置类别',
                             enum: ['general', 'physics', 'render', 'assets'],
                             default: 'general'
                         }
@@ -65,30 +65,30 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'refresh_assets',
-                description: 'Refresh asset database',
+                description: '刷新资源数据库',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         folder: {
                             type: 'string',
-                            description: 'Specific folder to refresh (optional)'
+                            description: '要刷新的特定文件夹（可选）'
                         }
                     }
                 }
             },
             {
                 name: 'import_asset',
-                description: 'Import an asset file',
+                description: '导入资源文件',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         sourcePath: {
                             type: 'string',
-                            description: 'Source file path'
+                            description: '源文件路径'
                         },
                         targetFolder: {
                             type: 'string',
-                            description: 'Target folder in assets'
+                            description: '资源目标文件夹'
                         }
                     },
                     required: ['sourcePath', 'targetFolder']
@@ -96,13 +96,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'get_asset_info',
-                description: 'Get asset information',
+                description: '获取资源信息',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         assetPath: {
                             type: 'string',
-                            description: 'Asset path (db://assets/...)'
+                            description: '资源路径（db://assets/...）'
                         }
                     },
                     required: ['assetPath']
@@ -110,19 +110,19 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'get_assets',
-                description: 'Get assets by type',
+                description: '按类型获取资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         type: {
                             type: 'string',
-                            description: 'Asset type filter',
+                            description: '资源类型过滤',
                             enum: ['all', 'scene', 'prefab', 'script', 'texture', 'material', 'mesh', 'audio', 'animation'],
                             default: 'all'
                         },
                         folder: {
                             type: 'string',
-                            description: 'Folder to search in',
+                            description: '要搜索的文件夹',
                             default: 'db://assets'
                         }
                     }
@@ -130,7 +130,7 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'get_build_settings',
-                description: 'Get build settings - shows current limitations',
+                description: '获取构建设置 - 显示当前限制',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -138,7 +138,7 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'open_build_panel',
-                description: 'Open the build panel in the editor',
+                description: '在编辑器中打开构建面板',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -146,7 +146,7 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'check_builder_status',
-                description: 'Check if builder worker is ready',
+                description: '检查构建工作线程是否就绪',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -154,13 +154,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'start_preview_server',
-                description: 'Start preview server',
+                description: '启动预览服务器',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         port: {
                             type: 'number',
-                            description: 'Preview server port',
+                            description: '预览服务器端口',
                             default: 7456
                         }
                     }
@@ -168,7 +168,7 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'stop_preview_server',
-                description: 'Stop preview server',
+                description: '停止预览服务器',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -176,22 +176,22 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'create_asset',
-                description: 'Create a new asset file or folder',
+                description: '创建新资源文件或文件夹',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL (e.g., db://assets/newfile.json)'
+                            description: '资源 URL（例如 db://assets/newfile.json）'
                         },
                         content: {
                             type: 'string',
-                            description: 'File content (null for folder)',
+                            description: '文件内容（文件夹则为 null）',
                             default: null
                         },
                         overwrite: {
                             type: 'boolean',
-                            description: 'Overwrite existing file',
+                            description: '是否覆盖已有文件',
                             default: false
                         }
                     },
@@ -200,21 +200,21 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'copy_asset',
-                description: 'Copy an asset to another location',
+                description: '复制资源到另一位置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         source: {
                             type: 'string',
-                            description: 'Source asset URL'
+                            description: '源资源 URL'
                         },
                         target: {
                             type: 'string',
-                            description: 'Target location URL'
+                            description: '目标位置 URL'
                         },
                         overwrite: {
                             type: 'boolean',
-                            description: 'Overwrite existing file',
+                            description: '是否覆盖已有文件',
                             default: false
                         }
                     },
@@ -223,21 +223,21 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'move_asset',
-                description: 'Move an asset to another location',
+                description: '移动资源到另一位置',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         source: {
                             type: 'string',
-                            description: 'Source asset URL'
+                            description: '源资源 URL'
                         },
                         target: {
                             type: 'string',
-                            description: 'Target location URL'
+                            description: '目标位置 URL'
                         },
                         overwrite: {
                             type: 'boolean',
-                            description: 'Overwrite existing file',
+                            description: '是否覆盖已有文件',
                             default: false
                         }
                     },
@@ -246,13 +246,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'delete_asset',
-                description: 'Delete an asset',
+                description: '删除资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL to delete'
+                            description: '要删除的资源 URL'
                         }
                     },
                     required: ['url']
@@ -260,17 +260,17 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'save_asset',
-                description: 'Save asset content',
+                description: '保存资源内容',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL'
+                            description: '资源 URL'
                         },
                         content: {
                             type: 'string',
-                            description: 'Asset content'
+                            description: '资源内容'
                         }
                     },
                     required: ['url', 'content']
@@ -278,13 +278,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'reimport_asset',
-                description: 'Reimport an asset',
+                description: '重新导入资源',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL to reimport'
+                            description: '要重新导入的资源 URL'
                         }
                     },
                     required: ['url']
@@ -292,13 +292,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'query_asset_path',
-                description: 'Get asset disk path',
+                description: '获取资源磁盘路径',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL'
+                            description: '资源 URL'
                         }
                     },
                     required: ['url']
@@ -306,13 +306,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'query_asset_uuid',
-                description: 'Get asset UUID from URL',
+                description: '通过 URL 获取资源 UUID',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         url: {
                             type: 'string',
-                            description: 'Asset URL'
+                            description: '资源 URL'
                         }
                     },
                     required: ['url']
@@ -320,13 +320,13 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'query_asset_url',
-                description: 'Get asset URL from UUID',
+                description: '通过 UUID 获取资源 URL',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         uuid: {
                             type: 'string',
-                            description: 'Asset UUID'
+                            description: '资源 UUID'
                         }
                     },
                     required: ['uuid']
@@ -334,33 +334,33 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'find_asset_by_name',
-                description: 'Find assets by name (supports partial matching and multiple results)',
+                description: '按名称查找资源（支持模糊匹配和多结果）',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Asset name to search for (supports partial matching)'
+                            description: '要搜索的资源名称（支持模糊匹配）'
                         },
                         exactMatch: {
                             type: 'boolean',
-                            description: 'Whether to use exact name matching',
+                            description: '是否使用精确名称匹配',
                             default: false
                         },
                         assetType: {
                             type: 'string',
-                            description: 'Filter by asset type',
+                            description: '按资源类型过滤',
                             enum: ['all', 'scene', 'prefab', 'script', 'texture', 'material', 'mesh', 'audio', 'animation', 'spriteFrame'],
                             default: 'all'
                         },
                         folder: {
                             type: 'string',
-                            description: 'Folder to search in',
+                            description: '要搜索的文件夹',
                             default: 'db://assets'
                         },
                         maxResults: {
                             type: 'number',
-                            description: 'Maximum number of results to return',
+                            description: '返回结果的最大数量',
                             default: 20,
                             minimum: 1,
                             maximum: 100
@@ -371,17 +371,17 @@ export class ProjectTools implements ToolExecutor {
             },
             {
                 name: 'get_asset_details',
-                description: 'Get detailed asset information including spriteFrame sub-assets',
+                description: '获取资源详细信息（包括 spriteFrame 子资源）',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         assetPath: {
                             type: 'string',
-                            description: 'Asset path (db://assets/...)'
+                            description: '资源路径（db://assets/...）'
                         },
                         includeSubAssets: {
                             type: 'boolean',
-                            description: 'Include sub-assets like spriteFrame, texture',
+                            description: '是否包含子资源（如 spriteFrame、texture）',
                             default: true
                         }
                     },

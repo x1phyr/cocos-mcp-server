@@ -96,10 +96,11 @@ module.exports = Editor.Panel.define({
                         const toolCategories = ref<string[]>([]);
                         const externalProviders = ref<ExternalProviderSummary[]>([]);
                         const settingsChanged = ref(false);
+                        let isLoadingSettings = false; // 防止从服务器加载设置时误触 settingsChanged
 
                         const statusClass = computed(() => ({
-                            'status-running': serverRunning.value,
-                            'status-stopped': !serverRunning.value,
+                            running: serverRunning.value,
+                            stopped: !serverRunning.value,
                         }));
 
                         const totalTools = computed(() => availableTools.value.length);
@@ -134,21 +135,28 @@ module.exports = Editor.Panel.define({
                         const isExternalCategory = (category: string) => !BUILTIN_TOOL_CATEGORIES.has(category);
 
                         const refreshServerStatus = async () => {
-                            const result = await Editor.Message.request('cocos-mcp-server', 'get-server-status');
-                            if (result) {
-                                serverRunning.value = result.running;
-                                serverStatus.value = result.running ? '运行中' : '已停止';
-                                connectedClients.value = result.clients || 0;
-                                httpUrl.value = result.running ? `http://127.0.0.1:${result.port}` : '';
-                                if (result.settings) {
-                                    settings.value = {
-                                        port: result.settings.port || DEFAULT_MCP_PORT,
-                                        autoStart: result.settings.autoStart || false,
-                                        debugLog: result.settings.enableDebugLog || false,
-                                        maxConnections: result.settings.maxConnections || 10,
-                                    };
-                                    settingsChanged.value = false;
+                            try {
+                                const result = await Editor.Message.request('cocos-mcp-server', 'get-server-status');
+                                if (result) {
+                                    serverRunning.value = result.running;
+                                    serverStatus.value = result.running ? '运行中' : '已停止';
+                                    connectedClients.value = result.clients || 0;
+                                    httpUrl.value = result.running ? `http://127.0.0.1:${result.port}` : '';
+                                    if (result.settings) {
+                                        isLoadingSettings = true;
+                                        settings.value = {
+                                            port: result.settings.port || DEFAULT_MCP_PORT,
+                                            autoStart: result.settings.autoStart || false,
+                                            debugLog: result.settings.enableDebugLog || false,
+                                            maxConnections: result.settings.maxConnections || 10,
+                                        };
+                                        settingsChanged.value = false;
+                                        // nextTick 确保 watch 被跳过
+                                        setTimeout(() => { isLoadingSettings = false; }, 0);
+                                    }
                                 }
+                            } catch (error) {
+                                console.error('[Vue App] Failed to refresh server status:', error);
                             }
                         };
 
@@ -230,11 +238,6 @@ module.exports = Editor.Panel.define({
                             const validationError = validateMcpServerSettings(buildMcpSettings(settings.value));
                             if (validationError) {
                                 settingsFeedback.value = validationError;
-                                settingsFeedbackKind.value = 'error';
-                                return;
-                            }
-                            if (serverRunning.value) {
-                                settingsFeedback.value = '请先停止服务器再修改端口';
                                 settingsFeedbackKind.value = 'error';
                                 return;
                             }
@@ -328,6 +331,40 @@ module.exports = Editor.Panel.define({
                             return availableTools.value.filter((tool) => tool.category === category);
                         };
 
+                        // --- 分类折叠状态 (默认全部折叠) ---
+                        const collapsedCategories = ref<Set<string>>(new Set());
+
+                        // 初始化时全部折叠
+                        watch(sortedToolCategories, (cats) => {
+                            const newSet = new Set<string>();
+                            cats.forEach((c) => newSet.add(c));
+                            collapsedCategories.value = newSet;
+                        }, { immediate: true });
+
+                        const isCategoryCollapsed = (category: string): boolean => {
+                            return collapsedCategories.value.has(category);
+                        };
+
+                        const toggleCategoryCollapse = (category: string) => {
+                            const newSet = new Set(collapsedCategories.value);
+                            if (newSet.has(category)) {
+                                newSet.delete(category);
+                            } else {
+                                newSet.add(category);
+                            }
+                            collapsedCategories.value = newSet;
+                        };
+
+                        const expandAllCategories = () => {
+                            collapsedCategories.value = new Set();
+                        };
+
+                        const collapseAllCategories = () => {
+                            const newSet = new Set<string>();
+                            sortedToolCategories.value.forEach((c) => newSet.add(c));
+                            collapsedCategories.value = newSet;
+                        };
+
                         const getCategoryDisplayName = (category: string): string => {
                             if (isExternalCategory(category)) {
                                 return `外部 · ${category}`;
@@ -354,6 +391,9 @@ module.exports = Editor.Panel.define({
                         watch(
                             settings,
                             () => {
+                                if (isLoadingSettings) {
+                                    return;
+                                }
                                 settingsChanged.value = true;
                                 if (settingsFeedbackKind.value === 'success') {
                                     settingsFeedback.value = '';
@@ -409,6 +449,7 @@ module.exports = Editor.Panel.define({
                             disabledTools,
                             builtinToolCount,
                             externalToolCount,
+                            collapsedCategories,
                             switchTab,
                             toggleServer,
                             saveSettings,
@@ -422,6 +463,10 @@ module.exports = Editor.Panel.define({
                             getToolsByCategory,
                             getCategoryDisplayName,
                             isExternalCategory,
+                            isCategoryCollapsed,
+                            toggleCategoryCollapse,
+                            expandAllCategories,
+                            collapseAllCategories,
                         };
                     },
                     template: readFileSync(

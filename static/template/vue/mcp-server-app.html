@@ -1,88 +1,96 @@
 <div class="mcp-app">
-    <!-- 选项卡导航 -->
+    <!-- 选项卡导航 — pill-style -->
     <div class="tab-navigation">
         <button class="tab-button" :class="{ active: activeTab === 'server' }" @click="switchTab('server')">
-            <span>服务器</span>
+            <span>⚡ 服务器</span>
         </button>
         <button class="tab-button" :class="{ active: activeTab === 'tools' }" @click="switchTab('tools')">
-            <span>工具管理</span>
+            <span>🔧 工具管理</span>
         </button>
     </div>
 
     <!-- 服务器选项卡 -->
     <div class="tab-content" v-show="activeTab === 'server'">
-        <section class="server-status">
-            <h3>服务器状态</h3>
-            <div class="status-info">
-                <ui-prop>
-                    <ui-label slot="label">状态</ui-label>
-                    <ui-label slot="content" class="status-value" :class="statusClass">
-                        <span class="status-dot" :class="{ 'status-dot-running': serverRunning, 'status-dot-stopped': !serverRunning }"></span>
-                        {{ serverStatus }}
-                    </ui-label>
-                </ui-prop>
-                <ui-prop v-if="serverRunning">
-                    <ui-label slot="label">连接数</ui-label>
-                    <ui-label slot="content">{{ connectedClients }}</ui-label>
-                </ui-prop>
+        <!-- 状态卡片 -->
+        <section class="status-card" :class="{ 'status-card-running': serverRunning }">
+            <div class="status-card-header">
+                <div class="status-indicator">
+                    <span class="status-dot" :class="{ 'status-dot-running': serverRunning, 'status-dot-stopped': !serverRunning }"></span>
+                    <span class="status-label" :class="statusClass">{{ serverStatus }}</span>
+                </div>
+                <ui-button @click="toggleServer" :disabled="isProcessing" class="primary">
+                    {{ serverToggleLabel }}
+                </ui-button>
             </div>
-        </section>
-
-        <section class="server-controls">
-            <ui-button @click="toggleServer" :disabled="isProcessing" class="primary">
-                {{ serverToggleLabel }}
-            </ui-button>
+            <div class="status-card-meta" v-if="serverRunning">
+                <span class="meta-item">
+                    <span class="meta-icon">🔗</span>
+                    <span>{{ connectedClients }} 个连接</span>
+                </span>
+                <span class="meta-item">
+                    <span class="meta-icon">🌐</span>
+                    <span>端口 {{ settings.port }}</span>
+                </span>
+            </div>
             <p v-if="serverActionError" class="feedback feedback-error">{{ serverActionError }}</p>
         </section>
 
-        <section class="server-settings">
-            <h3>服务器设置</h3>
-            <ui-prop>
-                <ui-label slot="label">端口</ui-label>
-                <ui-num-input slot="content" v-model="settings.port" :min="1024" :max="65535" :step="1" :disabled="serverRunning">
-                </ui-num-input>
-            </ui-prop>
-            <p v-if="settingsValidationError && settingsChanged" class="feedback feedback-error">{{ settingsValidationError }}</p>
-            <ui-prop>
-                <ui-label slot="label">自动启动</ui-label>
-                <ui-checkbox slot="content" v-model="settings.autoStart"></ui-checkbox>
-            </ui-prop>
-            <ui-prop>
-                <ui-label slot="label">调试日志</ui-label>
-                <ui-checkbox slot="content" v-model="settings.debugLog"></ui-checkbox>
-            </ui-prop>
-            <ui-prop>
-                <ui-label slot="label">最大连接数</ui-label>
-                <ui-num-input slot="content" v-model="settings.maxConnections" :min="1" :max="100" :step="1">
-                </ui-num-input>
-            </ui-prop>
-        </section>
-
-        <section class="server-info" v-if="serverRunning">
+        <!-- 连接信息 -->
+        <section class="connection-card" v-if="serverRunning">
             <h3>连接信息</h3>
-            <div class="connection-details">
-                <ui-prop>
-                    <ui-label slot="label">HTTP URL</ui-label>
-                    <ui-input slot="content" :value="httpUrl" readonly>
-                        <ui-button slot="suffix" @click="copyUrl">复制</ui-button>
-                    </ui-input>
-                </ui-prop>
+            <div class="url-display">
+                <code class="url-text">{{ httpUrl }}</code>
+                <ui-button @click="copyUrl" class="small">复制</ui-button>
             </div>
         </section>
 
+        <!-- 设置区域 -->
+        <section class="settings-card">
+            <h3>设置</h3>
+            <div class="settings-grid">
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">🔌</span>
+                        <span>端口号</span>
+                    </div>
+                    <ui-num-input v-model="settings.port" :min="1024" :max="65535" :step="1" :disabled="serverRunning" class="setting-input">
+                    </ui-num-input>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">🚀</span>
+                        <span>自动启动</span>
+                    </div>
+                    <ui-checkbox v-model="settings.autoStart"></ui-checkbox>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">📋</span>
+                        <span>调试日志</span>
+                    </div>
+                    <ui-checkbox v-model="settings.debugLog"></ui-checkbox>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">👥</span>
+                        <span>最大连接数</span>
+                    </div>
+                    <ui-num-input v-model="settings.maxConnections" :min="1" :max="100" :step="1" class="setting-input">
+                    </ui-num-input>
+                </div>
+            </div>
+            <p v-if="settingsValidationError && settingsChanged" class="feedback feedback-error">{{ settingsValidationError }}</p>
+        </section>
+
         <footer>
-            <ui-button @click="saveSettings" :disabled="!settingsChanged || isProcessing || !!settingsValidationError">保存设置</ui-button>
             <p v-if="settingsFeedback" class="feedback" :class="settingsFeedbackKind === 'success' ? 'feedback-success' : 'feedback-error'">{{ settingsFeedback }}</p>
+            <ui-button @click="saveSettings" :disabled="!settingsChanged || isProcessing || !!settingsValidationError" class="primary">保存设置</ui-button>
         </footer>
     </div>
 
     <!-- 工具管理选项卡 -->
     <div class="tab-content" v-show="activeTab === 'tools'">
         <section class="tool-manager">
-            <div class="tool-manager-header">
-                <h3>工具管理</h3>
-            </div>
-
             <div class="tools-summary">
                 <span class="summary-chip">内置 {{ builtinToolCount }}</span>
                 <span class="summary-chip summary-chip-external">外部 {{ externalToolCount }}</span>
@@ -104,32 +112,34 @@
                     <div class="tools-section-title">
                         <h4>可用工具</h4>
                         <div class="tools-stats">
-                            {{ totalTools }} 个工具
-                            ({{ enabledTools }} 启用 / {{ disabledTools }} 禁用)
+                            {{ totalTools }} 个工具 · {{ enabledTools }} 启用 · {{ disabledTools }} 禁用
                         </div>
                     </div>
                     <div class="tools-section-controls">
+                        <ui-button @click="expandAllCategories" class="small">展开</ui-button>
+                        <ui-button @click="collapseAllCategories" class="small">折叠</ui-button>
                         <ui-button @click="selectAllTools" class="small">全选</ui-button>
-                        <ui-button @click="deselectAllTools" class="small">取消全选</ui-button>
+                        <ui-button @click="deselectAllTools" class="small">取消</ui-button>
                         <ui-button @click="loadToolManagerState" class="small">刷新</ui-button>
-                        <ui-button @click="saveChanges" class="primary">保存更改</ui-button>
+                        <ui-button @click="saveChanges" class="primary">保存</ui-button>
                     </div>
                 </div>
 
                 <div class="tools-container">
-                    <div v-for="category in sortedToolCategories" :key="category" class="tool-category" :class="{ 'tool-category-external': isExternalCategory(category) }">
-                        <div class="category-header">
+                    <div v-for="category in sortedToolCategories" :key="category" class="tool-category" :class="{ 'tool-category-external': isExternalCategory(category), 'tool-category-collapsed': isCategoryCollapsed(category) }">
+                        <div class="category-header" @click="toggleCategoryCollapse(category)">
                             <h5>
+                                <span class="collapse-arrow" :class="{ 'collapse-arrow-collapsed': isCategoryCollapsed(category) }">▾</span>
                                 {{ getCategoryDisplayName(category) }}
                                 <span class="category-count">({{ getToolsByCategory(category).length }})</span>
-                                <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">外部</span>
+                                <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">EXT</span>
                             </h5>
-                            <div class="category-controls">
+                            <div class="category-controls" @click.stop>
                                 <ui-button @click="toggleCategoryTools(category, true)" class="small">全选</ui-button>
-                                <ui-button @click="toggleCategoryTools(category, false)" class="small">取消全选</ui-button>
+                                <ui-button @click="toggleCategoryTools(category, false)" class="small">取消</ui-button>
                             </div>
                         </div>
-                        <div class="tool-items">
+                        <div class="tool-items" v-show="!isCategoryCollapsed(category)">
                             <div v-for="tool in getToolsByCategory(category)" :key="tool.name" class="tool-item">
                                 <ui-checkbox
                                     :value="tool.enabled"
