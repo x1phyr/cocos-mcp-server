@@ -1493,7 +1493,7 @@ Cocos Creator 使用 `db://` 前缀的资源URL格式：
 2. 在 `invokeMessage` 绑定的 method 中处理 `{ tool, args }` 并返回 `{ success, data?, error? }`。
 3. `unload` 时调用 `mcp-unregister-tools`。
 
-完整说明与示例：[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)、[examples/mcp-provider-demo](./examples/mcp-provider-demo)。
+完整说明与示例：[MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md)、[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)、[examples/mcp-provider-demo](./examples/mcp-provider-demo)。
 
 ---
 

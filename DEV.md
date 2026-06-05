@@ -8,6 +8,7 @@
 |------|------|
 | [README.md](./README.md) | 插件功能、安装、手动 MCP 配置 |
 | [README.EN.md](./README.EN.md) | 英文 README |
+| [MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md) | **外部扩展注册 MCP 工具**（AI / 第三方集成） |
 | [FEATURE_GUIDE_CN.md](./FEATURE_GUIDE_CN.md) | MCP 工具说明 |
 | 下文 [§ 架构：在线能力提供者](#架构在线能力提供者) | v1.7 已实现：Bridge + ToolRegistry |
 | 下文 [§ 版本规划](#版本规划) | v1.8 未发布草案；面板 P0 已于 v1.7.3 交付 |
@@ -187,6 +188,9 @@ Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 
 ## 第三方扩展接入
 
 其他 Cocos 扩展可在运行时向本插件注册 MCP 工具，无需改 `cocos-mcp-server` 源码。
+
+> **完整指南（推荐 AI / 集成方阅读）**：[MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md)  
+> 含：Agent 步骤清单、Payload  schema、命名规则、ToolResponse 约定、现有能力映射模式、验证与常见错误。
 
 ### 消息（`package.json` → `contributions.messages`）
 

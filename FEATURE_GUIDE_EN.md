@@ -1498,4 +1498,4 @@ If you encounter issues during use, you can:
 
 *This document is based on Cocos Creator MCP Server v1.5.0. Please refer to the latest version documentation for updates.*
 
-For third-party extension tool registration (v1.5.0+), see [DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入) (Chinese).
+For third-party extension tool registration (v1.5.0+), see **[MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md)** (step-by-step guide for AI and integrators).

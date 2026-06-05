@@ -15,6 +15,7 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 ## Quick Links
 
 - **[DEV.md](./DEV.md)** — `publish`, `deploy-mcp`, local config, [roadmap](./DEV.md#版本规划), [versioning skill](.cursor/skills/cocos-mcp-versioning/SKILL.md) (Chinese)
+- **[External MCP tool registration guide](./MCP_EXTERNAL_TOOL_REGISTRATION.md)** — for AI agents and third-party extensions
 - **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** — Tool reference (to be completed)
 - **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** — Tool reference (to be completed)
 

@@ -14,6 +14,7 @@
 ## 快速链接
 
 - **[开发指南 DEV.md](./DEV.md)** — `publish`、`deploy-mcp`、本地配置、[版本规划](./DEV.md#版本规划)、[版本维护 skill](.cursor/skills/cocos-mcp-versioning/SKILL.md)
+- **[外部 MCP 工具注册指南](./MCP_EXTERNAL_TOOL_REGISTRATION.md)** — 供 AI / 第三方扩展将现有插件能力注册为 MCP 工具
 - **[📖 Complete Feature Guide (English)](FEATURE_GUIDE_EN.md)** — 工具详细说明（待补充）
 - **[📖 完整功能指南 (中文)](FEATURE_GUIDE_CN.md)** — 工具详细说明（待补充）
 
