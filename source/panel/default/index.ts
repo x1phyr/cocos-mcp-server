@@ -96,7 +96,6 @@ module.exports = Editor.Panel.define({
                         const toolCategories = ref<string[]>([]);
                         const externalProviders = ref<ExternalProviderSummary[]>([]);
                         const settingsChanged = ref(false);
-                        let isLoadingSettings = false; // 防止从服务器加载设置时误触 settingsChanged
 
                         const statusClass = computed(() => ({
                             running: serverRunning.value,
@@ -142,17 +141,14 @@ module.exports = Editor.Panel.define({
                                     serverStatus.value = result.running ? '运行中' : '已停止';
                                     connectedClients.value = result.clients || 0;
                                     httpUrl.value = result.running ? `http://127.0.0.1:${result.port}` : '';
-                                    // 仅在用户未修改设置时，才从服务端同步设置（避免覆盖用户未保存的修改）
+                                    // 仅在用户未修改设置时，才从服务端同步设置
                                     if (result.settings && !settingsChanged.value) {
-                                        isLoadingSettings = true;
                                         settings.value = {
                                             port: result.settings.port || DEFAULT_MCP_PORT,
                                             autoStart: result.settings.autoStart || false,
                                             debugLog: result.settings.enableDebugLog || false,
                                             maxConnections: result.settings.maxConnections || 10,
                                         };
-                                        settingsChanged.value = false;
-                                        setTimeout(() => { isLoadingSettings = false; }, 0);
                                     }
                                 }
                             } catch (error) {
@@ -268,6 +264,26 @@ module.exports = Editor.Panel.define({
                             } catch (error) {
                                 console.error('[Vue App] Failed to copy URL:', error);
                             }
+                        };
+
+                        const onAutoStartChange = (event: any) => {
+                            settings.value.autoStart = !!event.target.value;
+                            settingsChanged.value = true;
+                        };
+
+                        const onDebugLogChange = (event: any) => {
+                            settings.value.debugLog = !!event.target.value;
+                            settingsChanged.value = true;
+                        };
+
+                        const onPortChange = (event: any) => {
+                            settings.value.port = Number(event.target.value);
+                            settingsChanged.value = true;
+                        };
+
+                        const onMaxConnectionsChange = (event: any) => {
+                            settings.value.maxConnections = Number(event.target.value);
+                            settingsChanged.value = true;
                         };
 
                         const updateToolStatus = async (category: string, name: string, enabled: boolean) => {
@@ -388,21 +404,6 @@ module.exports = Editor.Panel.define({
                             return categoryNames[category] || category;
                         };
 
-                        watch(
-                            settings,
-                            () => {
-                                if (isLoadingSettings) {
-                                    return;
-                                }
-                                settingsChanged.value = true;
-                                if (settingsFeedbackKind.value === 'success') {
-                                    settingsFeedback.value = '';
-                                    settingsFeedbackKind.value = '';
-                                }
-                            },
-                            { deep: true }
-                        );
-
                         let statusPollTimer: ReturnType<typeof setInterval> | null = null;
 
                         onMounted(async () => {
@@ -454,6 +455,10 @@ module.exports = Editor.Panel.define({
                             toggleServer,
                             saveSettings,
                             copyUrl,
+                            onAutoStartChange,
+                            onDebugLogChange,
+                            onPortChange,
+                            onMaxConnectionsChange,
                             loadToolManagerState,
                             updateToolStatus,
                             selectAllTools,

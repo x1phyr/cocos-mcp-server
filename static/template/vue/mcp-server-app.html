@@ -53,7 +53,7 @@
                         <span class="setting-icon">🔌</span>
                         <span>端口号</span>
                     </div>
-                    <ui-num-input v-model="settings.port" :min="1024" :max="65535" :step="1" :disabled="serverRunning" class="setting-input">
+                    <ui-num-input :value="settings.port" :min="1024" :max="65535" :step="1" :disabled="serverRunning" class="setting-input" @confirm="onPortChange">
                     </ui-num-input>
                 </div>
                 <div class="setting-row">
@@ -61,21 +61,21 @@
                         <span class="setting-icon">🚀</span>
                         <span>自动启动</span>
                     </div>
-                    <ui-checkbox v-model="settings.autoStart"></ui-checkbox>
+                    <ui-checkbox :value="settings.autoStart" @confirm="onAutoStartChange"></ui-checkbox>
                 </div>
                 <div class="setting-row">
                     <div class="setting-label">
                         <span class="setting-icon">📋</span>
                         <span>调试日志</span>
                     </div>
-                    <ui-checkbox v-model="settings.debugLog"></ui-checkbox>
+                    <ui-checkbox :value="settings.debugLog" @confirm="onDebugLogChange"></ui-checkbox>
                 </div>
                 <div class="setting-row">
                     <div class="setting-label">
                         <span class="setting-icon">👥</span>
                         <span>最大连接数</span>
                     </div>
-                    <ui-num-input v-model="settings.maxConnections" :min="1" :max="100" :step="1" class="setting-input">
+                    <ui-num-input :value="settings.maxConnections" :min="1" :max="100" :step="1" class="setting-input" @confirm="onMaxConnectionsChange">
                     </ui-num-input>
                 </div>
             </div>
