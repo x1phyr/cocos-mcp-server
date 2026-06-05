@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ToolConfig, ToolConfiguration, ToolManagerSettings, ToolDefinition } from '../types';
-import * as fs from 'fs';
-import * as path from 'path';
+import { readToolManagerSettings, saveToolManagerSettings } from '../core/settings';
 
 export class ToolManager {
     private settings: ToolManagerSettings;
@@ -11,55 +10,13 @@ export class ToolManager {
 
     constructor(builtinToolConfigs?: { category: string; name: string; description: string }[]) {
         this.injectedBuiltinConfigs = builtinToolConfigs ?? null;
-        this.settings = this.readToolManagerSettings();
+        this.settings = readToolManagerSettings();
         this.initializeAvailableTools();
         
         // 如果没有配置，自动创建一个默认配置
         if (this.settings.configurations.length === 0) {
             console.log('[ToolManager] No configurations found, creating default configuration...');
             this.createConfiguration('默认配置', '自动创建的默认工具配置');
-        }
-    }
-
-    private getToolManagerSettingsPath(): string {
-        return path.join(Editor.Project.path, 'settings', 'tool-manager.json');
-    }
-
-    private ensureSettingsDir(): void {
-        const settingsDir = path.dirname(this.getToolManagerSettingsPath());
-        if (!fs.existsSync(settingsDir)) {
-            fs.mkdirSync(settingsDir, { recursive: true });
-        }
-    }
-
-    private readToolManagerSettings(): ToolManagerSettings {
-        const DEFAULT_TOOL_MANAGER_SETTINGS: ToolManagerSettings = {
-            configurations: [],
-            currentConfigId: '',
-            maxConfigSlots: 5
-        };
-
-        try {
-            this.ensureSettingsDir();
-            const settingsFile = this.getToolManagerSettingsPath();
-            if (fs.existsSync(settingsFile)) {
-                const content = fs.readFileSync(settingsFile, 'utf8');
-                return { ...DEFAULT_TOOL_MANAGER_SETTINGS, ...JSON.parse(content) };
-            }
-        } catch (e) {
-            console.error('Failed to read tool manager settings:', e);
-        }
-        return DEFAULT_TOOL_MANAGER_SETTINGS;
-    }
-
-    private saveToolManagerSettings(settings: ToolManagerSettings): void {
-        try {
-            this.ensureSettingsDir();
-            const settingsFile = this.getToolManagerSettingsPath();
-            fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
-        } catch (e) {
-            console.error('Failed to save tool manager settings:', e);
-            throw e;
         }
     }
 
@@ -421,7 +378,7 @@ export class ToolManager {
 
     private saveSettings(): void {
         console.log(`Backend: Saving settings, current configs count: ${this.settings.configurations.length}`);
-        this.saveToolManagerSettings(this.settings);
+        saveToolManagerSettings(this.settings);
         console.log(`Backend: Settings saved to file`);
     }
-} 
+}

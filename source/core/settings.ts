@@ -1,6 +1,11 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import { DEFAULT_MCP_PORT } from './constants';
+import {
+    ensureUserConfigDir,
+    getMcpServerSettingsPath,
+    getToolManagerSettingsPath,
+    migrateLegacyProjectSettingsIfNeeded,
+} from './config-path';
 import { MCPServerSettings, ToolManagerSettings, ToolConfiguration, ToolConfig } from '../types';
 
 const DEFAULT_SETTINGS: MCPServerSettings = {
@@ -17,25 +22,11 @@ const DEFAULT_TOOL_MANAGER_SETTINGS: ToolManagerSettings = {
     maxConfigSlots: 5
 };
 
-function getSettingsPath(): string {
-    return path.join(Editor.Project.path, 'settings', 'mcp-server.json');
-}
-
-function getToolManagerSettingsPath(): string {
-    return path.join(Editor.Project.path, 'settings', 'tool-manager.json');
-}
-
-function ensureSettingsDir(): void {
-    const settingsDir = path.dirname(getSettingsPath());
-    if (!fs.existsSync(settingsDir)) {
-        fs.mkdirSync(settingsDir, { recursive: true });
-    }
-}
-
 export function readSettings(): MCPServerSettings {
     try {
-        ensureSettingsDir();
-        const settingsFile = getSettingsPath();
+        migrateLegacyProjectSettingsIfNeeded();
+        ensureUserConfigDir();
+        const settingsFile = getMcpServerSettingsPath();
         if (fs.existsSync(settingsFile)) {
             const content = fs.readFileSync(settingsFile, 'utf8');
             return { ...DEFAULT_SETTINGS, ...JSON.parse(content) };
@@ -48,8 +39,8 @@ export function readSettings(): MCPServerSettings {
 
 export function saveSettings(settings: MCPServerSettings): void {
     try {
-        ensureSettingsDir();
-        const settingsFile = getSettingsPath();
+        ensureUserConfigDir();
+        const settingsFile = getMcpServerSettingsPath();
         fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
     } catch (e) {
         console.error('Failed to save settings:', e);
@@ -72,10 +63,10 @@ export function validateMcpServerSettings(settings: Partial<MCPServerSettings>):
     return null;
 }
 
-// 工具管理器设置相关函数
 export function readToolManagerSettings(): ToolManagerSettings {
     try {
-        ensureSettingsDir();
+        migrateLegacyProjectSettingsIfNeeded();
+        ensureUserConfigDir();
         const settingsFile = getToolManagerSettingsPath();
         if (fs.existsSync(settingsFile)) {
             const content = fs.readFileSync(settingsFile, 'utf8');
@@ -89,7 +80,7 @@ export function readToolManagerSettings(): ToolManagerSettings {
 
 export function saveToolManagerSettings(settings: ToolManagerSettings): void {
     try {
-        ensureSettingsDir();
+        ensureUserConfigDir();
         const settingsFile = getToolManagerSettingsPath();
         fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2));
     } catch (e) {
@@ -105,7 +96,6 @@ export function exportToolConfiguration(config: ToolConfiguration): string {
 export function importToolConfiguration(configJson: string): ToolConfiguration {
     try {
         const config = JSON.parse(configJson);
-        // 验证配置格式
         if (!config.id || !config.name || !Array.isArray(config.tools)) {
             throw new Error('Invalid configuration format');
         }

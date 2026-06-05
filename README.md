@@ -21,7 +21,15 @@
 
 ## 更新日志
 
-### v1.7.6 - 2026年6月5日（当前版本）
+### v1.7.7 - 2026年6月5日（当前版本）
+
+- **Changed**：MCP 服务器与 Tool Manager 配置改存本机 userData（`.cocos-mcp-server-*.json`），不再写入工程 `settings/`。
+- **Added**：首次启动自动从旧版 `<工程>/settings/mcp-server.json` / `tool-manager.json` 迁移。
+- **Changed**：`deploy-mcp` 从本地 userData 读取端口（CLI 无 Electron 时使用 Cocos Creator 默认 userData 路径）。
+
+**后续规划（未实现）**：v1.8 工具热更新（`tools/list_changed`）— 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**。
+
+### v1.7.6 - 2026年6月5日
 
 - **UI**：Tool Manager 面板移除硬编码 CSS，改用 Cocos Creator 主题变量，支持明暗主题自动适配
 - **UI**：默认面板增加状态指示灯（绿色/红色圆点）和类别工具计数徽章

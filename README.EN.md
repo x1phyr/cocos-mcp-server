@@ -22,7 +22,15 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Changelog
 
-### v1.7.6 - June 5, 2026 (Current version)
+### v1.7.7 - June 5, 2026 (Current version)
+
+- **Changed**: MCP server and Tool Manager settings are stored in local userData (`.cocos-mcp-server-*.json`), not under the project `settings/` folder.
+- **Added**: One-time migration from legacy `<project>/settings/mcp-server.json` and `tool-manager.json` when local files are missing.
+- **Changed**: `deploy-mcp` reads the port from local userData (falls back to Cocos Creator default userData path when Electron is unavailable).
+
+**Planned (not shipped)**: v1.8 tool hot-reload (`tools/list_changed`) — **[DEV.md § 版本规划](./DEV.md#版本规划)**.
+
+### v1.7.6 - June 5, 2026
 
 - **UI**: Tool Manager panel removed hardcoded CSS, now uses Cocos Creator theme variables for automatic light/dark theme support
 - **UI**: Default panel added status indicator dot (green/red) and category tool count badges

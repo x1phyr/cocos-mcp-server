@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const { DEFAULT_MCP_PORT } = require('./constants');
+const {
+    readMcpServerSettingsJson,
+    migrateLegacyProjectSettings,
+    getMcpServerSettingsPath,
+} = require('./user-config-path');
 
 const EXTENSION_ROOT = path.join(__dirname, '..');
 const EXAMPLE_PATH = path.join(EXTENSION_ROOT, 'local.env.json.example');
@@ -137,18 +142,24 @@ function loadLocalEnv(cliOverrides) {
 }
 
 function resolveMcpPort(cocosProjectPath) {
-    const settingsPath = path.join(cocosProjectPath, 'settings', 'mcp-server.json');
-    if (!fs.existsSync(settingsPath)) {
-        return DEFAULT_MCP_PORT;
+    migrateLegacyProjectSettings(cocosProjectPath);
+    const settings = readMcpServerSettingsJson();
+    if (settings && typeof settings.port === 'number' && settings.port > 0) {
+        return settings.port;
     }
-    try {
-        const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-        if (typeof settings.port === 'number' && settings.port > 0) {
-            return settings.port;
+
+    const legacyPath = path.join(cocosProjectPath, 'settings', 'mcp-server.json');
+    if (fs.existsSync(legacyPath)) {
+        try {
+            const legacy = JSON.parse(fs.readFileSync(legacyPath, 'utf8'));
+            if (typeof legacy.port === 'number' && legacy.port > 0) {
+                return legacy.port;
+            }
+        } catch (error) {
+            console.warn(`Warning: could not read ${legacyPath}, using default port: ${error.message}`);
         }
-    } catch (error) {
-        console.warn(`Warning: could not read ${settingsPath}, using default port: ${error.message}`);
     }
+
     return DEFAULT_MCP_PORT;
 }
 
@@ -160,4 +171,5 @@ module.exports = {
     EXTENSION_ROOT,
     EXAMPLE_PATH,
     DEFAULT_MCP_PORT,
+    getMcpServerSettingsPath,
 };

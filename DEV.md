@@ -1,6 +1,6 @@
 # 开发指南
 
-**v1.7.6**
+**v1.7.7**
 
 ## 文档
 
@@ -109,7 +109,16 @@ npm run check:identity
 
 在 `package.json` 中配置 `"mcpDefaultPort": 28473`，**不要**写在 `local.env.json` 里。
 
-Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 才会一致。端口优先读工程 `settings/mcp-server.json`。
+MCP 服务器与工具管理器配置保存在 **本机用户目录**（Electron `userData`，与 Cocos Creator 一致），不在工程 `settings/` 内：
+
+| 文件 | 说明 |
+|------|------|
+| `.cocos-mcp-server-mcp-settings.json` | 端口、autoStart、allowedOrigins 等 |
+| `.cocos-mcp-server-tool-manager.json` | 工具启用配置槽位 |
+
+macOS 典型路径：`~/Library/Application Support/CocosCreator/`。首次启动时会自动从旧版 `<工程>/settings/mcp-server.json` 与 `tool-manager.json` 迁移（若本地文件尚不存在）。
+
+Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 才会一致。`deploy-mcp` 读取上述本地 MCP 设置中的端口。
 
 ---
 
@@ -360,7 +369,7 @@ AI  tools/call("scene_get_scene_hierarchy", args)
 | 外部扩展注册 | `ExternalToolRegistry` + `Editor.Message` | 迁入 `ToolRegistry` + external adapter |
 | 内置工具 | `MCPServer` 直接 `new SceneTools()` | 经 Capability Bridge 代理 |
 | 工具启用过滤 | `ToolManager` + `enabledTools` | 不变；过滤在 `setupTools` 层 |
-| 持久化 | 无工具 registry 文件 | 仍无；仅 `tool-manager.json` 存启用配置 |
+| 持久化 | 无工具 registry 文件 | MCP / ToolManager 配置存于本机 userData（见 [§ 配置](#配置)） |
 
 ---
 
@@ -375,7 +384,7 @@ AI  tools/call("scene_get_scene_hierarchy", args)
 | [README.md § 更新日志](./README.md#更新日志) | **已发布**版本全文（v1.5.0、v1.4.x…及 Cocos 商城说明） |
 | 下文 [§ 版本规划](#版本规划) | **未发布**功能草案（当前仅 v1.8） |
 
-**本仓库 Git 当前**：v1.7.6（`package.json` 的 `version` 字段）。
+**本仓库 Git 当前**：v1.7.7（`package.json` 的 `version` 字段）。
 
 > **版本号勿混用**：README 里「商城 v1.5.0（2024-07）」是 Cocos 商店渠道大版本；本仓库 **Git v1.5.0** 为扩展注册 MCP 工具，二者无关。
 
@@ -402,6 +411,7 @@ flowchart LR
 | **v1.7.4** | 工具启用语义与外部工具 enabled 同步 | 已发布（见 README 更新日志） |
 | **v1.7.5** | Bug 修复与文档完善（12项修复） | 已发布（见 README 更新日志） |
 | **v1.7.6** | 面板 UI 美化（主题适配、状态指示、计数徽章） | 已发布（见 README 更新日志） |
+| **v1.7.7** | 配置持久化迁至本机 userData | 已发布（见 README 更新日志） |
 | **v1.8.0** | `tools/list_changed` 与状态探针工具 | 规划中（可选） |
 
 > 与 Cocos 商城「v1.5.0（2024-07）」无关；Git 版本以 `package.json` 为准。
