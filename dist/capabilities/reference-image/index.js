@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReferenceImageTools = void 0;
+exports.createReferenceImageCapability = createReferenceImageCapability;
+const create_builtin_capability_1 = require("../create-builtin-capability");
+const tools_1 = require("./tools");
+Object.defineProperty(exports, "ReferenceImageTools", { enumerable: true, get: function () { return tools_1.ReferenceImageTools; } });
+function createReferenceImageCapability() {
+    return (0, create_builtin_capability_1.createBuiltinCapability)('referenceImage', tools_1.ReferenceImageTools);
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zb3VyY2UvY2FwYWJpbGl0aWVzL3JlZmVyZW5jZS1pbWFnZS9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFLQSx3RUFFQztBQVBELDRFQUF1RTtBQUN2RSxtQ0FBOEM7QUFFckMsb0dBRkEsMkJBQW1CLE9BRUE7QUFFNUIsU0FBZ0IsOEJBQThCO0lBQzFDLE9BQU8sSUFBQSxtREFBdUIsRUFBQyxnQkFBZ0IsRUFBRSwyQkFBbUIsQ0FBQyxDQUFDO0FBQzFFLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBjcmVhdGVCdWlsdGluQ2FwYWJpbGl0eSB9IGZyb20gJy4uL2NyZWF0ZS1idWlsdGluLWNhcGFiaWxpdHknO1xuaW1wb3J0IHsgUmVmZXJlbmNlSW1hZ2VUb29scyB9IGZyb20gJy4vdG9vbHMnO1xuXG5leHBvcnQgeyBSZWZlcmVuY2VJbWFnZVRvb2xzIH07XG5cbmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVSZWZlcmVuY2VJbWFnZUNhcGFiaWxpdHkoKSB7XG4gICAgcmV0dXJuIGNyZWF0ZUJ1aWx0aW5DYXBhYmlsaXR5KCdyZWZlcmVuY2VJbWFnZScsIFJlZmVyZW5jZUltYWdlVG9vbHMpO1xufVxuIl19

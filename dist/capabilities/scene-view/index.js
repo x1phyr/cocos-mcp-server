@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SceneViewTools = void 0;
+exports.createSceneViewCapability = createSceneViewCapability;
+const create_builtin_capability_1 = require("../create-builtin-capability");
+const tools_1 = require("./tools");
+Object.defineProperty(exports, "SceneViewTools", { enumerable: true, get: function () { return tools_1.SceneViewTools; } });
+function createSceneViewCapability() {
+    return (0, create_builtin_capability_1.createBuiltinCapability)('sceneView', tools_1.SceneViewTools);
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zb3VyY2UvY2FwYWJpbGl0aWVzL3NjZW5lLXZpZXcvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBS0EsOERBRUM7QUFQRCw0RUFBdUU7QUFDdkUsbUNBQXlDO0FBRWhDLCtGQUZBLHNCQUFjLE9BRUE7QUFFdkIsU0FBZ0IseUJBQXlCO0lBQ3JDLE9BQU8sSUFBQSxtREFBdUIsRUFBQyxXQUFXLEVBQUUsc0JBQWMsQ0FBQyxDQUFDO0FBQ2hFLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBjcmVhdGVCdWlsdGluQ2FwYWJpbGl0eSB9IGZyb20gJy4uL2NyZWF0ZS1idWlsdGluLWNhcGFiaWxpdHknO1xuaW1wb3J0IHsgU2NlbmVWaWV3VG9vbHMgfSBmcm9tICcuL3Rvb2xzJztcblxuZXhwb3J0IHsgU2NlbmVWaWV3VG9vbHMgfTtcblxuZXhwb3J0IGZ1bmN0aW9uIGNyZWF0ZVNjZW5lVmlld0NhcGFiaWxpdHkoKSB7XG4gICAgcmV0dXJuIGNyZWF0ZUJ1aWx0aW5DYXBhYmlsaXR5KCdzY2VuZVZpZXcnLCBTY2VuZVZpZXdUb29scyk7XG59XG4iXX0=

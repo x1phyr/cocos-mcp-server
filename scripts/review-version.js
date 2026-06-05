@@ -80,11 +80,11 @@ function runReview() {
         fail('check:identity failed');
     }
 
-    const distMcp = fs.readFileSync(path.join(ROOT, 'dist/mcp-server.js'), 'utf8');
+    const distMcp = fs.readFileSync(path.join(ROOT, 'dist/mcp/server.js'), 'utf8');
     if (!distMcp.includes('PACKAGE_VERSION')) {
-        fail('dist/mcp-server.js should use PACKAGE_VERSION (run npm run build)');
+        fail('dist/mcp/server.js should use PACKAGE_VERSION (run npm run build)');
     }
-    ok('dist/mcp-server uses PACKAGE_VERSION');
+    ok('dist/mcp/server uses PACKAGE_VERSION');
 
     console.log('[review-version] All checks passed.');
     return version;

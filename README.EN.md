@@ -21,15 +21,38 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Changelog
 
-### v1.5.0 - June 4, 2026 (Current version)
+### v1.7.2 - June 5, 2026 (Current version)
+
+- **Fixed**: Block external extensions from using `cocos-builtin-*` provider IDs; enforce enabled-tool checks on `tools/call` and Simple API.
+- **Fixed**: Tool-manager panel message contracts, `getToolManagerState.currentConfiguration`, `openToolManager`, and panel registration.
+- **Fixed**: Sync MCP enabled tools after config switch/import/update; merge new built-in tools on upgrade.
+- **Fixed**: HTTP connection counting covers async body handling; 4MB request body limit; `createPrefabFromNode` stub no longer reports success.
+- **Changed**: Broadcast listen tools return explicit not-available guidance.
+
+### v1.7.1 - June 5, 2026
+
+- **Fixed**: `ToolRegistry.syncProvider` no longer leaves orphan index entries on failure; failed external re-register keeps the previous provider.
+- **Fixed**: Built-in capability registration failures are logged; `invoke` consistently returns `ToolResponse` instead of throwing.
+- **Changed**: `allowedOrigins` and `maxConnections` are enforced on the HTTP layer; `tools/list` is empty while the server is stopped.
+- **Changed**: Removed duplicate ToolManager fallback instantiation; `NodeTools` shares the `ComponentTools` instance with the component capability.
+
+### v1.7.0 - June 5, 2026
+
+- **Changed**: Built-in and external MCP tools are proxied through **Capability Bridge** + in-memory `ToolRegistry`; `MCPServer` is a protocol gateway (`tools/call` uses a single `invokeByFullName` path).
+- **Added**: `source/bridge/` (`CapabilityManager`, 14 built-in capability plugins, `ExternalMessageAdapter`); `npm run test:tool-registry`.
+- **Changed**: `/health` includes a `providers` list; extension `unload` / `stopServer` clear the runtime registry; `ToolManager` receives built-in tool metadata from the Bridge.
+
+See **[DEV.md § 架构：在线能力提供者](./DEV.md#架构在线能力提供者)** (Chinese). Third-party APIs (`mcp-register-tools`, etc.) are unchanged.
+
+**Planned (not shipped)**: v1.6 panel UI, v1.8 tool hot-reload — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
+
+### v1.5.0 - June 4, 2026
 
 - **Added**: Other Cocos extensions can **register/unregister** MCP tools at runtime via `mcp-register-tools` / `mcp-unregister-tools`; `mcp-list-external-tools`; demo at [examples/mcp-provider-demo](./examples/mcp-provider-demo).
 - **Changed**: `tools/list` and `tools/call` include external tools; `/health` reports `externalTools` and `externalProviders`; hot registration without HTTP restart.
 - **Added**: `npm run test:registry` unit tests for the registry.
 
 See **[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)** (Chinese).
-
-**Planned (not shipped)**: v1.6 panel UI — **[DEV.md § 版本规划](./DEV.md#版本规划)**. Not the same as the Cocos Store **v1.5.0** section below.
 
 ### v1.4.2 - June 3, 2026
 
@@ -353,32 +376,22 @@ Publish and deploy-mcp: **[DEV.md](./DEV.md)** (Chinese).
 ### Project Structure
 ```
 cocos-mcp-server/
-├── source/                    # TypeScript source files
-│   ├── main.ts               # Plugin entry point
-│   ├── mcp-server.ts         # MCP server implementation
-│   ├── settings.ts           # Settings management
-│   ├── types/                # TypeScript type definitions
-│   ├── tools/                # Tool implementations
-│   │   ├── scene-tools.ts
-│   │   ├── node-tools.ts
-│   │   ├── component-tools.ts
-│   │   ├── prefab-tools.ts
-│   │   ├── project-tools.ts
-│   │   ├── debug-tools.ts
-│   │   ├── preferences-tools.ts
-│   │   ├── server-tools.ts
-│   │   ├── broadcast-tools.ts
-│   │   ├── scene-advanced-tools.ts (integrated into node-tools.ts and scene-tools.ts)
-│   │   ├── scene-view-tools.ts
-│   │   ├── reference-image-tools.ts
-│   │   └── asset-advanced-tools.ts
-│   ├── panels/               # UI panel implementation
-│   └── test/                 # Test files
-├── dist/                     # Compiled JavaScript output
-├── static/                   # Static assets (icons, etc.)
-├── i18n/                     # Internationalization files
-├── package.json              # Plugin configuration
-└── tsconfig.json             # TypeScript configuration
+├── source/
+│   ├── main.ts                 # Extension entry (Cocos fixed path)
+│   ├── scene.ts                # Scene script entry
+│   ├── core/                   # constants, settings
+│   ├── mcp/server.ts           # MCP HTTP protocol gateway
+│   ├── bridge/                 # Capability Bridge
+│   ├── registry/               # ToolRegistry
+│   ├── capabilities/           # 14 domain modules (tools.ts + index.ts)
+│   ├── config/tool-manager.ts  # Tool enable/disable config
+│   ├── panel/                  # Creator panel UI
+│   └── test/
+├── dist/
+├── static/
+├── i18n/
+├── package.json
+└── tsconfig.json
 ```
 
 ### Building from Source
@@ -392,10 +405,9 @@ npm run build    # or npm run watch
 
 ### Adding New Tools
 
-1. Create a new tool class in `source/tools/`
-2. Implement the `ToolExecutor` interface
-3. Add tool to `mcp-server.ts` initialization
-4. Tools are automatically exposed via MCP protocol
+1. Implement `ToolExecutor` in `source/capabilities/<domain>/tools.ts`
+2. Export `createXxxCapability()` from `index.ts` and register it in `bridge/builtin-registry.ts`
+3. After reloading the extension, tools appear in `tools/list` via the Bridge
 
 ### TypeScript Support
 

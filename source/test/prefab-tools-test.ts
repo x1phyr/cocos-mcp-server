@@ -1,4 +1,4 @@
-import { PrefabTools } from '../tools/prefab-tools';
+import { PrefabTools } from '../capabilities/prefab/tools';
 
 // 预制体工具测试
 export class PrefabToolsTest {

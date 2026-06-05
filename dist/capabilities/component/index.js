@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSharedComponentTools = exports.ComponentTools = void 0;
+exports.createComponentCapability = createComponentCapability;
+const builtin_category_adapter_1 = require("../../bridge/adapters/builtin-category-adapter");
+const shared_1 = require("./shared");
+const tools_1 = require("./tools");
+Object.defineProperty(exports, "ComponentTools", { enumerable: true, get: function () { return tools_1.ComponentTools; } });
+var shared_2 = require("./shared");
+Object.defineProperty(exports, "getSharedComponentTools", { enumerable: true, get: function () { return shared_2.getSharedComponentTools; } });
+function createComponentCapability() {
+    return new builtin_category_adapter_1.BuiltinCategoryAdapter('component', (0, shared_1.getSharedComponentTools)());
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zb3VyY2UvY2FwYWJpbGl0aWVzL2NvbXBvbmVudC9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFRQSw4REFFQztBQVZELDZGQUF3RjtBQUV4RixxQ0FBbUQ7QUFDbkQsbUNBQXlDO0FBRWhDLCtGQUZBLHNCQUFjLE9BRUE7QUFDdkIsbUNBQW1EO0FBQTFDLGlIQUFBLHVCQUF1QixPQUFBO0FBRWhDLFNBQWdCLHlCQUF5QjtJQUNyQyxPQUFPLElBQUksaURBQXNCLENBQUMsV0FBVyxFQUFFLElBQUEsZ0NBQXVCLEdBQUUsQ0FBQyxDQUFDO0FBQzlFLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBCdWlsdGluQ2F0ZWdvcnlBZGFwdGVyIH0gZnJvbSAnLi4vLi4vYnJpZGdlL2FkYXB0ZXJzL2J1aWx0aW4tY2F0ZWdvcnktYWRhcHRlcic7XG5pbXBvcnQgeyBDb2Nvc0NhcGFiaWxpdHlQbHVnaW4gfSBmcm9tICcuLi8uLi9icmlkZ2UvY2FwYWJpbGl0eS1wbHVnaW4nO1xuaW1wb3J0IHsgZ2V0U2hhcmVkQ29tcG9uZW50VG9vbHMgfSBmcm9tICcuL3NoYXJlZCc7XG5pbXBvcnQgeyBDb21wb25lbnRUb29scyB9IGZyb20gJy4vdG9vbHMnO1xuXG5leHBvcnQgeyBDb21wb25lbnRUb29scyB9O1xuZXhwb3J0IHsgZ2V0U2hhcmVkQ29tcG9uZW50VG9vbHMgfSBmcm9tICcuL3NoYXJlZCc7XG5cbmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVDb21wb25lbnRDYXBhYmlsaXR5KCk6IENvY29zQ2FwYWJpbGl0eVBsdWdpbiB7XG4gICAgcmV0dXJuIG5ldyBCdWlsdGluQ2F0ZWdvcnlBZGFwdGVyKCdjb21wb25lbnQnLCBnZXRTaGFyZWRDb21wb25lbnRUb29scygpKTtcbn1cbiJdfQ==

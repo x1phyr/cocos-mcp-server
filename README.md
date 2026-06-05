@@ -20,15 +20,38 @@
 
 ## 更新日志
 
-### v1.5.0 - 2026年6月4日（当前版本）
+### v1.7.2 - 2026年6月5日（当前版本）
+
+- **Fixed**：禁止外部扩展占用 `cocos-builtin-*` providerId；`tools/call` 与 Simple API 校验工具启用状态。
+- **Fixed**：多配置 tool-manager 面板消息契约、`getToolManagerState.currentConfiguration`、`openToolManager` 与面板注册。
+- **Fixed**：切换/导入/更新工具配置后同步 MCP enabled 列表；升级时 merge 新内置工具。
+- **Fixed**：HTTP 连接计数覆盖异步请求体处理；请求体 4MB 上限；`createPrefabFromNode` stub 不再误报 success。
+- **Changed**：Broadcast 监听工具明确返回不可用说明。
+
+### v1.7.1 - 2026年6月5日
+
+- **Fixed**：`ToolRegistry.syncProvider` 注册失败时不再留下孤儿索引；外部 provider 更新失败时保留旧注册。
+- **Fixed**：内置 capability 启动失败会记录错误；`invoke` 统一返回 `ToolResponse` 而非抛错。
+- **Changed**：`allowedOrigins` / `maxConnections` 在 HTTP 层生效；服务停止后 `tools/list` 返回空列表。
+- **Changed**：`ToolManager` 移除重复实例化后备路径；`NodeTools` 与 `component` capability 共享 `ComponentTools` 实例。
+
+### v1.7.0 - 2026年6月5日
+
+- **Changed**：内置与外部 MCP 工具统一经 **Capability Bridge** + 内存 `ToolRegistry` 代理；`MCPServer` 瘦身为协议网关（`tools/call` 单轨 `invokeByFullName`）。
+- **Added**：`source/bridge/`（`CapabilityManager`、14 个内置 capability plugin、外部 `ExternalMessageAdapter`）；`npm run test:tool-registry`。
+- **Changed**：`/health` 增加 `providers` 列表；扩展 `unload` / `stopServer` 清理运行时注册表；`ToolManager` 从 Bridge 注入内置工具元数据。
+
+详见 **[DEV.md § 架构：在线能力提供者](./DEV.md#架构在线能力提供者)**。第三方扩展 API（`mcp-register-tools` 等）不变。
+
+**后续规划（未实现）**：v1.6 面板 UI、v1.8 工具热更新 — 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
+
+### v1.5.0 - 2026年6月4日
 
 - **Added**：其他 Cocos 扩展可通过 `Editor.Message` 向 MCP **动态注册/注销**工具（`mcp-register-tools` / `mcp-unregister-tools`）；`mcp-list-external-tools` 查询注册表；示例扩展 [examples/mcp-provider-demo](./examples/mcp-provider-demo)。
 - **Changed**：`tools/list` 与 `tools/call` 合并外部工具；`/health` 返回 `externalTools` / `externalProviders`；热注册无需重启 HTTP。
 - **Added**：`npm run test:registry` 注册表单元测试。
 
 详见 **[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)**。
-
-**后续规划（未实现）**：v1.6 面板 UI — 见 **[DEV.md § 版本规划](./DEV.md#版本规划)**（与下方「商城 v1.5.0」不是同一版本线）。
 
 ### v1.4.2 - 2026年6月3日
 
@@ -352,32 +375,22 @@ AI 助手可以使用 MCP 协议连接并访问所有可用工具。
 ### 项目结构
 ```
 cocos-mcp-server/
-├── source/                    # TypeScript 源文件
-│   ├── main.ts               # 插件入口点
-│   ├── mcp-server.ts         # MCP 服务器实现
-│   ├── settings.ts           # 设置管理
-│   ├── types/                # TypeScript 类型定义
-│   ├── tools/                # 工具实现
-│   │   ├── scene-tools.ts
-│   │   ├── node-tools.ts
-│   │   ├── component-tools.ts
-│   │   ├── prefab-tools.ts
-│   │   ├── project-tools.ts
-│   │   ├── debug-tools.ts
-│   │   ├── preferences-tools.ts
-│   │   ├── server-tools.ts
-│   │   ├── broadcast-tools.ts
-│   │   ├── scene-advanced-tools.ts (已整合到 node-tools.ts 和 scene-tools.ts)
-│   │   ├── scene-view-tools.ts
-│   │   ├── reference-image-tools.ts
-│   │   └── asset-advanced-tools.ts
-│   ├── panels/               # UI 面板实现
-│   └── test/                 # 测试文件
-├── dist/                     # 编译后的 JavaScript 输出
-├── static/                   # 静态资源（图标等）
-├── i18n/                     # 国际化文件
-├── package.json              # 插件配置
-└── tsconfig.json             # TypeScript 配置
+├── source/
+│   ├── main.ts                 # 扩展入口（Cocos 固定路径）
+│   ├── scene.ts                # 场景脚本入口
+│   ├── core/                   # constants、settings
+│   ├── mcp/server.ts           # MCP HTTP 协议网关
+│   ├── bridge/                 # Capability Bridge
+│   ├── registry/               # ToolRegistry
+│   ├── capabilities/           # 14 个领域模块（tools.ts + index.ts）
+│   ├── config/tool-manager.ts  # 工具启用配置
+│   ├── panel/                  # Creator 面板 UI
+│   └── test/
+├── dist/
+├── static/
+├── i18n/
+├── package.json
+└── tsconfig.json
 ```
 
 ### 从源码构建
@@ -391,10 +404,9 @@ npm run build    # 或 npm run watch
 
 ### 添加新工具
 
-1. 在 `source/tools/` 中创建新的工具类
-2. 实现 `ToolExecutor` 接口
-3. 将工具添加到 `mcp-server.ts` 初始化中
-4. 工具会自动通过 MCP 协议暴露
+1. 在 `source/capabilities/<领域>/tools.ts` 中实现 `ToolExecutor`
+2. 在同目录 `index.ts` 导出 `createXxxCapability()`，并在 `bridge/builtin-registry.ts` 注册
+3. 重启扩展后工具经 Bridge 自动出现在 `tools/list`
 
 ### TypeScript 支持
 

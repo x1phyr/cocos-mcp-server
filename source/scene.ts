@@ -339,15 +339,11 @@ export const methods: { [key: string]: (...any: any) => any } = {
                 return { success: false, error: `Node with UUID ${nodeUuid} not found` };
             }
 
-            // 注意：这里只是一个模拟实现，因为运行时环境下无法直接创建预制体文件
-            // 真正的预制体创建需要Editor API支持
+            // Runtime scene script cannot create prefab assets; use prefab_create_prefab via Editor API.
             return {
-                success: true,
-                data: {
-                    prefabPath: prefabPath,
-                    sourceNodeUuid: nodeUuid,
-                    message: `Prefab created from node '${node.name}' at ${prefabPath}`
-                }
+                success: false,
+                error: 'createPrefabFromNode is not supported in scene runtime script',
+                instruction: 'Use prefab_create_prefab or other Editor prefab tools instead.',
             };
         } catch (error: any) {
             return { success: false, error: error.message };

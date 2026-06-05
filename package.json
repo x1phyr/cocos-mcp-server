@@ -2,7 +2,7 @@
     "$schema": "./@types/schema/package/index.json",
     "package_version": 2,
     "name": "cocos-mcp-server",
-    "version": "1.5.0",
+    "version": "1.7.2",
     "mcpDefaultPort": 28473,
     "author": "LiDaxian",
     "editor": ">=3.8.6",
@@ -14,7 +14,8 @@
         "deploy-mcp": "node ./scripts/deploy-mcp.js",
         "check:identity": "node ./scripts/check-identity-keywords.js",
         "review:version": "node ./scripts/review-version.js",
-        "test:registry": "npm run build && node ./scripts/test-external-registry.js"
+        "test:registry": "npm run build && node ./scripts/test-tool-registry.js",
+        "test:tool-registry": "npm run build && node ./scripts/test-tool-registry.js"
     },
     "description": "i18n:cocos-mcp-server.description",
     "main": "./dist/main.js",
@@ -34,13 +35,25 @@
         "default": {
             "title": "i18n:cocos-mcp-server.panel_title",
             "type": "dockable",
-            "main": "dist/panels/default",
+            "main": "dist/panel/default",
             "icon": "./static/icon.png",
             "size": {
                 "min-width": 400,
                 "min-height": 300,
                 "width": 600,
                 "height": 500
+            }
+        },
+        "tool-manager": {
+            "title": "i18n:cocos-mcp-server.tool_manager",
+            "type": "dockable",
+            "main": "dist/panel/tool-manager",
+            "icon": "./static/icon.png",
+            "size": {
+                "min-width": 500,
+                "min-height": 400,
+                "width": 800,
+                "height": 600
             }
         }
     },

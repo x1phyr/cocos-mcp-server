@@ -1,5 +1,6 @@
 /**
- * Demo: register MCP tools with cocos-mcp-server (v1.5+).
+ * Demo: register MCP tools with cocos-mcp-server (v1.5+ API, v1.7+ Bridge).
+ * Registers via mcp-register-tools → CapabilityManager → in-memory ToolRegistry.
  * Copy this folder to <cocos-project>/extensions/mcp-provider-demo and enable in Creator.
  */
 

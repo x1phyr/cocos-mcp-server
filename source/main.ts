@@ -1,15 +1,18 @@
-import { MCPServer } from './mcp-server';
-import { readSettings, saveSettings } from './settings';
+import { MCPServer } from './mcp/server';
+import { readSettings, saveSettings } from './core/settings';
 import { MCPServerSettings } from './types';
-import { ToolManager } from './tools/tool-manager';
+import { ToolManager } from './config/tool-manager';
 import {
-    getExternalToolRegistry,
     RegisterExternalToolsPayload,
     RegisterResult,
 } from './registry/external-tool-registry';
+import { CapabilityManager } from './bridge/capability-manager';
+import { createDefaultCapabilityManager } from './bridge/builtin-registry';
+import { setCapabilityManager, resetCapabilityManagerForTests } from './bridge/capability-manager';
 
 let mcpServer: MCPServer | null = null;
 let toolManager: ToolManager;
+let capabilityManager: CapabilityManager;
 
 function notifyToolsChanged(): void {
     const broadcast = (Editor.Message as { broadcast?: (name: string, ...args: unknown[]) => void })
@@ -19,17 +22,29 @@ function notifyToolsChanged(): void {
     }
 }
 
-function applyExternalRegistryChange(): void {
-    const registry = getExternalToolRegistry();
-    if (toolManager) {
-        toolManager.syncExternalToolsFromRegistry(registry.getToolConfigsForManager());
-    }
-    if (mcpServer) {
+function syncMcpEnabledTools(): void {
+    if (mcpServer && toolManager) {
         const enabledTools = toolManager.getEnabledTools();
         mcpServer.updateEnabledTools(enabledTools);
+    }
+}
+
+function applyRegistryChange(): void {
+    if (toolManager) {
+        toolManager.syncBuiltinToolsFromRegistry(capabilityManager.exportBuiltinToolConfigs());
+        toolManager.syncExternalToolsFromRegistry(
+            capabilityManager.getExternalToolConfigsForManager()
+        );
+    }
+    if (mcpServer) {
+        syncMcpEnabledTools();
         mcpServer.refreshToolList();
     }
     notifyToolsChanged();
+}
+
+function createMcpServer(settings: MCPServerSettings): MCPServer {
+    return new MCPServer(settings, capabilityManager);
 }
 
 /**
@@ -45,7 +60,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
         Editor.Panel.open('cocos-mcp-server');
     },
 
-
+    openToolManager() {
+        Editor.Panel.open('cocos-mcp-server.tool-manager');
+    },
 
     /**
      * @en Start the MCP server
@@ -53,7 +70,6 @@ export const methods: { [key: string]: (...any: any) => any } = {
      */
     async startServer() {
         if (mcpServer) {
-            // 确保使用最新的工具配置
             const enabledTools = toolManager.getEnabledTools();
             mcpServer.updateEnabledTools(enabledTools);
             await mcpServer.start();
@@ -69,6 +85,7 @@ export const methods: { [key: string]: (...any: any) => any } = {
     async stopServer() {
         if (mcpServer) {
             mcpServer.stop();
+            notifyToolsChanged();
         } else {
             console.warn('[MCP插件] mcpServer 未初始化');
         }
@@ -83,7 +100,7 @@ export const methods: { [key: string]: (...any: any) => any } = {
         const settings = mcpServer ? mcpServer.getSettings() : readSettings();
         return {
             ...status,
-            settings: settings
+            settings: settings,
         };
     },
 
@@ -95,11 +112,17 @@ export const methods: { [key: string]: (...any: any) => any } = {
         saveSettings(settings);
         if (mcpServer) {
             mcpServer.stop();
-            mcpServer = new MCPServer(settings);
-            mcpServer.start();
+            mcpServer = createMcpServer(settings);
+            applyRegistryChange();
+            mcpServer.start().catch((err) => {
+                console.error('[MCP插件] Failed to restart MCP server after settings update:', err);
+            });
         } else {
-            mcpServer = new MCPServer(settings);
-            mcpServer.start();
+            mcpServer = createMcpServer(settings);
+            applyRegistryChange();
+            mcpServer.start().catch((err) => {
+                console.error('[MCP插件] Failed to start MCP server after settings update:', err);
+            });
         }
     },
 
@@ -113,15 +136,13 @@ export const methods: { [key: string]: (...any: any) => any } = {
 
     getFilteredToolsList() {
         if (!mcpServer) return [];
-        
-        // 获取当前启用的工具
+
         const enabledTools = toolManager.getEnabledTools();
-        
-        // 更新MCP服务器的启用工具列表
         mcpServer.updateEnabledTools(enabledTools);
-        
+
         return mcpServer.getFilteredTools(enabledTools);
     },
+
     /**
      * @en Get server settings
      * @zh 获取服务器设置
@@ -138,7 +159,6 @@ export const methods: { [key: string]: (...any: any) => any } = {
         return mcpServer ? mcpServer.getSettings() : readSettings();
     },
 
-    // 工具管理器相关方法
     async getToolManagerState() {
         return toolManager.getToolManagerState();
     },
@@ -146,6 +166,7 @@ export const methods: { [key: string]: (...any: any) => any } = {
     async createToolConfiguration(name: string, description?: string) {
         try {
             const config = toolManager.createConfiguration(name, description);
+            syncMcpEnabledTools();
             return { success: true, id: config.id, config };
         } catch (error: any) {
             throw new Error(`创建配置失败: ${error.message}`);
@@ -154,7 +175,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
 
     async updateToolConfiguration(configId: string, updates: any) {
         try {
-            return toolManager.updateConfiguration(configId, updates);
+            const result = toolManager.updateConfiguration(configId, updates);
+            syncMcpEnabledTools();
+            return result;
         } catch (error: any) {
             throw new Error(`更新配置失败: ${error.message}`);
         }
@@ -163,6 +186,7 @@ export const methods: { [key: string]: (...any: any) => any } = {
     async deleteToolConfiguration(configId: string) {
         try {
             toolManager.deleteConfiguration(configId);
+            syncMcpEnabledTools();
             return { success: true };
         } catch (error: any) {
             throw new Error(`删除配置失败: ${error.message}`);
@@ -172,6 +196,10 @@ export const methods: { [key: string]: (...any: any) => any } = {
     async setCurrentToolConfiguration(configId: string) {
         try {
             toolManager.setCurrentConfiguration(configId);
+            syncMcpEnabledTools();
+            if (mcpServer) {
+                mcpServer.refreshToolList();
+            }
             return { success: true };
         } catch (error: any) {
             throw new Error(`设置当前配置失败: ${error.message}`);
@@ -184,15 +212,10 @@ export const methods: { [key: string]: (...any: any) => any } = {
             if (!currentConfig) {
                 throw new Error('没有当前配置');
             }
-            
+
             toolManager.updateToolStatus(currentConfig.id, category, toolName, enabled);
-            
-            // 更新MCP服务器的工具列表
-            if (mcpServer) {
-                const enabledTools = toolManager.getEnabledTools();
-                mcpServer.updateEnabledTools(enabledTools);
-            }
-            
+            syncMcpEnabledTools();
+
             return { success: true };
         } catch (error: any) {
             throw new Error(`更新工具状态失败: ${error.message}`);
@@ -202,20 +225,15 @@ export const methods: { [key: string]: (...any: any) => any } = {
     async updateToolStatusBatch(updates: any[]) {
         try {
             console.log(`[Main] updateToolStatusBatch called with updates count:`, updates ? updates.length : 0);
-            
+
             const currentConfig = toolManager.getCurrentConfiguration();
             if (!currentConfig) {
                 throw new Error('没有当前配置');
             }
-            
+
             toolManager.updateToolStatusBatch(currentConfig.id, updates);
-            
-            // 更新MCP服务器的工具列表
-            if (mcpServer) {
-                const enabledTools = toolManager.getEnabledTools();
-                mcpServer.updateEnabledTools(enabledTools);
-            }
-            
+            syncMcpEnabledTools();
+
             return { success: true };
         } catch (error: any) {
             throw new Error(`批量更新工具状态失败: ${error.message}`);
@@ -232,7 +250,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
 
     async importToolConfiguration(configJson: string) {
         try {
-            return toolManager.importConfiguration(configJson);
+            const config = toolManager.importConfiguration(configJson);
+            syncMcpEnabledTools();
+            return config;
         } catch (error: any) {
             throw new Error(`导入配置失败: ${error.message}`);
         }
@@ -247,10 +267,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
      * @zh 注册其他扩展提供的 MCP 工具
      */
     registerExternalTools(payload: RegisterExternalToolsPayload): RegisterResult {
-        const registry = getExternalToolRegistry();
-        const result = registry.register(payload);
+        const result = capabilityManager.registerExternal(payload);
         if (result.success) {
-            applyExternalRegistryChange();
+            applyRegistryChange();
         }
         return result;
     },
@@ -263,9 +282,9 @@ export const methods: { [key: string]: (...any: any) => any } = {
         if (!payload?.providerId) {
             return { success: false, removed: false };
         }
-        const removed = getExternalToolRegistry().unregister(payload.providerId);
+        const removed = capabilityManager.unregisterExternal(payload.providerId);
         if (removed) {
-            applyExternalRegistryChange();
+            applyRegistryChange();
         }
         return { success: true, removed };
     },
@@ -275,13 +294,12 @@ export const methods: { [key: string]: (...any: any) => any } = {
      * @zh 列出已注册的外部工具提供方
      */
     listExternalTools(): {
-        providers: ReturnType<typeof getExternalToolRegistry.prototype.listProviders>;
-        tools: ReturnType<typeof getExternalToolRegistry.prototype.getMcpToolDefinitions>;
+        providers: ReturnType<CapabilityManager['listExternalProviders']>;
+        tools: ReturnType<CapabilityManager['getExternalMcpToolDefinitions']>;
     } {
-        const registry = getExternalToolRegistry();
         return {
-            providers: registry.listProviders(),
-            tools: registry.getMcpToolDefinitions(),
+            providers: capabilityManager.listExternalProviders(),
+            tools: capabilityManager.getExternalMcpToolDefinitions(),
         };
     },
 };
@@ -292,21 +310,22 @@ export const methods: { [key: string]: (...any: any) => any } = {
  */
 export function load() {
     console.log('Cocos MCP Server extension loaded');
-    
-    // 初始化工具管理器
-    toolManager = new ToolManager();
-    
-    // 读取设置
+
+    capabilityManager = createDefaultCapabilityManager();
+    setCapabilityManager(capabilityManager);
+
+    toolManager = new ToolManager(capabilityManager.exportBuiltinToolConfigs());
+
     const settings = readSettings();
-    mcpServer = new MCPServer(settings);
-    
-    // 初始化MCP服务器的工具列表
+    mcpServer = createMcpServer(settings);
+
+    applyRegistryChange();
+
     const enabledTools = toolManager.getEnabledTools();
     mcpServer.updateEnabledTools(enabledTools);
-    
-    // 如果设置了自动启动，则启动服务器
+
     if (settings.autoStart) {
-        mcpServer.start().catch(err => {
+        mcpServer.start().catch((err) => {
             console.error('Failed to auto-start MCP server:', err);
         });
     }
@@ -321,4 +340,8 @@ export function unload() {
         mcpServer.stop();
         mcpServer = null;
     }
+    if (capabilityManager) {
+        capabilityManager.clearAll();
+    }
+    resetCapabilityManagerForTests();
 }

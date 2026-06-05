@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BroadcastTools = void 0;
+exports.createBroadcastCapability = createBroadcastCapability;
+const create_builtin_capability_1 = require("../create-builtin-capability");
+const tools_1 = require("./tools");
+Object.defineProperty(exports, "BroadcastTools", { enumerable: true, get: function () { return tools_1.BroadcastTools; } });
+function createBroadcastCapability() {
+    return (0, create_builtin_capability_1.createBuiltinCapability)('broadcast', tools_1.BroadcastTools);
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zb3VyY2UvY2FwYWJpbGl0aWVzL2Jyb2FkY2FzdC9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFLQSw4REFFQztBQVBELDRFQUF1RTtBQUN2RSxtQ0FBeUM7QUFFaEMsK0ZBRkEsc0JBQWMsT0FFQTtBQUV2QixTQUFnQix5QkFBeUI7SUFDckMsT0FBTyxJQUFBLG1EQUF1QixFQUFDLFdBQVcsRUFBRSxzQkFBYyxDQUFDLENBQUM7QUFDaEUsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGNyZWF0ZUJ1aWx0aW5DYXBhYmlsaXR5IH0gZnJvbSAnLi4vY3JlYXRlLWJ1aWx0aW4tY2FwYWJpbGl0eSc7XG5pbXBvcnQgeyBCcm9hZGNhc3RUb29scyB9IGZyb20gJy4vdG9vbHMnO1xuXG5leHBvcnQgeyBCcm9hZGNhc3RUb29scyB9O1xuXG5leHBvcnQgZnVuY3Rpb24gY3JlYXRlQnJvYWRjYXN0Q2FwYWJpbGl0eSgpIHtcbiAgICByZXR1cm4gY3JlYXRlQnVpbHRpbkNhcGFiaWxpdHkoJ2Jyb2FkY2FzdCcsIEJyb2FkY2FzdFRvb2xzKTtcbn1cbiJdfQ==

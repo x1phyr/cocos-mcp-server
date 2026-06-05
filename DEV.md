@@ -1,6 +1,6 @@
 # 开发指南
 
-**v1.5.0**
+**v1.7.2**
 
 ## 文档
 
@@ -9,6 +9,8 @@
 | [README.md](./README.md) | 插件功能、安装、手动 MCP 配置 |
 | [README.EN.md](./README.EN.md) | 英文 README |
 | [FEATURE_GUIDE_CN.md](./FEATURE_GUIDE_CN.md) | MCP 工具说明 |
+| 下文 [§ 架构：在线能力提供者](#架构在线能力提供者) | v1.7 已实现：Bridge + ToolRegistry |
+| 下文 [§ 版本规划](#版本规划) | v1.6 / v1.8 未发布草案 |
 
 ---
 
@@ -119,7 +121,8 @@ Creator 面板改过端口并保存后，须重新 `deploy-mcp`，客户端 URL 
 | `npm run watch` | 开发仓库 | 监听编译 |
 | `npm run publish` | 开发仓库 | `build` + 同步到 Cocos 扩展目录 |
 | `npm run deploy-mcp` | 开发仓库 **或** `extensions/cocos-mcp-server` | 写入 AI 客户端 MCP 配置 |
-| `npm run test:registry` | 开发仓库 | 外部工具注册表单元测试（无需 Creator） |
+| `npm run test:registry` | 开发仓库 | ToolRegistry / CapabilityManager 单元测试（无需 Creator） |
+| `npm run test:tool-registry` | 开发仓库 | 同上（`test:registry` 别名） |
 
 ---
 
@@ -227,6 +230,134 @@ Editor.Message.request('cocos-mcp-server', 'mcp-register-tools', {
 npm run test:registry
 ```
 
+### 与 Capability Bridge 的关系（v1.7+）
+
+v1.5 的 `mcp-register-tools` **继续可用**。注册请求由 `CapabilityManager.registerExternal` 处理，创建 `ExternalMessageAdapter` 并写入内存 `ToolRegistry`；`MCPServer` 仅代理 `tools/call`。详见 [§ 架构：在线能力提供者](#架构在线能力提供者)。
+
+---
+
+## 架构：在线能力提供者
+
+**Online Capability Provider**（中文：在线能力提供者）是本仓库 v1.7 起的内部架构方向：**依托 Cocos 扩展体系**，不拆独立 MCP CLI 进程，不引入跨进程 WebSocket。
+
+### 定位
+
+| 角色 | 职责 |
+|------|------|
+| **Cocos 扩展** | 能力提供方（唯一事实源）；掌握当前项目、场景、扩展、Editor API |
+| **MCP 协议层**（扩展内 `MCPServer`） | 对外暴露 MCP；`tools/list`、`tools/call`；**不内嵌** Cocos 业务逻辑 |
+| **Capability Bridge**（扩展内） | 聚合内置与第三方 capability；执行工具；向 `ToolRegistry` 全量同步 |
+| **ToolRegistry**（内存） | 运行时工具索引；重启即清空；按 `providerId` 全量替换 |
+
+### 设计原则
+
+1. **不持久化工具注册表** — 无 `registry.json`；每次扩展 `load` / HTTP 服务启动后由 Provider 全量上报。
+2. **Cocos 插件是唯一事实源** — 有什么能力由 Bridge 决定；MCP 层只代理。
+3. **全量同步优于增量 diff** — 能力变更时对同一 `providerId` 先移除旧 tools 再写入新列表。
+4. **Provider 离线即工具下线** — 扩展 `unload` 或第三方 `mcp-unregister-tools` 后，对应 tools 从 `tools/list` 消失。
+
+### 进程模型（明确不做的事）
+
+```txt
+✅ 采用
+  AI Host ──HTTP MCP──► cocos-mcp-server 扩展（单进程）
+                            ├─ MCPServer（协议网关）
+                            ├─ ToolRegistry（内存）
+                            └─ Capability Bridge ──► *Tools / 第三方扩展
+
+❌ 不做（本仓库范围内）
+  独立 MCP CLI 子进程（stdio 拉起、与 Editor 生命周期解耦）
+  跨进程 WebSocket Provider 通道（除非未来明确需要「一个 MCP 聚合多个 Editor」）
+```
+
+部署方式不变：Creator 面板启动 HTTP 服务 → `deploy-mcp` 写客户端 URL → AI 连接 `http://127.0.0.1:{port}/mcp`。
+
+### 架构图
+
+```txt
+AI Host（Cursor / Claude / Codex）
+        │  MCP over HTTP
+        ▼
+┌─────────────────────────────────────────────┐
+│  cocos-mcp-server 扩展（Cocos Creator 进程）   │
+│                                             │
+│  MCPServer          ToolRegistry（内存）    │
+│      │                    ▲                 │
+│      │ tools/call        │ 全量 sync        │
+│      ▼                    │                 │
+│  Capability Bridge ───────┘                 │
+│      │                                      │
+│      ├─ capabilities/scene   （tools.ts + index.ts）
+│      ├─ capabilities/node    …共 14 个领域模块   │
+│      └─ external adapters    （第三方 Editor.Message 注册）
+│              │                              │
+└──────────────┼──────────────────────────────┘
+               ▼
+        Cocos Editor API / 项目 assets / 场景
+```
+
+### 目标模块划分
+
+| 路径 | 说明 |
+|------|------|
+| `source/main.ts` / `source/scene.ts` | Cocos 扩展入口（须保持根路径，对应 `package.json`） |
+| `source/core/` | `constants.ts`、`settings.ts` |
+| `source/mcp/server.ts` | MCP 协议网关（HTTP、`tools/list`、`tools/call`） |
+| `source/registry/` | 内存 `ToolRegistry`、外部注册 payload 校验 |
+| `source/bridge/` | `CapabilityManager`、内置注册表、内外适配器 |
+| `source/capabilities/<领域>/` | `tools.ts`（实现）+ `index.ts`（capability 工厂） |
+| `source/config/tool-manager.ts` | 面板工具启用配置（非执行层） |
+| `source/panel/` | Creator 面板 UI（`default`、`tool-manager`） |
+
+### 核心接口（草案）
+
+```ts
+interface CocosCapabilityPlugin {
+  readonly providerId: string;   // 内置如 "cocos-builtin-scene"
+  getTools(): ProviderToolDefinition[];
+  callTool(name: string, args: unknown): Promise<ToolResponse>;
+}
+
+interface ProviderSession {
+  providerId: string;
+  projectRoot: string;
+  cocosVersion?: string;
+  tools: ProviderTool[];
+  connectedAt: number;
+}
+```
+
+内置工具对外名称**保持 v1.5 约定**：`{category}_{toolName}`（如 `scene_get_scene_hierarchy`）。`cocos.*` 点分命名留作未来 MAJOR 再议，避免破坏现有 AI 工作流。
+
+### 调用流程
+
+```txt
+AI  tools/call("scene_get_scene_hierarchy", args)
+  → MCPServer.executeToolCall
+  → ToolRegistry.resolve(toolName) → { providerId, shortName }
+  → CapabilityManager.callTool(providerId, shortName, args)
+  → ScenePlugin.callTool → SceneTools.execute
+  → ToolResponse 原路返回 → MCP JSON-RPC
+```
+
+### 能力变更与生命周期
+
+| 事件 | 行为 |
+|------|------|
+| 扩展 `load` + HTTP 服务 `start` | Bridge 收集全部 plugin tools → `ToolRegistry.syncProvider` 全量写入 |
+| 第三方 `mcp-register-tools` | 注册 external adapter → 全量 sync 该 `providerId` |
+| 第三方 `mcp-unregister-tools` / 扩展 `unload` | `ToolRegistry.removeProvider` → 刷新 `tools/list` |
+| MCP HTTP 服务 `stop` | registry 可保留至进程结束；下次 `start` 重新 sync |
+
+### 与当前代码的对照
+
+| 能力 | v1.5 现状 | v1.7 目标 |
+|------|-----------|-----------|
+| 外部扩展注册 | `ExternalToolRegistry` + `Editor.Message` | 迁入 `ToolRegistry` + external adapter |
+| 内置工具 | `MCPServer` 直接 `new SceneTools()` | 经 Capability Bridge 代理 |
+| 工具启用过滤 | `ToolManager` + `enabledTools` | 不变；过滤在 `setupTools` 层 |
+| 持久化 | 无工具 registry 文件 | 仍无；仅 `tool-manager.json` 存启用配置 |
+
 ---
 
 ## 版本说明
@@ -240,7 +371,7 @@ npm run test:registry
 | [README.md § 更新日志](./README.md#更新日志) | **已发布**版本全文（v1.5.0、v1.4.x…及 Cocos 商城说明） |
 | 下文 [§ 版本规划](#版本规划) | **未发布**功能草案（当前仅 v1.6） |
 
-**本仓库 Git 当前**：v1.5.0（`package.json` 的 `version` 字段）。
+**本仓库 Git 当前**：v1.7.2（`package.json` 的 `version` 字段）。
 
 > **版本号勿混用**：README 里「商城 v1.5.0（2024-07）」是 Cocos 商店渠道大版本；本仓库 **Git v1.5.0** 为扩展注册 MCP 工具，二者无关。
 
@@ -252,16 +383,22 @@ npm run test:registry
 
 ```mermaid
 flowchart LR
-  A[v1.5.0 已发布] --> B[v1.6 UI 优化]
-  B --> C[面板展示外部工具来源]
+  A[v1.5.0 已发布] --> B[v1.7 在线能力提供者]
+  B --> C[v1.6 面板 UI]
+  B --> D[v1.8 工具热更新]
 ```
 
 | 版本 | 主题 | 状态 |
 |------|------|------|
 | **v1.5.0** | 外部扩展注册 MCP 工具 | 已发布（见 [§ 第三方扩展接入](#第三方扩展接入)） |
+| **v1.7.0** | 在线能力提供者（进程内架构重构） | 已发布（见 [§ 架构：在线能力提供者](#架构在线能力提供者)） |
+| **v1.7.2** | registry/面板/MCP 安全与契约修复 | 已发布（见 README 更新日志） |
 | **v1.6.0** | Creator 面板 UI 优化（含外部工具展示） | 规划中 |
+| **v1.8.0** | `tools/list_changed` 与状态探针工具 | 规划中（可选） |
 
-### v1.6.0 — UI 优化
+> 与 Cocos 商城「v1.5.0（2024-07）」无关；Git 版本以 `package.json` 为准。
+
+### v1.6.0 — 面板 UI 优化
 
 **目标**：面板更易用；清晰区分内置 / 外部工具（依赖 v1.5）。
 
@@ -270,6 +407,18 @@ flowchart LR
 | 运行状态、启停 loading | 工具搜索 / 分类全选 | 外部工具按 `providerId` 分组 |
 | 端口校验与保存反馈 | 启用数统计 | 错误提示、主题间距 |
 
-**技术项**：拆分 `panels/default/index.ts`；订阅 `mcp-tools-changed` 减少轮询。
+**技术项**：拆分 `panel/default/index.ts`；订阅 `mcp-tools-changed` 减少轮询。
 
-**English (planned)**：v1.6 — panel UX for built-in vs external tools. Git v1.5.0 (external registration) is shipped; unrelated to Cocos Store v1.5.0 in README.
+**可并行**：与 v1.7 无硬依赖，可与 Phase 1 并行开发。
+
+### v1.8.0 — 工具热更新（可选）
+
+**目标**：AI 客户端在工具列表变化时自动感知，无需重连。
+
+| 项 | 内容 |
+|----|------|
+| 协议 | MCP `notifications/tools/list_changed`（依赖客户端 transport 能力） |
+| 工具 | `server_status` 或新增探针：当前 `providerId`、工程路径、在线工具数 |
+| 前置 | v1.7 `ToolRegistry` 在 sync/remove 时触发 notifier |
+
+**English (planned)**：v1.7 — in-process Online Capability Provider; v1.6 — panel UX. Git releases unrelated to Cocos Store v1.5.0 in README.
