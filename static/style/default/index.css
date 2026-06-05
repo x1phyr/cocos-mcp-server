@@ -491,21 +491,42 @@ ui-prop {
     align-items: center;
 }
 
-/* 展开/折叠按钮行 */
-.tools-list-actions {
-    display: flex;
-    gap: 6px;
-    margin-bottom: var(--mcp-spacing-sm);
+/* 工具管理 tab — 撑满高度 */
+.tab-content-tools {
+    padding: var(--mcp-spacing-sm);
+}
+
+.tab-content-tools .tools-section {
+    height: 100%;
+}
+
+/* 操作文字链接 */
+.tools-action-link {
+    font-size: 12px;
+    color: var(--mcp-text-tertiary);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: color var(--mcp-transition);
+}
+
+.tools-action-link:hover {
+    color: var(--mcp-accent);
+    background: var(--mcp-accent-dim);
+}
+
+.tools-action-divider {
+    font-size: 11px;
+    color: var(--mcp-border-emphasis);
 }
 
 /* ============================================================
-   Tools Container — Scrollable Area
+   Tools Container — Scrollable Area (fill remaining space)
    ============================================================ */
 .tools-container {
     flex: 1;
     overflow-y: auto;
-    padding-right: 8px;
-    max-height: 400px;
+    padding-right: 4px;
 }
 
 .tools-container::-webkit-scrollbar {

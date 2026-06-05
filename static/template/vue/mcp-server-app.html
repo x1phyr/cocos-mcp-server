@@ -89,77 +89,57 @@
     </div>
 
     <!-- 工具管理选项卡 -->
-    <div class="tab-content" v-show="activeTab === 'tools'">
-        <section class="tool-manager">
-            <div class="tools-summary">
-                <span class="summary-chip">内置 {{ builtinToolCount }}</span>
-                <span class="summary-chip summary-chip-external">外部 {{ externalToolCount }}</span>
-                <span class="summary-chip">已启用 {{ enabledTools }} / {{ totalTools }}</span>
+    <div class="tab-content tab-content-tools" v-show="activeTab === 'tools'">
+        <div class="tools-section">
+            <div class="tools-section-header">
+                <div class="tools-section-title">
+                    <div class="tools-stats">
+                        {{ totalTools }} 个工具 · {{ enabledTools }} 启用 · {{ disabledTools }} 禁用
+                    </div>
+                </div>
+                <div class="tools-section-controls">
+                    <span class="tools-action-link" @click="expandAllCategories">展开</span>
+                    <span class="tools-action-divider">|</span>
+                    <span class="tools-action-link" @click="collapseAllCategories">折叠</span>
+                    <span class="tools-action-divider">·</span>
+                    <span class="tools-action-link" @click="selectAllTools">全选</span>
+                    <span class="tools-action-divider">|</span>
+                    <span class="tools-action-link" @click="deselectAllTools">清空</span>
+                    <span class="tools-action-divider">·</span>
+                    <span class="tools-action-link" @click="loadToolManagerState">刷新</span>
+                    <ui-button @click="saveChanges" class="small primary">保存</ui-button>
+                </div>
             </div>
 
-            <div v-if="externalProviders.length > 0" class="external-providers">
-                <h4>外部扩展</h4>
-                <ul>
-                    <li v-for="provider in externalProviders" :key="provider.providerId">
-                        <strong>{{ provider.providerId }}</strong>
-                        <span class="provider-meta">namespace: {{ provider.namespace }} · {{ provider.tools.length }} 工具</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="tools-section">
-                <div class="tools-section-header">
-                    <div class="tools-section-title">
-                        <h4>可用工具</h4>
-                        <div class="tools-stats">
-                            {{ totalTools }} 个工具 · {{ enabledTools }} 启用 · {{ disabledTools }} 禁用
+            <div class="tools-container">
+                <div v-for="category in sortedToolCategories" :key="category" class="tool-category" :class="{ 'tool-category-external': isExternalCategory(category), 'tool-category-collapsed': isCategoryCollapsed(category) }">
+                    <div class="category-header" @click="toggleCategoryCollapse(category)">
+                        <h5>
+                            <span class="collapse-arrow" :class="{ 'collapse-arrow-collapsed': isCategoryCollapsed(category) }">▾</span>
+                            {{ getCategoryDisplayName(category) }}
+                            <span class="category-count">({{ getToolsByCategory(category).length }})</span>
+                            <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">EXT</span>
+                        </h5>
+                        <div class="category-controls" @click.stop>
+                            <span class="category-toggle-link" @click="toggleCategoryTools(category, true)">全选</span>
+                            <span class="category-toggle-divider">|</span>
+                            <span class="category-toggle-link" @click="toggleCategoryTools(category, false)">清空</span>
                         </div>
                     </div>
-                    <div class="tools-section-controls">
-                        <ui-button @click="selectAllTools" class="small">全选</ui-button>
-                        <ui-button @click="deselectAllTools" class="small">清空</ui-button>
-                        <ui-button @click="loadToolManagerState" class="small">刷新</ui-button>
-                        <ui-button @click="saveChanges" class="small primary">保存</ui-button>
-                    </div>
-                </div>
-
-                <div class="tools-list-actions">
-                    <ui-button @click="expandAllCategories" class="small secondary">展开全部</ui-button>
-                    <ui-button @click="collapseAllCategories" class="small secondary">折叠全部</ui-button>
-                </div>
-                    </div>
-                </div>
-
-                <div class="tools-container">
-                    <div v-for="category in sortedToolCategories" :key="category" class="tool-category" :class="{ 'tool-category-external': isExternalCategory(category), 'tool-category-collapsed': isCategoryCollapsed(category) }">
-                        <div class="category-header" @click="toggleCategoryCollapse(category)">
-                            <h5>
-                                <span class="collapse-arrow" :class="{ 'collapse-arrow-collapsed': isCategoryCollapsed(category) }">▾</span>
-                                {{ getCategoryDisplayName(category) }}
-                                <span class="category-count">({{ getToolsByCategory(category).length }})</span>
-                                <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">EXT</span>
-                            </h5>
-                            <div class="category-controls" @click.stop>
-                                <span class="category-toggle-link" @click="toggleCategoryTools(category, true)">全选</span>
-                                <span class="category-toggle-divider">|</span>
-                                <span class="category-toggle-link" @click="toggleCategoryTools(category, false)">清空</span>
-                            </div>
-                        </div>
-                        <div class="tool-items" v-show="!isCategoryCollapsed(category)">
-                            <div v-for="tool in getToolsByCategory(category)" :key="tool.name" class="tool-item">
-                                <ui-checkbox
-                                    :value="tool.enabled"
-                                    @change="(event) => updateToolStatus(category, tool.name, event.target.checked)"
-                                ></ui-checkbox>
-                                <div class="tool-info">
-                                    <div class="tool-name">{{ tool.name }}</div>
-                                    <div class="tool-description">{{ tool.description }}</div>
-                                </div>
+                    <div class="tool-items" v-show="!isCategoryCollapsed(category)">
+                        <div v-for="tool in getToolsByCategory(category)" :key="tool.name" class="tool-item">
+                            <ui-checkbox
+                                :value="tool.enabled"
+                                @change="(event) => updateToolStatus(category, tool.name, event.target.checked)"
+                            ></ui-checkbox>
+                            <div class="tool-info">
+                                <div class="tool-name">{{ tool.name }}</div>
+                                <div class="tool-description">{{ tool.description }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 </div>
