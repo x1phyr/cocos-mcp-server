@@ -21,7 +21,13 @@ A comprehensive MCP (Model Context Protocol) server plugin for Cocos Creator 3.8
 
 ## Changelog
 
-### v1.7.2 - June 5, 2026 (Current version)
+### v1.7.3 - June 5, 2026 (Current version)
+
+- **Added**: Default panel start/stop loading, port/connection validation with save feedback, and built-in vs external tool sections with provider summary.
+- **Changed**: Panel listens for `mcp-tools-changed` to refresh tools; status polling runs on the server tab only when idle.
+- **Fixed**: Panel save settings now maps `enableDebugLog` correctly.
+
+### v1.7.2 - June 5, 2026
 
 - **Fixed**: Block external extensions from using `cocos-builtin-*` provider IDs; enforce enabled-tool checks on `tools/call` and Simple API.
 - **Fixed**: Tool-manager panel message contracts, `getToolManagerState.currentConfiguration`, `openToolManager`, and panel registration.

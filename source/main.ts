@@ -1,5 +1,5 @@
 import { MCPServer } from './mcp/server';
-import { readSettings, saveSettings } from './core/settings';
+import { readSettings, saveSettings, validateMcpServerSettings } from './core/settings';
 import { MCPServerSettings } from './types';
 import { ToolManager } from './config/tool-manager';
 import {
@@ -109,6 +109,10 @@ export const methods: { [key: string]: (...any: any) => any } = {
      * @zh 更新服务器设置
      */
     updateSettings(settings: MCPServerSettings) {
+        const validationError = validateMcpServerSettings(settings);
+        if (validationError) {
+            throw new Error(validationError);
+        }
         saveSettings(settings);
         if (mcpServer) {
             mcpServer.stop();

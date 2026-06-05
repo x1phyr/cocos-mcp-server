@@ -57,6 +57,21 @@ export function saveSettings(settings: MCPServerSettings): void {
     }
 }
 
+export function validateMcpServerSettings(settings: Partial<MCPServerSettings>): string | null {
+    const port = settings.port;
+    if (port === undefined || !Number.isInteger(port) || port < 1024 || port > 65535) {
+        return '端口必须是 1024–65535 之间的整数';
+    }
+    const maxConnections = settings.maxConnections;
+    if (
+        maxConnections !== undefined &&
+        (!Number.isInteger(maxConnections) || maxConnections < 1 || maxConnections > 100)
+    ) {
+        return '最大连接数必须是 1–100 之间的整数';
+    }
+    return null;
+}
+
 // 工具管理器设置相关函数
 export function readToolManagerSettings(): ToolManagerSettings {
     try {

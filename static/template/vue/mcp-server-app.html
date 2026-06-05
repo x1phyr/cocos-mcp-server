@@ -27,8 +27,9 @@
 
         <section class="server-controls">
             <ui-button @click="toggleServer" :disabled="isProcessing" class="primary">
-                {{ serverRunning ? '停止服务器' : '启动服务器' }}
+                {{ serverToggleLabel }}
             </ui-button>
+            <p v-if="serverActionError" class="feedback feedback-error">{{ serverActionError }}</p>
         </section>
 
         <section class="server-settings">
@@ -38,6 +39,7 @@
                 <ui-num-input slot="content" v-model="settings.port" :min="1024" :max="65535" :step="1" :disabled="serverRunning">
                 </ui-num-input>
             </ui-prop>
+            <p v-if="settingsValidationError && settingsChanged" class="feedback feedback-error">{{ settingsValidationError }}</p>
             <ui-prop>
                 <ui-label slot="label">自动启动</ui-label>
                 <ui-checkbox slot="content" v-model="settings.autoStart"></ui-checkbox>
@@ -66,7 +68,8 @@
         </section>
 
         <footer>
-            <ui-button @click="saveSettings" :disabled="!settingsChanged">保存设置</ui-button>
+            <ui-button @click="saveSettings" :disabled="!settingsChanged || isProcessing || !!settingsValidationError">保存设置</ui-button>
+            <p v-if="settingsFeedback" class="feedback" :class="settingsFeedbackKind === 'success' ? 'feedback-success' : 'feedback-error'">{{ settingsFeedback }}</p>
         </footer>
     </div>
     
@@ -75,6 +78,22 @@
         <section class="tool-manager">
             <div class="tool-manager-header">
                 <h3>工具管理</h3>
+            </div>
+
+            <div class="tools-summary">
+                <span class="summary-chip">内置 {{ builtinToolCount }}</span>
+                <span class="summary-chip summary-chip-external">外部 {{ externalToolCount }}</span>
+                <span class="summary-chip">已启用 {{ enabledTools }} / {{ totalTools }}</span>
+            </div>
+
+            <div v-if="externalProviders.length > 0" class="external-providers">
+                <h4>外部扩展</h4>
+                <ul>
+                    <li v-for="provider in externalProviders" :key="provider.providerId">
+                        <strong>{{ provider.providerId }}</strong>
+                        <span class="provider-meta">namespace: {{ provider.namespace }} · {{ provider.tools.length }} 工具</span>
+                    </li>
+                </ul>
             </div>
             
             <div class="tools-section">
@@ -89,14 +108,18 @@
                     <div class="tools-section-controls">
                         <ui-button @click="selectAllTools" class="small">全选</ui-button>
                         <ui-button @click="deselectAllTools" class="small">取消全选</ui-button>
+                        <ui-button @click="loadToolManagerState" class="small">刷新</ui-button>
                         <ui-button @click="saveChanges" class="primary">保存更改</ui-button>
                     </div>
                 </div>
                 
                 <div class="tools-container">
-                    <div v-for="category in toolCategories" :key="category" class="tool-category">
+                    <div v-for="category in sortedToolCategories" :key="category" class="tool-category" :class="{ 'tool-category-external': isExternalCategory(category) }">
                         <div class="category-header">
-                            <h5>{{ getCategoryDisplayName(category) }}</h5>
+                            <h5>
+                                {{ getCategoryDisplayName(category) }}
+                                <span v-if="isExternalCategory(category)" class="tool-badge tool-badge-external">外部</span>
+                            </h5>
                             <div class="category-controls">
                                 <ui-button @click="toggleCategoryTools(category, true)" class="small">全选</ui-button>
                                 <ui-button @click="toggleCategoryTools(category, false)" class="small">取消全选</ui-button>
@@ -117,10 +140,6 @@
                     </div>
                 </div>
             </div>
-            
-
         </section>
     </div>
 </div>
-
- 

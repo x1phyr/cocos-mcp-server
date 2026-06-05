@@ -390,3 +390,84 @@ ui-button.secondary:hover {
     margin: 0;
     font-size: 14px;
 }
+
+.feedback {
+    margin: 10px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.feedback-success {
+    color: var(--color-success, #6cc644);
+}
+
+.feedback-error {
+    color: var(--color-danger, #e74c3c);
+}
+
+.tools-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.summary-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: var(--color-normal-fill);
+    border: 1px solid var(--color-normal-border);
+}
+
+.summary-chip-external {
+    border-color: var(--color-warn-fill, #c9a227);
+}
+
+.external-providers {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 4px;
+    background: var(--color-normal-fill);
+    border: 1px solid var(--color-normal-border);
+}
+
+.external-providers h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+}
+
+.external-providers ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.external-providers li {
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.provider-meta {
+    margin-left: 8px;
+    color: var(--color-normal-text-secondary);
+}
+
+.tool-category-external {
+    border-left: 3px solid var(--color-warn-fill, #c9a227);
+}
+
+.tool-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.tool-badge-external {
+    background: var(--color-warn-fill, rgba(201, 162, 39, 0.2));
+    color: var(--color-warn-text, #8a6d1d);
+}

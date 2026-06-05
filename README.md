@@ -20,7 +20,13 @@
 
 ## 更新日志
 
-### v1.7.2 - 2026年6月5日（当前版本）
+### v1.7.3 - 2026年6月5日（当前版本）
+
+- **Added**：默认面板启停 loading、端口/连接数校验与保存反馈；内置/外部工具分区展示与外部 provider 摘要。
+- **Changed**：面板订阅 `mcp-tools-changed` 刷新工具列表；服务器状态轮询仅在服务器页且非 processing 时进行。
+- **Fixed**：面板保存设置时 `enableDebugLog` 字段映射错误。
+
+### v1.7.2 - 2026年6月5日
 
 - **Fixed**：禁止外部扩展占用 `cocos-builtin-*` providerId；`tools/call` 与 Simple API 校验工具启用状态。
 - **Fixed**：多配置 tool-manager 面板消息契约、`getToolManagerState.currentConfiguration`、`openToolManager` 与面板注册。
