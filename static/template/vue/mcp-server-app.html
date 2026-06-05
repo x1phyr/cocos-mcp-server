@@ -91,6 +91,24 @@
     <!-- 工具管理选项卡 -->
     <div class="tab-content tab-content-tools" v-show="activeTab === 'tools'">
         <div class="tools-section">
+            <!-- 概括栏 -->
+            <div class="tools-overview">
+                <div class="tools-summary">
+                    <span class="summary-chip">内置 {{ builtinToolCount }}</span>
+                    <span class="summary-chip summary-chip-external">外部 {{ externalToolCount }}</span>
+                    <span class="summary-chip">已启用 {{ enabledTools }} / {{ totalTools }}</span>
+                </div>
+                <div v-if="externalProviders.length > 0" class="external-providers">
+                    <h4>外部扩展</h4>
+                    <ul>
+                        <li v-for="provider in externalProviders" :key="provider.providerId">
+                            <strong>{{ provider.providerId }}</strong>
+                            <span class="provider-meta">namespace: {{ provider.namespace }} · {{ provider.tools.length }} 工具</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="tools-section-header">
                 <div class="tools-section-title">
                     <div class="tools-stats">

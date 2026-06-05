@@ -500,6 +500,11 @@ ui-prop {
     height: 100%;
 }
 
+/* 概括栏 */
+.tools-overview {
+    margin-bottom: var(--mcp-spacing-md);
+}
+
 /* 操作文字链接 */
 .tools-action-link {
     font-size: 12px;
