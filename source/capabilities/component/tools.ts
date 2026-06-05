@@ -204,118 +204,113 @@ export class ComponentTools implements ToolExecutor {
     }
 
     private async addComponent(nodeUuid: string, componentType: string): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            // 先查找节点上是否已存在该组件
-            const allComponentsInfo = await this.getComponents(nodeUuid);
-            if (allComponentsInfo.success && allComponentsInfo.data?.components) {
-                const existingComponent = allComponentsInfo.data.components.find((comp: any) => comp.type === componentType);
-                if (existingComponent) {
-                    resolve({
-                        success: true,
-                        message: `Component '${componentType}' already exists on node`,
-                        data: {
-                            nodeUuid: nodeUuid,
-                            componentType: componentType,
-                            componentVerified: true,
-                            existing: true
-                        }
-                    });
-                    return;
-                }
+        // 先查找节点上是否已存在该组件
+        const allComponentsInfo = await this.getComponents(nodeUuid);
+        if (allComponentsInfo.success && allComponentsInfo.data?.components) {
+            const existingComponent = allComponentsInfo.data.components.find((comp: any) => comp.type === componentType);
+            if (existingComponent) {
+                return {
+                    success: true,
+                    message: `Component '${componentType}' already exists on node`,
+                    data: {
+                        nodeUuid: nodeUuid,
+                        componentType: componentType,
+                        componentVerified: true,
+                        existing: true
+                    }
+                };
             }
-            // 尝试直接使用 Editor API 添加组件
-            Editor.Message.request('scene', 'create-component', {
+        }
+        // 尝试直接使用 Editor API 添加组件
+        try {
+            await Editor.Message.request('scene', 'create-component', {
                 uuid: nodeUuid,
                 component: componentType
-            }).then(async (result: any) => {
-                // 等待一段时间让Editor完成组件添加
-                await new Promise(resolve => setTimeout(resolve, 100));
-                // 重新查询节点信息验证组件是否真的添加成功
-                try {
-                    const allComponentsInfo2 = await this.getComponents(nodeUuid);
-                    if (allComponentsInfo2.success && allComponentsInfo2.data?.components) {
-                        const addedComponent = allComponentsInfo2.data.components.find((comp: any) => comp.type === componentType);
-                        if (addedComponent) {
-                            resolve({
-                                success: true,
-                                message: `Component '${componentType}' added successfully`,
-                                data: {
-                                    nodeUuid: nodeUuid,
-                                    componentType: componentType,
-                                    componentVerified: true,
-                                    existing: false
-                                }
-                            });
-                        } else {
-                            resolve({
-                                success: false,
-                                error: `Component '${componentType}' was not found on node after addition. Available components: ${allComponentsInfo2.data.components.map((c: any) => c.type).join(', ')}`
-                            });
-                        }
-                    } else {
-                        resolve({
-                            success: false,
-                            error: `Failed to verify component addition: ${allComponentsInfo2.error || 'Unable to get node components'}`
-                        });
-                    }
-                } catch (verifyError: any) {
-                    resolve({
-                        success: false,
-                        error: `Failed to verify component addition: ${verifyError.message}`
-                    });
-                }
-            }).catch((err: Error) => {
-                // 备用方案：使用场景脚本
-                const options = {
-                    name: 'cocos-mcp-server',
-                    method: 'addComponentToNode',
-                    args: [nodeUuid, componentType]
-                };
-                Editor.Message.request('scene', 'execute-scene-script', options).then((result: any) => {
-                    resolve(result);
-                }).catch((err2: Error) => {
-                    resolve({ success: false, error: `Direct API failed: ${err.message}, Scene script failed: ${err2.message}` });
-                });
             });
-        });
+            // 等待一段时间让Editor完成组件添加
+            await new Promise(r => setTimeout(r, 100));
+            // 重新查询节点信息验证组件是否真的添加成功
+            try {
+                const allComponentsInfo2 = await this.getComponents(nodeUuid);
+                if (allComponentsInfo2.success && allComponentsInfo2.data?.components) {
+                    const addedComponent = allComponentsInfo2.data.components.find((comp: any) => comp.type === componentType);
+                    if (addedComponent) {
+                        return {
+                            success: true,
+                            message: `Component '${componentType}' added successfully`,
+                            data: {
+                                nodeUuid: nodeUuid,
+                                componentType: componentType,
+                                componentVerified: true,
+                                existing: false
+                            }
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            error: `Component '${componentType}' was not found on node after addition. Available components: ${allComponentsInfo2.data.components.map((c: any) => c.type).join(', ')}`
+                        };
+                    }
+                } else {
+                    return {
+                        success: false,
+                        error: `Failed to verify component addition: ${allComponentsInfo2.error || 'Unable to get node components'}`
+                    };
+                }
+            } catch (verifyError: any) {
+                return {
+                    success: false,
+                    error: `Failed to verify component addition: ${verifyError.message}`
+                };
+            }
+        } catch (err: any) {
+            // 备用方案：使用场景脚本
+            const options = {
+                name: 'cocos-mcp-server',
+                method: 'addComponentToNode',
+                args: [nodeUuid, componentType]
+            };
+            try {
+                const result: any = await Editor.Message.request('scene', 'execute-scene-script', options);
+                return result;
+            } catch (err2: any) {
+                return { success: false, error: `Direct API failed: ${err.message}, Scene script failed: ${err2.message}` };
+            }
+        }
     }
 
     private async removeComponent(nodeUuid: string, componentType: string): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            // 1. 查找节点上的所有组件
-            const allComponentsInfo = await this.getComponents(nodeUuid);
-            if (!allComponentsInfo.success || !allComponentsInfo.data?.components) {
-                resolve({ success: false, error: `Failed to get components for node '${nodeUuid}': ${allComponentsInfo.error}` });
-                return;
+        // 1. 查找节点上的所有组件
+        const allComponentsInfo = await this.getComponents(nodeUuid);
+        if (!allComponentsInfo.success || !allComponentsInfo.data?.components) {
+            return { success: false, error: `Failed to get components for node '${nodeUuid}': ${allComponentsInfo.error}` };
+        }
+        // 2. 只查找type字段等于componentType的组件（即cid）
+        const exists = allComponentsInfo.data.components.some((comp: any) => comp.type === componentType);
+        if (!exists) {
+            return { success: false, error: `Component cid '${componentType}' not found on node '${nodeUuid}'. 请用getComponents获取type字段（cid）作为componentType。` };
+        }
+        // 3. 官方API直接移除
+        try {
+            await Editor.Message.request('scene', 'remove-component', {
+                uuid: nodeUuid,
+                component: componentType
+            });
+            // 4. 再查一次确认是否移除
+            const afterRemoveInfo = await this.getComponents(nodeUuid);
+            const stillExists = afterRemoveInfo.success && afterRemoveInfo.data?.components?.some((comp: any) => comp.type === componentType);
+            if (stillExists) {
+                return { success: false, error: `Component cid '${componentType}' was not removed from node '${nodeUuid}'.` };
+            } else {
+                return {
+                    success: true,
+                    message: `Component cid '${componentType}' removed successfully from node '${nodeUuid}'`,
+                    data: { nodeUuid, componentType }
+                };
             }
-            // 2. 只查找type字段等于componentType的组件（即cid）
-            const exists = allComponentsInfo.data.components.some((comp: any) => comp.type === componentType);
-            if (!exists) {
-                resolve({ success: false, error: `Component cid '${componentType}' not found on node '${nodeUuid}'. 请用getComponents获取type字段（cid）作为componentType。` });
-                return;
-            }
-            // 3. 官方API直接移除
-            try {
-                await Editor.Message.request('scene', 'remove-component', {
-                    uuid: nodeUuid,
-                    component: componentType
-                });
-                // 4. 再查一次确认是否移除
-                const afterRemoveInfo = await this.getComponents(nodeUuid);
-                const stillExists = afterRemoveInfo.success && afterRemoveInfo.data?.components?.some((comp: any) => comp.type === componentType);
-                if (stillExists) {
-                    resolve({ success: false, error: `Component cid '${componentType}' was not removed from node '${nodeUuid}'.` });
-                } else {
-                    resolve({
-                        success: true,
-                        message: `Component cid '${componentType}' removed successfully from node '${nodeUuid}'`,
-                        data: { nodeUuid, componentType }
-                    });
-                }
-            } catch (err: any) {
-                resolve({ success: false, error: `Failed to remove component: ${err.message}` });
-            }
-        });
+        } catch (err: any) {
+            return { success: false, error: `Failed to remove component: ${err.message}` };
+        }
     }
 
     private async getComponents(nodeUuid: string): Promise<ToolResponse> {
@@ -500,78 +495,72 @@ export class ComponentTools implements ToolExecutor {
     }
 
     private async setComponentProperty(args: any): Promise<ToolResponse> {
-                        const { nodeUuid, componentType, property, propertyType, value } = args;
-        
-        return new Promise(async (resolve) => {
+        const { nodeUuid, componentType, property, propertyType, value } = args;
+
+        try {
+            console.log(`[ComponentTools] Setting ${componentType}.${property} (type: ${propertyType}) = ${JSON.stringify(value)} on node ${nodeUuid}`);
+
+            // Step 0: 检测是否为节点属性，如果是则重定向到对应的节点方法
+            const nodeRedirectResult = await this.checkAndRedirectNodeProperties(args);
+            if (nodeRedirectResult) {
+                return nodeRedirectResult;
+            }
+
+            // Step 1: 获取组件信息，使用与getComponents相同的方法
+            const componentsResponse = await this.getComponents(nodeUuid);
+            if (!componentsResponse.success || !componentsResponse.data) {
+                return {
+                    success: false,
+                    error: `Failed to get components for node '${nodeUuid}': ${componentsResponse.error}`,
+                    instruction: `Please verify that node UUID '${nodeUuid}' is correct. Use get_all_nodes or find_node_by_name to get the correct node UUID.`
+                };
+            }
+
+            const allComponents = componentsResponse.data.components;
+
+            // Step 2: 查找目标组件
+            let targetComponent = null;
+            const availableTypes: string[] = [];
+
+            for (let i = 0; i < allComponents.length; i++) {
+                const comp = allComponents[i];
+                availableTypes.push(comp.type);
+
+                if (comp.type === componentType) {
+                    targetComponent = comp;
+                    break;
+                }
+            }
+
+            if (!targetComponent) {
+                // 提供更详细的错误信息和建议
+                const instruction = this.generateComponentSuggestion(componentType, availableTypes, property);
+                return {
+                    success: false,
+                    error: `Component '${componentType}' not found on node. Available components: ${availableTypes.join(', ')}`,
+                    instruction: instruction
+                };
+            }
+
+            // Step 3: 自动检测和转换属性值
+            let propertyInfo;
             try {
-                console.log(`[ComponentTools] Setting ${componentType}.${property} (type: ${propertyType}) = ${JSON.stringify(value)} on node ${nodeUuid}`);
-                
-                // Step 0: 检测是否为节点属性，如果是则重定向到对应的节点方法
-                const nodeRedirectResult = await this.checkAndRedirectNodeProperties(args);
-                if (nodeRedirectResult) {
-                    resolve(nodeRedirectResult);
-                    return;
-                }
-                
-                // Step 1: 获取组件信息，使用与getComponents相同的方法
-                const componentsResponse = await this.getComponents(nodeUuid);
-                if (!componentsResponse.success || !componentsResponse.data) {
-                    resolve({
-                        success: false,
-                        error: `Failed to get components for node '${nodeUuid}': ${componentsResponse.error}`,
-                        instruction: `Please verify that node UUID '${nodeUuid}' is correct. Use get_all_nodes or find_node_by_name to get the correct node UUID.`
-                    });
-                    return;
-                }
-                
-                const allComponents = componentsResponse.data.components;
-                
-                // Step 2: 查找目标组件
-                let targetComponent = null;
-                const availableTypes: string[] = [];
-                
-                for (let i = 0; i < allComponents.length; i++) {
-                    const comp = allComponents[i];
-                    availableTypes.push(comp.type);
-                    
-                    if (comp.type === componentType) {
-                        targetComponent = comp;
-                        break;
-                    }
-                }
-                
-                if (!targetComponent) {
-                    // 提供更详细的错误信息和建议
-                    const instruction = this.generateComponentSuggestion(componentType, availableTypes, property);
-                    resolve({
-                        success: false,
-                        error: `Component '${componentType}' not found on node. Available components: ${availableTypes.join(', ')}`,
-                        instruction: instruction
-                    });
-                    return;
-                }
-                
-                // Step 3: 自动检测和转换属性值
-                let propertyInfo;
-                try {
-                    console.log(`[ComponentTools] Analyzing property: ${property}`);
-                    propertyInfo = this.analyzeProperty(targetComponent, property);
-                } catch (analyzeError: any) {
-                    console.error(`[ComponentTools] Error in analyzeProperty:`, analyzeError);
-                    resolve({
-                        success: false,
-                        error: `Failed to analyze property '${property}': ${analyzeError.message}`
-                    });
-                    return;
-                }
-                
-                if (!propertyInfo.exists) {
-                    resolve({
-                        success: false,
-                        error: `Property '${property}' not found on component '${componentType}'. Available properties: ${propertyInfo.availableProperties.join(', ')}`
-                    });
-                    return;
-                }
+                console.log(`[ComponentTools] Analyzing property: ${property}`);
+                propertyInfo = this.analyzeProperty(targetComponent, property);
+            } catch (analyzeError: any) {
+                console.error(`[ComponentTools] Error in analyzeProperty:`, analyzeError);
+                return {
+                    success: false,
+                    error: `Failed to analyze property '${property}': ${analyzeError.message}`
+                };
+            }
+
+            if (!propertyInfo.exists) {
+                return {
+                    success: false,
+                    error: `Property '${property}' not found on component '${componentType}'. Available properties: ${propertyInfo.availableProperties.join(', ')}`
+                };
+            }
                 
                 // Step 4: 处理属性值和设置
                 const originalValue = propertyInfo.originalValue;
@@ -720,11 +709,10 @@ export class ComponentTools implements ToolExecutor {
                 // Step 5: 获取原始节点数据来构建正确的路径
                 const rawNodeData = await Editor.Message.request('scene', 'query-node', nodeUuid);
                 if (!rawNodeData || !rawNodeData.__comps__) {
-                    resolve({
+                    return {
                         success: false,
                         error: `Failed to get raw node data for property setting`
-                    });
-                    return;
+                    };
                 }
                 
                 // 找到原始组件的索引
@@ -739,11 +727,10 @@ export class ComponentTools implements ToolExecutor {
                 }
                 
                 if (rawComponentIndex === -1) {
-                    resolve({
+                    return {
                         success: false,
                         error: `Could not find component index for setting property`
-                    });
-                    return;
+                    };
                 }
                 
                 // 构建正确的属性路径
@@ -1061,11 +1048,11 @@ export class ComponentTools implements ToolExecutor {
                 }
                 
                 // Step 5: 等待Editor完成更新，然后验证设置结果
-                await new Promise(resolve => setTimeout(resolve, 200)); // 等待200ms让Editor完成更新
-                
+                await new Promise(r => setTimeout(r, 200)); // 等待200ms让Editor完成更新
+
                 const verification = await this.verifyPropertyChange(nodeUuid, componentType, property, originalValue, actualExpectedValue);
-                
-                resolve({
+
+                return {
                     success: true,
                     message: `Successfully set ${componentType}.${property}`,
                     data: {
@@ -1075,95 +1062,92 @@ export class ComponentTools implements ToolExecutor {
                         actualValue: verification.actualValue,
                         changeVerified: verification.verified
                     }
-                });
-                
+                };
+
             } catch (error: any) {
                 console.error(`[ComponentTools] Error setting property:`, error);
-                resolve({
+                return {
                     success: false,
                     error: `Failed to set property: ${error.message}`
-                });
+                };
             }
-        });
-    }
+        }
 
 
     private async attachScript(nodeUuid: string, scriptPath: string): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            // 从脚本路径提取组件类名
-            const scriptName = scriptPath.split('/').pop()?.replace('.ts', '').replace('.js', '');
-            if (!scriptName) {
-                resolve({ success: false, error: 'Invalid script path' });
-                return;
+        // 从脚本路径提取组件类名
+        const scriptName = scriptPath.split('/').pop()?.replace('.ts', '').replace('.js', '');
+        if (!scriptName) {
+            return { success: false, error: 'Invalid script path' };
+        }
+        // 先查找节点上是否已存在该脚本组件
+        const allComponentsInfo = await this.getComponents(nodeUuid);
+        if (allComponentsInfo.success && allComponentsInfo.data?.components) {
+            const existingScript = allComponentsInfo.data.components.find((comp: any) => comp.type === scriptName);
+            if (existingScript) {
+                return {
+                    success: true,
+                    message: `Script '${scriptName}' already exists on node`,
+                    data: {
+                        nodeUuid: nodeUuid,
+                        componentName: scriptName,
+                        existing: true
+                    }
+                };
             }
-            // 先查找节点上是否已存在该脚本组件
-            const allComponentsInfo = await this.getComponents(nodeUuid);
-            if (allComponentsInfo.success && allComponentsInfo.data?.components) {
-                const existingScript = allComponentsInfo.data.components.find((comp: any) => comp.type === scriptName);
-                if (existingScript) {
-                    resolve({
+        }
+        // 首先尝试直接使用脚本名称作为组件类型
+        try {
+            await Editor.Message.request('scene', 'create-component', {
+                uuid: nodeUuid,
+                component: scriptName  // 使用脚本名称而非UUID
+            });
+            // 等待一段时间让Editor完成组件添加
+            await new Promise(r => setTimeout(r, 100));
+            // 重新查询节点信息验证脚本是否真的添加成功
+            const allComponentsInfo2 = await this.getComponents(nodeUuid);
+            if (allComponentsInfo2.success && allComponentsInfo2.data?.components) {
+                const addedScript = allComponentsInfo2.data.components.find((comp: any) => comp.type === scriptName);
+                if (addedScript) {
+                    return {
                         success: true,
-                        message: `Script '${scriptName}' already exists on node`,
+                        message: `Script '${scriptName}' attached successfully`,
                         data: {
                             nodeUuid: nodeUuid,
                             componentName: scriptName,
-                            existing: true
+                            existing: false
                         }
-                    });
-                    return;
-                }
-            }
-            // 首先尝试直接使用脚本名称作为组件类型
-            Editor.Message.request('scene', 'create-component', {
-                uuid: nodeUuid,
-                component: scriptName  // 使用脚本名称而非UUID
-            }).then(async (result: any) => {
-                // 等待一段时间让Editor完成组件添加
-                await new Promise(resolve => setTimeout(resolve, 100));
-                // 重新查询节点信息验证脚本是否真的添加成功
-                const allComponentsInfo2 = await this.getComponents(nodeUuid);
-                if (allComponentsInfo2.success && allComponentsInfo2.data?.components) {
-                    const addedScript = allComponentsInfo2.data.components.find((comp: any) => comp.type === scriptName);
-                    if (addedScript) {
-                        resolve({
-                            success: true,
-                            message: `Script '${scriptName}' attached successfully`,
-                            data: {
-                                nodeUuid: nodeUuid,
-                                componentName: scriptName,
-                                existing: false
-                            }
-                        });
-                    } else {
-                        resolve({
-                            success: false,
-                            error: `Script '${scriptName}' was not found on node after addition. Available components: ${allComponentsInfo2.data.components.map((c: any) => c.type).join(', ')}`
-                        });
-                    }
+                    };
                 } else {
-                    resolve({
+                    return {
                         success: false,
-                        error: `Failed to verify script addition: ${allComponentsInfo2.error || 'Unable to get node components'}`
-                    });
+                        error: `Script '${scriptName}' was not found on node after addition. Available components: ${allComponentsInfo2.data.components.map((c: any) => c.type).join(', ')}`
+                    };
                 }
-            }).catch((err: Error) => {
-                // 备用方案：使用场景脚本
-                const options = {
-                    name: 'cocos-mcp-server',
-                    method: 'attachScript',
-                    args: [nodeUuid, scriptPath]
+            } else {
+                return {
+                    success: false,
+                    error: `Failed to verify script addition: ${allComponentsInfo2.error || 'Unable to get node components'}`
                 };
-                Editor.Message.request('scene', 'execute-scene-script', options).then((result: any) => {
-                    resolve(result);
-                }).catch(() => {
-                    resolve({ 
-                        success: false, 
-                        error: `Failed to attach script '${scriptName}': ${err.message}`,
-                        instruction: 'Please ensure the script is properly compiled and exported as a Component class. You can also manually attach the script through the Properties panel in the editor.'
-                    });
-                });
-            });
-        });
+            }
+        } catch (err: any) {
+            // 备用方案：使用场景脚本
+            const options = {
+                name: 'cocos-mcp-server',
+                method: 'attachScript',
+                args: [nodeUuid, scriptPath]
+            };
+            try {
+                const result: any = await Editor.Message.request('scene', 'execute-scene-script', options);
+                return result;
+            } catch {
+                return {
+                    success: false,
+                    error: `Failed to attach script '${scriptName}': ${err.message}`,
+                    instruction: 'Please ensure the script is properly compiled and exported as a Component class. You can also manually attach the script through the Properties panel in the editor.'
+                };
+            }
+        }
     }
 
     private async getAvailableComponents(category: string = 'all'): Promise<ToolResponse> {

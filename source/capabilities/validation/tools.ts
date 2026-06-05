@@ -175,11 +175,6 @@ export class ValidationTools implements ToolExecutor {
         
         // Fix common escape character issues
         fixed = fixed
-            // Fix unescaped quotes in string values
-            .replace(/(\{[^}]*"[^"]*":\s*")([^"]*")([^"]*")([^}]*\})/g, (match, prefix, content, suffix, end) => {
-                const escapedContent = content.replace(/"/g, '\\"');
-                return prefix + escapedContent + suffix + end;
-            })
             // Fix unescaped backslashes
             .replace(/([^\\])\\([^"\\\/bfnrtu])/g, '$1\\\\$2')
             // Fix trailing commas
@@ -255,8 +250,15 @@ export class ValidationTools implements ToolExecutor {
     }
 
     private generateCurlCommand(jsonStr: string): string {
+        let port = 8585;
+        try {
+            const { readSettings } = require('../../core/settings');
+            port = readSettings().port ?? 8585;
+        } catch (_) {
+            // fallback to default
+        }
         const escapedJson = jsonStr.replace(/'/g, "'\"'\"'");
-        return `curl -X POST http://127.0.0.1:8585/mcp \\
+        return `curl -X POST http://127.0.0.1:${port}/mcp \\
   -H "Content-Type: application/json" \\
   -d '${escapedJson}'`;
     }

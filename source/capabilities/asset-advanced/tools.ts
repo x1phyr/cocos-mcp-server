@@ -122,7 +122,7 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'get_asset_dependencies',
-                description: 'Get asset dependency tree',
+                description: '[NOT AVAILABLE] Get asset dependency tree. Requires scene analysis APIs not currently available in the Cocos Creator MCP implementation.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -142,7 +142,7 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'get_unused_assets',
-                description: 'Find unused assets in project',
+                description: '[NOT AVAILABLE] Find unused assets in project. Requires comprehensive project analysis APIs not currently available in the Cocos Creator MCP implementation.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -162,7 +162,7 @@ export class AssetAdvancedTools implements ToolExecutor {
             },
             {
                 name: 'compress_textures',
-                description: 'Batch compress texture assets',
+                description: '[NOT AVAILABLE] Batch compress texture assets. Requires image processing capabilities not currently available in the Cocos Creator MCP implementation.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -310,14 +310,12 @@ export class AssetAdvancedTools implements ToolExecutor {
     }
 
     private async batchImportAssets(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 const fs = require('fs');
                 const path = require('path');
                 
                 if (!fs.existsSync(args.sourceDirectory)) {
-                    resolve({ success: false, error: 'Source directory does not exist' });
-                    return;
+                    return { success: false, error: 'Source directory does not exist' };
                 }
 
                 const files = this.getFilesFromDirectory(
@@ -358,7 +356,7 @@ export class AssetAdvancedTools implements ToolExecutor {
                     }
                 }
 
-                resolve({
+                return {
                     success: true,
                     data: {
                         totalFiles: files.length,
@@ -367,11 +365,10 @@ export class AssetAdvancedTools implements ToolExecutor {
                         results: importResults,
                         message: `Batch import completed: ${successCount} success, ${errorCount} errors`
                     }
-                });
+                };
             } catch (err: any) {
-                resolve({ success: false, error: err.message });
+                return { success: false, error: err.message };
             }
-        });
     }
 
     private getFilesFromDirectory(dirPath: string, fileFilter: string[], recursive: boolean): string[] {
@@ -398,8 +395,7 @@ export class AssetAdvancedTools implements ToolExecutor {
     }
 
     private async batchDeleteAssets(urls: string[]): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 const deleteResults: any[] = [];
                 let successCount = 0;
                 let errorCount = 0;
@@ -422,7 +418,7 @@ export class AssetAdvancedTools implements ToolExecutor {
                     }
                 }
 
-                resolve({
+                return {
                     success: true,
                     data: {
                         totalAssets: urls.length,
@@ -431,16 +427,14 @@ export class AssetAdvancedTools implements ToolExecutor {
                         results: deleteResults,
                         message: `Batch delete completed: ${successCount} success, ${errorCount} errors`
                     }
-                });
+                };
             } catch (err: any) {
-                resolve({ success: false, error: err.message });
+                return { success: false, error: err.message };
             }
-        });
     }
 
     private async validateAssetReferences(directory: string = 'db://assets'): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 // Get all assets in directory
                 const assets = await Editor.Message.request('asset-db', 'query-assets', { pattern: `${directory}/**/*` });
                 
@@ -467,7 +461,7 @@ export class AssetAdvancedTools implements ToolExecutor {
                     }
                 }
 
-                resolve({
+                return {
                     success: true,
                     data: {
                         directory: directory,
@@ -477,11 +471,10 @@ export class AssetAdvancedTools implements ToolExecutor {
                         brokenAssets: brokenReferences,
                         message: `Validation completed: ${brokenReferences.length} broken references found`
                     }
-                });
+                };
             } catch (err: any) {
-                resolve({ success: false, error: err.message });
+                return { success: false, error: err.message };
             }
-        });
     }
 
     private async getAssetDependencies(urlOrUUID: string, direction: string = 'dependencies'): Promise<ToolResponse> {
@@ -515,8 +508,7 @@ export class AssetAdvancedTools implements ToolExecutor {
     }
 
     private async exportAssetManifest(directory: string = 'db://assets', format: string = 'json', includeMetadata: boolean = true): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 const assets = await Editor.Message.request('asset-db', 'query-assets', { pattern: `${directory}/**/*` });
                 
                 const manifest: any[] = [];
@@ -560,7 +552,7 @@ export class AssetAdvancedTools implements ToolExecutor {
                         exportData = JSON.stringify(manifest, null, 2);
                 }
 
-                resolve({
+                return {
                     success: true,
                     data: {
                         directory: directory,
@@ -570,11 +562,10 @@ export class AssetAdvancedTools implements ToolExecutor {
                         manifest: exportData,
                         message: `Asset manifest exported with ${manifest.length} assets`
                     }
-                });
+                };
             } catch (err: any) {
-                resolve({ success: false, error: err.message });
+                return { success: false, error: err.message };
             }
-        });
     }
 
     private convertToCSV(data: any[]): string {

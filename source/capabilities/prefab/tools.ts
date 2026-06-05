@@ -257,8 +257,7 @@ export class PrefabTools implements ToolExecutor {
     }
 
     private async instantiatePrefab(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 // 获取预制体资源信息
                 const assetInfo = await Editor.Message.request('asset-db', 'query-asset-info', args.prefabPath);
                 if (!assetInfo) {
@@ -302,7 +301,7 @@ export class PrefabTools implements ToolExecutor {
                     prefabPath: args.prefabPath
                 });
                 
-                resolve({
+                return {
                     success: true,
                     data: {
                         nodeUuid: uuid,
@@ -311,15 +310,14 @@ export class PrefabTools implements ToolExecutor {
                         position: args.position,
                         message: '预制体实例化成功，已建立预制体关联'
                     }
-                });
+                };
             } catch (err: any) {
-                resolve({ 
-                    success: false, 
+                return {
+                    success: false,
                     error: `预制体实例化失败: ${err.message}`,
                     instruction: '请检查预制体路径是否正确，确保预制体文件格式正确'
-                });
+                };
             }
-        });
     }
 
     /**
@@ -446,11 +444,8 @@ export class PrefabTools implements ToolExecutor {
             
             // 尝试多个可能的项目根路径
             const possiblePaths = [
-                path.resolve(process.cwd(), '../../NewProject_3', fsPath),
-                path.resolve('/Users/lizhiyong/NewProject_3', fsPath),
+                path.resolve(process.cwd(), fsPath),
                 path.resolve(fsPath),
-                // 如果是根目录下的文件，也尝试直接路径
-                path.resolve('/Users/lizhiyong/NewProject_3/assets', path.basename(fsPath))
             ];
 
             console.log('尝试读取预制体文件，路径转换:', {
@@ -553,48 +548,44 @@ export class PrefabTools implements ToolExecutor {
     }
 
     private async tryAlternativeInstantiateMethods(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
-                // 方法1: 尝试使用 create-node 然后设置预制体
-                const assetInfo = await this.getAssetInfo(args.prefabPath);
-                if (!assetInfo) {
-                    resolve({ success: false, error: '无法获取预制体信息' });
-                    return;
-                }
-
-                // 创建空节点
-                const createResult = await this.createNode(args.parentUuid, args.position);
-                if (!createResult.success) {
-                    resolve(createResult);
-                    return;
-                }
-
-                // 尝试将预制体应用到节点
-                const applyResult = await this.applyPrefabToNode(createResult.data.nodeUuid, assetInfo.uuid);
-                if (applyResult.success) {
-                    resolve({
-                        success: true,
-                        data: {
-                            nodeUuid: createResult.data.nodeUuid,
-                            name: createResult.data.name,
-                            message: '预制体实例化成功（使用备选方法）'
-                        }
-                    });
-                } else {
-                    resolve({
-                        success: false,
-                        error: '无法将预制体应用到节点',
-                        data: {
-                            nodeUuid: createResult.data.nodeUuid,
-                            message: '已创建节点，但无法应用预制体数据'
-                        }
-                    });
-                }
-
-            } catch (error) {
-                resolve({ success: false, error: `备选实例化方法失败: ${error}` });
+        try {
+            // 方法1: 尝试使用 create-node 然后设置预制体
+            const assetInfo = await this.getAssetInfo(args.prefabPath);
+            if (!assetInfo) {
+                return { success: false, error: '无法获取预制体信息' };
             }
-        });
+
+            // 创建空节点
+            const createResult = await this.createNode(args.parentUuid, args.position);
+            if (!createResult.success) {
+                return createResult;
+            }
+
+            // 尝试将预制体应用到节点
+            const applyResult = await this.applyPrefabToNode(createResult.data.nodeUuid, assetInfo.uuid);
+            if (applyResult.success) {
+                return {
+                    success: true,
+                    data: {
+                        nodeUuid: createResult.data.nodeUuid,
+                        name: createResult.data.name,
+                        message: '预制体实例化成功（使用备选方法）'
+                    }
+                };
+            } else {
+                return {
+                    success: false,
+                    error: '无法将预制体应用到节点',
+                    data: {
+                        nodeUuid: createResult.data.nodeUuid,
+                        message: '已创建节点，但无法应用预制体数据'
+                    }
+                };
+            }
+
+        } catch (error) {
+            return { success: false, error: `备选实例化方法失败: ${error}` };
+        }
     }
 
     private async getAssetInfo(prefabPath: string): Promise<any> {
@@ -671,8 +662,7 @@ export class PrefabTools implements ToolExecutor {
      * 深度整合引擎的资源管理系统，实现完整的预制体创建流程
      */
     private async createPrefabWithAssetDB(nodeUuid: string, savePath: string, prefabName: string, includeChildren: boolean, includeComponents: boolean): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 console.log('=== 使用 Asset-DB API 创建预制体 ===');
                 console.log(`节点UUID: ${nodeUuid}`);
                 console.log(`保存路径: ${savePath}`);
@@ -681,11 +671,10 @@ export class PrefabTools implements ToolExecutor {
                 // 第一步：获取节点数据（包括变换属性）
                 const nodeData = await this.getNodeData(nodeUuid);
                 if (!nodeData) {
-                    resolve({
+                    return {
                         success: false,
                         error: '无法获取节点数据'
-                    });
-                    return;
+                    };
                 }
 
                 console.log('获取到节点数据，子节点数量:', nodeData.children ? nodeData.children.length : 0);
@@ -695,18 +684,16 @@ export class PrefabTools implements ToolExecutor {
                 const tempPrefabContent = JSON.stringify([{"__type__": "cc.Prefab", "_name": prefabName}], null, 2);
                 const createResult = await this.createAssetWithAssetDB(savePath, tempPrefabContent);
                 if (!createResult.success) {
-                    resolve(createResult);
-                    return;
+                    return createResult;
                 }
 
                 // 获取引擎分配的实际UUID
                 const actualPrefabUuid = createResult.data?.uuid;
                 if (!actualPrefabUuid) {
-                    resolve({
+                    return {
                         success: false,
                         error: '无法获取引擎分配的预制体UUID'
-                    });
-                    return;
+                    };
                 }
                 console.log('引擎分配的UUID:', actualPrefabUuid);
 
@@ -731,7 +718,7 @@ export class PrefabTools implements ToolExecutor {
                 console.log('尝试将原始节点转换为预制体实例...');
                 const convertResult = await this.convertNodeToPrefabInstance(nodeUuid, actualPrefabUuid, savePath);
                 
-                resolve({
+                return {
                     success: true,
                     data: {
                         prefabUuid: actualPrefabUuid,
@@ -746,179 +733,165 @@ export class PrefabTools implements ToolExecutor {
                         convertResult: convertResult,
                         message: convertResult.success ? '预制体创建并成功转换原始节点' : '预制体创建成功，但节点转换失败'
                     }
-                });
+                };
 
             } catch (error) {
                 console.error('创建预制体时发生错误:', error);
-                resolve({
+                return {
                     success: false,
                     error: `创建预制体失败: ${error}`
-                });
+                };
             }
-        });
     }
 
     private async createPrefab(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
-                // 支持 prefabPath 和 savePath 两种参数名
-                const pathParam = args.prefabPath || args.savePath;
-                if (!pathParam) {
-                    resolve({
-                        success: false,
-                        error: '缺少预制体路径参数。请提供 prefabPath 或 savePath。'
-                    });
-                    return;
-                }
-
-                const prefabName = args.prefabName || 'NewPrefab';
-                const fullPath = pathParam.endsWith('.prefab') ? 
-                    pathParam : `${pathParam}/${prefabName}.prefab`;
-
-                const includeChildren = args.includeChildren !== false; // 默认为 true
-                const includeComponents = args.includeComponents !== false; // 默认为 true
-
-                // 优先使用新的 asset-db 方法创建预制体
-                console.log('使用新的 asset-db 方法创建预制体...');
-                const assetDbResult = await this.createPrefabWithAssetDB(
-                    args.nodeUuid,
-                    fullPath,
-                    prefabName,
-                    includeChildren,
-                    includeComponents
-                );
-
-                if (assetDbResult.success) {
-                    resolve(assetDbResult);
-                    return;
-                }
-
-                // 如果 asset-db 方法失败，尝试使用Cocos Creator的原生预制体创建API
-                console.log('asset-db 方法失败，尝试原生API...');
-                const nativeResult = await this.createPrefabNative(args.nodeUuid, fullPath);
-                if (nativeResult.success) {
-                    resolve(nativeResult);
-                    return;
-                }
-
-                // 如果原生API失败，使用自定义实现
-                console.log('原生API失败，使用自定义实现...');
-                const customResult = await this.createPrefabCustom(args.nodeUuid, fullPath, prefabName);
-                resolve(customResult);
-
-            } catch (error) {
-                resolve({
+        try {
+            // 支持 prefabPath 和 savePath 两种参数名
+            const pathParam = args.prefabPath || args.savePath;
+            if (!pathParam) {
+                return {
                     success: false,
-                    error: `创建预制体时发生错误: ${error}`
-                });
+                    error: '缺少预制体路径参数。请提供 prefabPath 或 savePath。'
+                };
             }
-        });
+
+            const prefabName = args.prefabName || 'NewPrefab';
+            const fullPath = pathParam.endsWith('.prefab') ?
+                pathParam : `${pathParam}/${prefabName}.prefab`;
+
+            const includeChildren = args.includeChildren !== false; // 默认为 true
+            const includeComponents = args.includeComponents !== false; // 默认为 true
+
+            // 优先使用新的 asset-db 方法创建预制体
+            console.log('使用新的 asset-db 方法创建预制体...');
+            const assetDbResult = await this.createPrefabWithAssetDB(
+                args.nodeUuid,
+                fullPath,
+                prefabName,
+                includeChildren,
+                includeComponents
+            );
+
+            if (assetDbResult.success) {
+                return assetDbResult;
+            }
+
+            // 如果 asset-db 方法失败，尝试使用Cocos Creator的原生预制体创建API
+            console.log('asset-db 方法失败，尝试原生API...');
+            const nativeResult = await this.createPrefabNative(args.nodeUuid, fullPath);
+            if (nativeResult.success) {
+                return nativeResult;
+            }
+
+            // 如果原生API失败，使用自定义实现
+            console.log('原生API失败，使用自定义实现...');
+            const customResult = await this.createPrefabCustom(args.nodeUuid, fullPath, prefabName);
+            return customResult;
+
+        } catch (error) {
+            return {
+                success: false,
+                error: `创建预制体时发生错误: ${error}`
+            };
+        }
     }
 
     private async createPrefabNative(nodeUuid: string, prefabPath: string): Promise<ToolResponse> {
-        return new Promise((resolve) => {
-            // 根据官方API文档，不存在直接的预制体创建API
-            // 预制体创建需要手动在编辑器中完成
-            resolve({
-                success: false,
-                error: '原生预制体创建API不存在',
-                instruction: '根据Cocos Creator官方API文档，预制体创建需要手动操作：\n1. 在场景中选择节点\n2. 将节点拖拽到资源管理器中\n3. 或右键节点选择"生成预制体"'
-            });
-        });
+        // 根据官方API文档，不存在直接的预制体创建API
+        // 预制体创建需要手动在编辑器中完成
+        return {
+            success: false,
+            error: '原生预制体创建API不存在',
+            instruction: '根据Cocos Creator官方API文档，预制体创建需要手动操作：\n1. 在场景中选择节点\n2. 将节点拖拽到资源管理器中\n3. 或右键节点选择"生成预制体"'
+        };
     }
 
     private async createPrefabCustom(nodeUuid: string, prefabPath: string, prefabName: string): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
-                // 1. 获取源节点的完整数据
-                const nodeData = await this.getNodeData(nodeUuid);
-                if (!nodeData) {
-                    resolve({
-                        success: false,
-                        error: `无法找到节点: ${nodeUuid}`
-                    });
-                    return;
-                }
-
-                // 2. 生成预制体UUID
-                const prefabUuid = this.generateUUID();
-
-                // 3. 创建预制体数据结构
-                const prefabData = this.createPrefabData(nodeData, prefabName, prefabUuid);
-
-                // 4. 基于官方格式创建预制体数据结构
-                console.log('=== 开始创建预制体 ===');
-                console.log('节点名称:', nodeData.name?.value || '未知');
-                console.log('节点UUID:', nodeData.uuid?.value || '未知');
-                console.log('预制体保存路径:', prefabPath);
-                console.log(`开始创建预制体，节点数据:`, nodeData);
-                const prefabJsonData = await this.createStandardPrefabContent(nodeData, prefabName, prefabUuid, true, true);
-
-                // 5. 创建标准meta文件数据
-                const standardMetaData = this.createStandardMetaData(prefabName, prefabUuid);
-
-                // 6. 保存预制体和meta文件
-                const saveResult = await this.savePrefabWithMeta(prefabPath, prefabJsonData, standardMetaData);
-
-                if (saveResult.success) {
-                    // 保存成功后，将原始节点转换为预制体实例
-                    const convertResult = await this.convertNodeToPrefabInstance(nodeUuid, prefabPath, prefabUuid);
-                    
-                    resolve({
-                        success: true,
-                        data: {
-                            prefabUuid: prefabUuid,
-                            prefabPath: prefabPath,
-                            nodeUuid: nodeUuid,
-                            prefabName: prefabName,
-                            convertedToPrefabInstance: convertResult.success,
-                            message: convertResult.success ? 
-                                '自定义预制体创建成功，原始节点已转换为预制体实例' : 
-                                '预制体创建成功，但节点转换失败'
-                        }
-                    });
-                } else {
-                    resolve({
-                        success: false,
-                        error: saveResult.error || '保存预制体文件失败'
-                    });
-                }
-
-            } catch (error) {
-                resolve({
+        try {
+            // 1. 获取源节点的完整数据
+            const nodeData = await this.getNodeData(nodeUuid);
+            if (!nodeData) {
+                return {
                     success: false,
-                    error: `创建预制体时发生错误: ${error}`
-                });
+                    error: `无法找到节点: ${nodeUuid}`
+                };
             }
-        });
+
+            // 2. 生成预制体UUID
+            const prefabUuid = this.generateUUID();
+
+            // 3. 创建预制体数据结构
+            const prefabData = this.createPrefabData(nodeData, prefabName, prefabUuid);
+
+            // 4. 基于官方格式创建预制体数据结构
+            console.log('=== 开始创建预制体 ===');
+            console.log('节点名称:', nodeData.name?.value || '未知');
+            console.log('节点UUID:', nodeData.uuid?.value || '未知');
+            console.log('预制体保存路径:', prefabPath);
+            console.log(`开始创建预制体，节点数据:`, nodeData);
+            const prefabJsonData = await this.createStandardPrefabContent(nodeData, prefabName, prefabUuid, true, true);
+
+            // 5. 创建标准meta文件数据
+            const standardMetaData = this.createStandardMetaData(prefabName, prefabUuid);
+
+            // 6. 保存预制体和meta文件
+            const saveResult = await this.savePrefabWithMeta(prefabPath, prefabJsonData, standardMetaData);
+
+            if (saveResult.success) {
+                // 保存成功后，将原始节点转换为预制体实例
+                const convertResult = await this.convertNodeToPrefabInstance(nodeUuid, prefabPath, prefabUuid);
+
+                return {
+                    success: true,
+                    data: {
+                        prefabUuid: prefabUuid,
+                        prefabPath: prefabPath,
+                        nodeUuid: nodeUuid,
+                        prefabName: prefabName,
+                        convertedToPrefabInstance: convertResult.success,
+                        message: convertResult.success ?
+                            '自定义预制体创建成功，原始节点已转换为预制体实例' :
+                            '预制体创建成功，但节点转换失败'
+                    }
+                };
+            } else {
+                return {
+                    success: false,
+                    error: saveResult.error || '保存预制体文件失败'
+                };
+            }
+
+        } catch (error) {
+            return {
+                success: false,
+                error: `创建预制体时发生错误: ${error}`
+            };
+        }
     }
 
     private async getNodeData(nodeUuid: string): Promise<any> {
-        return new Promise(async (resolve) => {
-            try {
-                // 首先获取基本节点信息
-                const nodeInfo = await Editor.Message.request('scene', 'query-node', nodeUuid);
-                if (!nodeInfo) {
-                    resolve(null);
-                    return;
-                }
-
-                console.log(`获取节点 ${nodeUuid} 的基本信息成功`);
-                
-                // 使用query-node-tree获取包含子节点的完整结构
-                const nodeTree = await this.getNodeWithChildren(nodeUuid);
-                if (nodeTree) {
-                    console.log(`获取节点 ${nodeUuid} 的完整树结构成功`);
-                    resolve(nodeTree);
-                } else {
-                    console.log(`使用基本节点信息`);
-                    resolve(nodeInfo);
-                }
-            } catch (error) {
-                console.warn(`获取节点数据失败 ${nodeUuid}:`, error);
-                resolve(null);
+        try {
+            // 首先获取基本节点信息
+            const nodeInfo = await Editor.Message.request('scene', 'query-node', nodeUuid);
+            if (!nodeInfo) {
+                return null;
             }
-        });
+
+            console.log(`获取节点 ${nodeUuid} 的基本信息成功`);
+
+            // 使用query-node-tree获取包含子节点的完整结构
+            const nodeTree = await this.getNodeWithChildren(nodeUuid);
+            if (nodeTree) {
+                console.log(`获取节点 ${nodeUuid} 的完整树结构成功`);
+                return nodeTree;
+            } else {
+                console.log(`使用基本节点信息`);
+                return nodeInfo;
+            }
+        } catch (error) {
+            console.warn(`获取节点数据失败 ${nodeUuid}:`, error);
+            return null;
+        }
     }
 
     // 使用query-node-tree获取包含子节点的完整节点结构
@@ -979,7 +952,14 @@ export class PrefabTools implements ToolExecutor {
 
         try {
             // 使用MCP接口获取节点的组件信息
-            const response = await fetch('http://localhost:8585/mcp', {
+            let port = 8585;
+            try {
+                const { readSettings } = require('../../core/settings');
+                port = readSettings().port ?? 8585;
+            } catch (_) {
+                // fallback to default
+            }
+            const response = await fetch(`http://localhost:${port}/mcp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1502,53 +1482,49 @@ export class PrefabTools implements ToolExecutor {
     }
 
     private async duplicatePrefab(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
-                const { sourcePrefabPath, targetPrefabPath, newPrefabName } = args;
-                
-                // 读取源预制体
-                const sourceInfo = await this.getPrefabInfo(sourcePrefabPath);
-                if (!sourceInfo.success) {
-                    resolve({
-                        success: false,
-                        error: `无法读取源预制体: ${sourceInfo.error}`
-                    });
-                    return;
-                }
+        try {
+            const { sourcePrefabPath, targetPrefabPath, newPrefabName } = args;
 
-                // 读取源预制体内容
-                const sourceContent = await this.readPrefabContent(sourcePrefabPath);
-                if (!sourceContent.success) {
-                    resolve({
-                        success: false,
-                        error: `无法读取源预制体内容: ${sourceContent.error}`
-                    });
-                    return;
-                }
-
-                // 生成新的UUID
-                const newUuid = this.generateUUID();
-                
-                // 修改预制体数据
-                const modifiedData = this.modifyPrefabForDuplication(sourceContent.data, newPrefabName, newUuid);
-                
-                // 创建新的meta数据
-                const newMetaData = this.createMetaData(newPrefabName || 'DuplicatedPrefab', newUuid);
-                
-                // 预制体复制功能暂时禁用，因为涉及复杂的序列化格式
-                resolve({
+            // 读取源预制体
+            const sourceInfo = await this.getPrefabInfo(sourcePrefabPath);
+            if (!sourceInfo.success) {
+                return {
                     success: false,
-                    error: '预制体复制功能暂时不可用',
-                    instruction: '请在 Cocos Creator 编辑器中手动复制预制体：\n1. 在资源管理器中选择要复制的预制体\n2. 右键选择复制\n3. 在目标位置粘贴'
-                });
-
-            } catch (error) {
-                resolve({
-                    success: false,
-                    error: `复制预制体时发生错误: ${error}`
-                });
+                    error: `无法读取源预制体: ${sourceInfo.error}`
+                };
             }
-        });
+
+            // 读取源预制体内容
+            const sourceContent = await this.readPrefabContent(sourcePrefabPath);
+            if (!sourceContent.success) {
+                return {
+                    success: false,
+                    error: `无法读取源预制体内容: ${sourceContent.error}`
+                };
+            }
+
+            // 生成新的UUID
+            const newUuid = this.generateUUID();
+
+            // 修改预制体数据
+            const modifiedData = this.modifyPrefabForDuplication(sourceContent.data, newPrefabName, newUuid);
+
+            // 创建新的meta数据
+            const newMetaData = this.createMetaData(newPrefabName || 'DuplicatedPrefab', newUuid);
+
+            // 预制体复制功能暂时禁用，因为涉及复杂的序列化格式
+            return {
+                success: false,
+                error: '预制体复制功能暂时不可用',
+                instruction: '请在 Cocos Creator 编辑器中手动复制预制体：\n1. 在资源管理器中选择要复制的预制体\n2. 右键选择复制\n3. 在目标位置粘贴'
+            };
+
+        } catch (error) {
+            return {
+                success: false,
+                error: `复制预制体时发生错误: ${error}`
+            };
+        }
     }
 
     private async readPrefabContent(prefabPath: string): Promise<{ success: boolean; data?: any; error?: string }> {

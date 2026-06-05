@@ -12,7 +12,7 @@ export class BroadcastTools implements ToolExecutor {
         return [
             {
                 name: 'get_broadcast_log',
-                description: 'Get recent broadcast messages log',
+                description: '[SIMULATED ONLY] Get recent broadcast messages log. Data is always empty because Editor.Message.on listeners are not wired — no real broadcast events are captured.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -30,7 +30,7 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'listen_broadcast',
-                description: 'Start listening for specific broadcast messages',
+                description: '[NOT AVAILABLE] Start listening for specific broadcast messages. Requires Editor.Message.on which is not wired in the current extension — real broadcast events cannot be captured.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -44,7 +44,7 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'stop_listening',
-                description: 'Stop listening for specific broadcast messages',
+                description: '[NOT AVAILABLE] Stop listening for specific broadcast messages. Requires Editor.Message.off which is not wired — listeners were never registered with the editor.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -58,7 +58,7 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'clear_broadcast_log',
-                description: 'Clear the broadcast messages log',
+                description: '[SIMULATED ONLY] Clear the broadcast messages log. Only clears the in-memory simulated log, which is always empty since real broadcast events are not captured.',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -66,7 +66,7 @@ export class BroadcastTools implements ToolExecutor {
             },
             {
                 name: 'get_active_listeners',
-                description: 'Get list of active broadcast listeners',
+                description: '[SIMULATED ONLY] Get list of active broadcast listeners. Returns only simulated listener registrations — no real Editor.Message.on listeners are active.',
                 inputSchema: {
                     type: 'object',
                     properties: {}

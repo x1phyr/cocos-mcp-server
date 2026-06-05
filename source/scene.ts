@@ -353,7 +353,7 @@ export const methods: { [key: string]: (...any: any) => any } = {
     /**
      * Set component property
      */
-    setComponentProperty(nodeUuid: string, componentType: string, property: string, value: any) {
+    async setComponentProperty(nodeUuid: string, componentType: string, property: string, value: any) {
         try {
             const { director, js } = require('cc');
             const scene = director.getScene();
@@ -376,23 +376,25 @@ export const methods: { [key: string]: (...any: any) => any } = {
             if (property === 'spriteFrame' && componentType === 'cc.Sprite') {
                 // 支持 value 为 uuid 或资源路径
                 if (typeof value === 'string') {
-                    // 先尝试按 uuid 查找
                     const assetManager = require('cc').assetManager;
-                    assetManager.resources.load(value, require('cc').SpriteFrame, (err: any, spriteFrame: any) => {
-                        if (!err && spriteFrame) {
-                            component.spriteFrame = spriteFrame;
-                        } else {
-                            // 尝试通过 uuid 加载
-                            assetManager.loadAny({ uuid: value }, (err2: any, asset: any) => {
-                                if (!err2 && asset) {
-                                    component.spriteFrame = asset;
-                                } else {
-                                    // 直接赋值（兼容已传入资源对象）
-                                    component.spriteFrame = value;
-                                }
-                            });
-                        }
+                    const loaded = await new Promise<any>((resolveLoad) => {
+                        assetManager.resources.load(value, require('cc').SpriteFrame, (err: any, spriteFrame: any) => {
+                            if (!err && spriteFrame) {
+                                resolveLoad(spriteFrame);
+                            } else {
+                                // 尝试通过 uuid 加载
+                                assetManager.loadAny({ uuid: value }, (err2: any, asset: any) => {
+                                    if (!err2 && asset) {
+                                        resolveLoad(asset);
+                                    } else {
+                                        // 直接赋值（兼容已传入资源对象）
+                                        resolveLoad(value);
+                                    }
+                                });
+                            }
+                        });
                     });
+                    component.spriteFrame = loaded;
                 } else {
                     component.spriteFrame = value;
                 }
@@ -400,19 +402,22 @@ export const methods: { [key: string]: (...any: any) => any } = {
                 // 支持 value 为 uuid 或资源路径
                 if (typeof value === 'string') {
                     const assetManager = require('cc').assetManager;
-                    assetManager.resources.load(value, require('cc').Material, (err: any, material: any) => {
-                        if (!err && material) {
-                            component.material = material;
-                        } else {
-                            assetManager.loadAny({ uuid: value }, (err2: any, asset: any) => {
-                                if (!err2 && asset) {
-                                    component.material = asset;
-                                } else {
-                                    component.material = value;
-                                }
-                            });
-                        }
+                    const loaded = await new Promise<any>((resolveLoad) => {
+                        assetManager.resources.load(value, require('cc').Material, (err: any, material: any) => {
+                            if (!err && material) {
+                                resolveLoad(material);
+                            } else {
+                                assetManager.loadAny({ uuid: value }, (err2: any, asset: any) => {
+                                    if (!err2 && asset) {
+                                        resolveLoad(asset);
+                                    } else {
+                                        resolveLoad(value);
+                                    }
+                                });
+                            }
+                        });
                     });
+                    component.material = loaded;
                 } else {
                     component.material = value;
                 }

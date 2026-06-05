@@ -83,13 +83,13 @@ export class PreferencesTools implements ToolExecutor {
             },
             {
                 name: 'reset_preferences',
-                description: 'Reset preferences to default values',
+                description: 'Reset a specific preference category to default values. The name parameter is required — resetting all preferences at once is not supported.',
                 inputSchema: {
                     type: 'object',
                     properties: {
                         name: {
                             type: 'string',
-                            description: 'Specific preference category to reset (optional)'
+                            description: 'Preference category name to reset (required — resetting all is not supported)'
                         },
                         type: {
                             type: 'string',
@@ -97,7 +97,8 @@ export class PreferencesTools implements ToolExecutor {
                             enum: ['global', 'local'],
                             default: 'global'
                         }
-                    }
+                    },
+                    required: ['name']
                 }
             },
             {
@@ -115,7 +116,7 @@ export class PreferencesTools implements ToolExecutor {
             },
             {
                 name: 'import_preferences',
-                description: 'Import preferences configuration from file',
+                description: '[NOT AVAILABLE] Import preferences configuration from file. Requires filesystem access which is not available in the current MCP extension context.',
                 inputSchema: {
                     type: 'object',
                     properties: {

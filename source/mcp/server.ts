@@ -201,7 +201,7 @@ export class MCPServer {
                     return;
                 }
                 body += chunk.toString();
-                if (body.length > MAX_REQUEST_BODY_BYTES) {
+                if (Buffer.byteLength(body, 'utf8') > MAX_REQUEST_BODY_BYTES) {
                     tooLarge = true;
                     req.destroy();
                 }
@@ -410,10 +410,8 @@ export class MCPServer {
         let fixed = jsonStr;
 
         fixed = fixed
-            .replace(/([^\\])"([^"]*[^\\])"([^,}\]:])/g, '$1\\"$2\\"$3')
             .replace(/([^\\])\\([^"\\\/bfnrt])/g, '$1\\\\$2')
             .replace(/,(\s*[}\]])/g, '$1')
-            .replace(/'/g, '"')
             .replace(/\n/g, '\\n')
             .replace(/\r/g, '\\r')
             .replace(/\t/g, '\\t');

@@ -1,6 +1,6 @@
 # 开发指南
 
-**v1.7.4**
+**v1.7.5**
 
 ## 文档
 
@@ -375,7 +375,7 @@ AI  tools/call("scene_get_scene_hierarchy", args)
 | [README.md § 更新日志](./README.md#更新日志) | **已发布**版本全文（v1.5.0、v1.4.x…及 Cocos 商城说明） |
 | 下文 [§ 版本规划](#版本规划) | **未发布**功能草案（当前仅 v1.8） |
 
-**本仓库 Git 当前**：v1.7.4（`package.json` 的 `version` 字段）。
+**本仓库 Git 当前**：v1.7.5（`package.json` 的 `version` 字段）。
 
 > **版本号勿混用**：README 里「商城 v1.5.0（2024-07）」是 Cocos 商店渠道大版本；本仓库 **Git v1.5.0** 为扩展注册 MCP 工具，二者无关。
 
@@ -400,6 +400,7 @@ flowchart LR
 | **v1.7.2** | registry/面板/MCP 安全与契约修复 | 已发布（见 README 更新日志） |
 | **v1.7.3** | 默认面板 UI（启停 loading、校验、内置/外部区分） | 已发布（见 README 更新日志） |
 | **v1.7.4** | 工具启用语义与外部工具 enabled 同步 | 已发布（见 README 更新日志） |
+| **v1.7.5** | Bug 修复与文档完善（12项修复） | 已发布（见 README 更新日志） |
 | **v1.8.0** | `tools/list_changed` 与状态探针工具 | 规划中（可选） |
 
 > 与 Cocos 商城「v1.5.0（2024-07）」无关；Git 版本以 `package.json` 为准。

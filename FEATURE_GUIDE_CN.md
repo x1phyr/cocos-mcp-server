@@ -8,7 +8,7 @@ Cocos Creator MCP 服务器是一个全面的 Model Context Protocol (MCP) 服�
 
 ## 工具分类
 
-MCP 服务器提供了 **158 个工具**，按功能分为 13 个主要类别：
+MCP 服务器提供了 **157 个工具**，按功能分为 14 个主要类别：
 
 1. [场景操作工具 (Scene Tools)](#1-场景操作工具-scene-tools)
 2. [节点操作工具 (Node Tools)](#2-节点操作工具-node-tools)
@@ -19,10 +19,11 @@ MCP 服务器提供了 **158 个工具**，按功能分为 13 个主要类别：
 7. [偏好设置工具 (Preferences Tools)](#7-偏好设置工具-preferences-tools)
 8. [服务器工具 (Server Tools)](#8-服务器工具-server-tools)
 9. [广播工具 (Broadcast Tools)](#9-广播工具-broadcast-tools)
-10. [高级资源工具 (Asset Advanced Tools)](#10-高级资源工具-asset-advanced-tools)
-11. [参考图像工具 (Reference Image Tools)](#11-参考图像工具-reference-image-tools)
-12. [高级场景工具 (Scene Advanced Tools)](#12-高级场景工具-scene-advanced-tools)
-13. [场景视图工具 (Scene View Tools)](#13-场景视图工具-scene-view-tools)
+10. [高级场景工具 (Scene Advanced Tools)](#10-高级场景工具-scene-advanced-tools)
+11. [场景视图工具 (Scene View Tools)](#11-场景视图工具-scene-view-tools)
+12. [参考图像工具 (Reference Image Tools)](#12-参考图像工具-reference-image-tools)
+13. [高级资源工具 (Asset Advanced Tools)](#13-高级资源工具-asset-advanced-tools)
+14. [验证工具 (Validation Tools)](#14-验证工具-validation-tools)
 
 ---
 
@@ -1493,6 +1494,499 @@ Cocos Creator 使用 `db://` 前缀的资源URL格式：
 2. 在 `invokeMessage` 绑定的 method 中处理 `{ tool, args }` 并返回 `{ success, data?, error? }`。
 3. `unload` 时调用 `mcp-unregister-tools`。
 
+## 10. 高级场景工具 (Scene Advanced Tools)
+
+高级场景操作工具，提供节点属性重置、数组操作、复制粘贴、撤销记录等高级功能。
+
+### 10.1 scene-advanced_reset_node_property
+重置节点属性到默认值
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+- `path` (string, 必需): 属性路径（如position, rotation, scale）
+
+**示例**:
+```json
+{
+  "tool": "scene-advanced_reset_node_property",
+  "arguments": {
+    "uuid": "node-uuid-here",
+    "path": "position"
+  }
+}
+```
+
+### 10.2 scene-advanced_move_array_element
+移动数组元素位置
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+- `path` (string, 必需): 数组属性路径（如__comps__）
+- `target` (number, 必需): 目标项原始索引
+- `offset` (number, 必需): 偏移量（正数或负数）
+
+### 10.3 scene-advanced_remove_array_element
+移除数组元素
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+- `path` (string, 必需): 数组属性路径
+- `target` (number, 必需): 要移除的项索引
+
+### 10.4 scene-advanced_copy_node
+复制节点
+
+**参数**:
+- `uuid` (string, 必需): 要复制的节点UUID
+
+### 10.5 scene-advanced_paste_node
+粘贴节点
+
+**参数**:
+- `parentUuid` (string, 可选): 父节点UUID，不指定则粘贴到场景根节点
+
+### 10.6 scene-advanced_cut_node
+剪切节点
+
+**参数**:
+- `uuid` (string, 必需): 要剪切的节点UUID
+
+### 10.7 scene-advanced_reset_node_transform
+重置节点变换（位置、旋转、缩放）到默认值
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+
+### 10.8 scene-advanced_reset_component
+重置组件属性到默认值
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+- `component` (string, 必需): 组件类型名称
+
+### 10.9 scene-advanced_restore_prefab
+恢复预制体实例
+
+**参数**:
+- `uuid` (string, 必需): 预制体实例节点UUID
+
+### 10.10 scene-advanced_execute_component_method
+执行组件方法
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+- `component` (string, 必需): 组件类型
+- `method` (string, 必需): 方法名
+- `args` (array, 可选): 方法参数数组
+
+### 10.11 scene-advanced_execute_scene_script
+执行场景脚本
+
+**参数**:
+- `script` (string, 必需): 脚本内容
+- `args` (object, 可选): 脚本参数
+
+### 10.12 scene-advanced_scene_snapshot
+创建场景快照
+
+**参数**:
+- `name` (string, 可选): 快照名称
+
+### 10.13 scene-advanced_scene_snapshot_abort
+中止当前场景快照操作
+
+**参数**: 无
+
+### 10.14 scene-advanced_begin_undo_recording
+开始撤销记录
+
+**参数**:
+- `name` (string, 可选): 撤销操作名称
+
+### 10.15 scene-advanced_end_undo_recording
+结束撤销记录
+
+**参数**: 无
+
+### 10.16 scene-advanced_cancel_undo_recording
+取消撤销记录
+
+**参数**: 无
+
+### 10.17 scene-advanced_soft_reload_scene
+软重载场景（不丢失编辑器状态）
+
+**参数**: 无
+
+### 10.18 scene-advanced_query_scene_ready
+查询场景是否就绪
+
+**参数**: 无
+
+### 10.19 scene-advanced_query_scene_dirty
+查询场景是否已修改
+
+**参数**: 无
+
+### 10.20 scene-advanced_query_scene_classes
+查询场景可用的类
+
+**参数**: 无
+
+### 10.21 scene-advanced_query_scene_components
+查询场景中的所有组件
+
+**参数**: 无
+
+### 10.22 scene-advanced_query_component_has_script
+查询组件是否有脚本
+
+**参数**:
+- `component` (string, 必需): 组件类型
+
+### 10.23 scene-advanced_query_nodes_by_asset_uuid
+根据资源UUID查询使用该资源的节点
+
+**参数**:
+- `assetUuid` (string, 必需): 资源UUID
+
+---
+
+## 11. 场景视图工具 (Scene View Tools)
+
+场景视图控制工具，提供Gizmo工具切换、视图模式、网格显示、相机控制等功能。
+
+### 11.1 scene-view_change_gizmo_tool
+切换Gizmo工具
+
+**参数**:
+- `name` (string, 必需): 工具名称，可选值：position, rotation, scale, rect
+
+### 11.2 scene-view_query_gizmo_tool_name
+查询当前Gizmo工具名称
+
+**参数**: 无
+
+### 11.3 scene-view_change_gizmo_pivot
+切换变换轴心点
+
+**参数**:
+- `name` (string, 必需): 轴心点，可选值：pivot, center
+
+### 11.4 scene-view_query_gizmo_pivot
+查询当前Gizmo轴心点
+
+**参数**: 无
+
+### 11.5 scene-view_query_gizmo_view_mode
+查询Gizmo视图模式
+
+**参数**: 无
+
+### 11.6 scene-view_change_gizmo_coordinate
+切换Gizmo坐标系
+
+**参数**:
+- `name` (string, 必需): 坐标系，可选值：local, world
+
+### 11.7 scene-view_query_gizmo_coordinate
+查询当前Gizmo坐标系
+
+**参数**: 无
+
+### 11.8 scene-view_change_view_mode_2d_3d
+切换2D/3D视图模式
+
+**参数**:
+- `mode` (string, 必需): 视图模式，可选值：2d, 3d
+
+### 11.9 scene-view_query_view_mode_2d_3d
+查询当前2D/3D视图模式
+
+**参数**: 无
+
+### 11.10 scene-view_set_grid_visible
+设置网格显示/隐藏
+
+**参数**:
+- `visible` (boolean, 必需): 是否显示网格
+
+### 11.11 scene-view_query_grid_visible
+查询网格是否显示
+
+**参数**: 无
+
+### 11.12 scene-view_set_icon_gizmo_3d
+设置3D图标Gizmo显示
+
+**参数**:
+- `visible` (boolean, 必需): 是否显示
+
+### 11.13 scene-view_query_icon_gizmo_3d
+查询3D图标Gizmo显示状态
+
+**参数**: 无
+
+### 11.14 scene-view_set_icon_gizmo_size
+设置图标Gizmo大小
+
+**参数**:
+- `size` (number, 必需): 图标大小
+
+### 11.15 scene-view_query_icon_gizmo_size
+查询图标Gizmo大小
+
+**参数**: 无
+
+### 11.16 scene-view_focus_camera_on_nodes
+聚焦相机到指定节点
+
+**参数**:
+- `uuids` (array, 必需): 节点UUID数组
+
+### 11.17 scene-view_align_camera_with_view
+对齐相机到当前视图
+
+**参数**: 无
+
+### 11.18 scene-view_align_view_with_node
+对齐视图到节点
+
+**参数**:
+- `uuid` (string, 必需): 节点UUID
+
+### 11.19 scene-view_get_scene_view_status
+获取场景视图状态
+
+**参数**: 无
+
+### 11.20 scene-view_reset_scene_view
+重置场景视图
+
+**参数**: 无
+
+---
+
+## 12. 参考图像工具 (Reference Image Tools)
+
+参考图像管理工具，用于在场景中添加、管理和控制参考图像。
+
+### 12.1 reference-image_add_reference_image
+添加参考图像到场景
+
+**参数**:
+- `paths` (array, 必需): 参考图像绝对路径数组
+
+**示例**:
+```json
+{
+  "tool": "reference-image_add_reference_image",
+  "arguments": {
+    "paths": ["/path/to/image1.png", "/path/to/image2.png"]
+  }
+}
+```
+
+### 12.2 reference-image_remove_reference_image
+移除参考图像
+
+**参数**:
+- `paths` (array, 可选): 要移除的参考图像路径数组，空数组则移除当前参考图像
+
+### 12.3 reference-image_switch_reference_image
+切换到指定参考图像
+
+**参数**:
+- `path` (string, 必需): 参考图像绝对路径
+- `sceneUUID` (string, 可选): 指定场景UUID
+
+### 12.4 reference-image_set_reference_image_data
+设置参考图像数据
+
+**参数**:
+- `path` (string, 必需): 参考图像路径
+- `data` (object, 必需): 图像数据（位置、缩放、透明度等）
+
+### 12.5 reference-image_query_reference_image_config
+查询参考图像配置
+
+**参数**: 无
+
+### 12.6 reference-image_query_current_reference_image
+查询当前参考图像
+
+**参数**: 无
+
+### 12.7 reference-image_refresh_reference_image
+刷新参考图像
+
+**参数**: 无
+
+### 12.8 reference-image_set_reference_image_position
+设置参考图像位置
+
+**参数**:
+- `path` (string, 必需): 参考图像路径
+- `position` (object, 必需): 位置对象 {x, y, z}
+
+### 12.9 reference-image_set_reference_image_scale
+设置参考图像缩放
+
+**参数**:
+- `path` (string, 必需): 参考图像路径
+- `scale` (object, 必需): 缩放对象 {x, y, z}
+
+### 12.10 reference-image_set_reference_image_opacity
+设置参考图像透明度
+
+**参数**:
+- `path` (string, 必需): 参考图像路径
+- `opacity` (number, 必需): 透明度值（0-1）
+
+### 12.11 reference-image_list_reference_images
+列出所有参考图像
+
+**参数**: 无
+
+### 12.12 reference-image_clear_all_reference_images
+清除所有参考图像
+
+**参数**: 无
+
+---
+
+## 13. 高级资源工具 (Asset Advanced Tools)
+
+高级资源管理工具，提供批量导入/删除、依赖分析、资源验证等功能。
+
+### 13.1 asset-advanced_save_asset_meta
+保存资源元信息
+
+**参数**:
+- `urlOrUUID` (string, 必需): 资源URL或UUID
+- `content` (string, 必需): 资源元数据序列化内容字符串
+
+### 13.2 asset-advanced_generate_available_url
+根据输入URL生成可用的URL
+
+**参数**:
+- `url` (string, 必需): 要生成可用URL的资源URL
+
+### 13.3 asset-advanced_query_asset_db_ready
+查询资源数据库是否就绪
+
+**参数**: 无
+
+### 13.4 asset-advanced_open_asset_external
+用外部程序打开资源
+
+**参数**:
+- `urlOrUUID` (string, 必需): 要打开的资源URL或UUID
+
+### 13.5 asset-advanced_batch_import_assets
+批量导入资源
+
+**参数**:
+- `sourceDir` (string, 必需): 源目录路径
+- `targetDir` (string, 必需): 目标目录路径
+- `overwrite` (boolean, 可选): 是否覆盖现有资源
+
+### 13.6 asset-advanced_batch_delete_assets
+批量删除资源
+
+**参数**:
+- `urls` (array, 必需): 要删除的资源URL数组
+
+### 13.7 asset-advanced_validate_asset_references
+验证资源引用
+
+**参数**: 无
+
+### 13.8 asset-advanced_get_asset_dependencies [不可用]
+获取资源依赖关系
+
+**状态**: 此工具当前不可用，需要Cocos Creator提供额外的依赖分析API。
+
+**参数**:
+- `urlOrUUID` (string, 必需): 资源URL或UUID
+
+### 13.9 asset-advanced_get_unused_assets [不可用]
+获取未使用的资源
+
+**状态**: 此工具当前不可用，需要全面的项目分析能力。
+
+**参数**: 无
+
+### 13.10 asset-advanced_compress_textures [不可用]
+批量压缩纹理
+
+**状态**: 此工具当前不可用，需要图像处理能力。
+
+**参数**:
+- `directory` (string, 必需): 纹理资源目录
+- `quality` (number, 可选): 压缩质量（0-1）
+
+### 13.11 asset-advanced_export_asset_manifest [不可用]
+导出资源清单
+
+**状态**: 此工具当前不可用。
+
+**参数**: 无
+
+---
+
+## 14. 验证工具 (Validation Tools)
+
+验证工具，用于验证JSON参数、创建安全字符串值、格式化MCP请求等。
+
+### 14.1 validation_validate_json_params
+验证和修复JSON参数
+
+**参数**:
+- `jsonString` (string, 必需): 要验证和修复的JSON字符串
+- `expectedSchema` (object, 可选): 期望的参数schema
+
+**示例**:
+```json
+{
+  "tool": "validation_validate_json_params",
+  "arguments": {
+    "jsonString": "{\"name\": \"test\"}",
+    "expectedSchema": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"}
+      }
+    }
+  }
+}
+```
+
+### 14.2 validation_safe_string_value
+创建安全的字符串值
+
+**参数**:
+- `value` (string, 必需): 要转换为安全字符串的值
+
+### 14.3 validation_format_mcp_request
+格式化完整的MCP请求
+
+**参数**:
+- `toolName` (string, 必需): 工具名称
+- `arguments` (object, 必需): 工具参数
+
+---
+
+## 第三方工具注册
+
+本插件支持第三方扩展通过 `Editor.Message` 动态注册额外的MCP工具。
+
+### 注册流程
+
+1. 在提供方扩展的 `load` 中调用 `Editor.Message.request('cocos-mcp-server', 'mcp-register-tools', { providerId, invokeMessage, tools })`。
+2. 在 `invokeMessage` 绑定的 method 中处理 `{ tool, args }` 并返回 `{ success, data?, error? }`。
+3. `unload` 时调用 `mcp-unregister-tools`。
+
 完整说明与示例：[MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md)、[DEV.md § 第三方扩展接入](./DEV.md#第三方扩展接入)、[examples/mcp-provider-demo](./examples/mcp-provider-demo)。
 
 ---
@@ -1508,4 +2002,4 @@ Cocos Creator 使用 `db://` 前缀的资源URL格式：
 
 ---
 
-*此文档基于 Cocos Creator MCP 服务器 v1.7.3 编写，如有更新请参考 [README 更新日志](./README.md#更新日志)。*
+*此文档基于 Cocos Creator MCP 服务器 v1.7.4 编写，如有更新请参考 [README 更新日志](./README.md#更新日志)。*

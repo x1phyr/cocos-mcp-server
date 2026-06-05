@@ -33,7 +33,7 @@ export class DebugTools implements ToolExecutor {
         return [
             {
                 name: 'get_console_logs',
-                description: 'Get editor console logs',
+                description: '[NOT AVAILABLE] Get editor console logs. Console capture is not wired — Editor.Message.addBroadcastListener for console events is not implemented, so no log data is captured.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -53,7 +53,7 @@ export class DebugTools implements ToolExecutor {
             },
             {
                 name: 'clear_console',
-                description: 'Clear editor console',
+                description: '[PARTIALLY AVAILABLE] Clear editor console. Clears the in-memory log buffer and sends Editor.Message.send(\'console\', \'clear\'), but may not reliably clear the editor console UI in all Cocos Creator versions.',
                 inputSchema: {
                     type: 'object',
                     properties: {}
@@ -226,9 +226,10 @@ export class DebugTools implements ToolExecutor {
         }
 
         const recentLogs = logs.slice(-limit);
-        
+
         return {
             success: true,
+            warning: 'Console capture is not wired — Editor.Message.addBroadcastListener for console events is not implemented. The returned log data will always be empty.',
             data: {
                 total: logs.length,
                 returned: recentLogs.length,
@@ -427,10 +428,9 @@ export class DebugTools implements ToolExecutor {
             let logFilePath = '';
             const possiblePaths = [
                 Editor.Project ? Editor.Project.path : null,
-                '/Users/lizhiyong/NewProject_3',
                 process.cwd(),
             ].filter(p => p !== null);
-            
+
             for (const basePath of possiblePaths) {
                 const testPath = path.join(basePath, 'temp/logs/project.log');
                 if (fs.existsSync(testPath)) {
@@ -496,10 +496,9 @@ export class DebugTools implements ToolExecutor {
             let logFilePath = '';
             const possiblePaths = [
                 Editor.Project ? Editor.Project.path : null,
-                '/Users/lizhiyong/NewProject_3',
                 process.cwd(),
             ].filter(p => p !== null);
-            
+
             for (const basePath of possiblePaths) {
                 const testPath = path.join(basePath, 'temp/logs/project.log');
                 if (fs.existsSync(testPath)) {
@@ -545,10 +544,9 @@ export class DebugTools implements ToolExecutor {
             let logFilePath = '';
             const possiblePaths = [
                 Editor.Project ? Editor.Project.path : null,
-                '/Users/lizhiyong/NewProject_3',
                 process.cwd(),
             ].filter(p => p !== null);
-            
+
             for (const basePath of possiblePaths) {
                 const testPath = path.join(basePath, 'temp/logs/project.log');
                 if (fs.existsSync(testPath)) {

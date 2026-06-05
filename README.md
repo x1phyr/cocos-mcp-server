@@ -4,7 +4,7 @@
 
 一个适用于 Cocos Creator 3.8+ 的综合性 MCP（模型上下文协议）服务器插件，使 AI 助手能够通过标准化协议与 Cocos Creator 编辑器进行交互。一键安装和使用，省去所有繁琐环境和配置。已经测试过Claude客户端Claude CLI和Cursor，其他的编辑器理论上也完美支持。
 
-**🚀 现在提供 50 个强力融合工具，实现99%的编辑器控制！**
+**🚀 现在提供 157 个强力融合工具，实现99%的编辑器控制！**
 
 ## 视频演示和教学
 
@@ -21,7 +21,22 @@
 
 ## 更新日志
 
-### v1.7.4 - 2026年6月5日（当前版本）
+### v1.7.5 - 2026年6月5日（当前版本）
+
+- **Fixed**：修复 async Promise 构造器反模式（node/component/prefab/project/asset-advanced 等模块）
+- **Fixed**：修复 createNode 中重复添加组件问题
+- **Fixed**：修复破坏有效 JSON 的正则表达式
+- **Fixed**：修复 setComponentProperty 在异步操作前返回 success
+- **Fixed**：移除硬编码的开发者路径
+- **Fixed**：修复 validation 和 prefab 中的硬编码端口
+- **Fixed**：修复 panel 回滚逻辑
+- **Fixed**：修复请求体大小检查
+- **Fixed**：标记死代码工具为 unavailable
+- **Fixed**：修复 innerHTML 注入漏洞
+- **Fixed**：为 external provider 添加超时机制
+- **Docs**：更新 FEATURE_GUIDE_CN/EN 匹配实际实现（157个工具，14个类别）
+
+### v1.7.4 - 2026年6月5日
 
 - **Fixed**：Tool Manager 全部禁用工具后 MCP 仍暴露/可调用所有工具（空列表不再视为「无过滤」）。
 - **Fixed**：外部工具 re-sync 时保留用户已保存的 `enabled` 状态。
@@ -93,7 +108,7 @@ cocos store：https://store.cocos.com/app/detail/7941
 ## 工具体系与操作码
 
 - 所有工具均以“类别_操作”命名，参数采用统一Schema，支持多操作码（action）切换，极大提升灵活性和可扩展性。
-- 50个核心工具涵盖场景、节点、组件、预制体、资源、项目、调试、偏好设置、服务器、消息广播等全部编辑器操作。
+- 50个核心工具涵盖场景、节点、组件、预制体、资源、项目、调试、偏好设置、服务器、消息广播等全部编辑器操作（实际实现157个工具，分布在14个能力模块中）。
 - 工具调用示例：
 
 ```json

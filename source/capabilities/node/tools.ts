@@ -307,8 +307,7 @@ export class NodeTools implements ToolExecutor {
     }
 
     private async createNode(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 let targetParentUuid = args.parentUuid;
                 
                 // 如果没有提供父节点UUID，获取场景根节点
@@ -341,18 +340,16 @@ export class NodeTools implements ToolExecutor {
                             finalAssetUuid = assetInfo.uuid;
                             console.log(`Asset path '${args.assetPath}' resolved to UUID: ${finalAssetUuid}`);
                         } else {
-                            resolve({
+                            return {
                                 success: false,
                                 error: `Asset not found at path: ${args.assetPath}`
-                            });
-                            return;
+                            };
                         }
                     } catch (err) {
-                        resolve({
+                        return {
                             success: false,
                             error: `Failed to resolve asset path '${args.assetPath}': ${err}`
-                        });
-                        return;
+                        };
                     }
                 }
 
@@ -409,29 +406,7 @@ export class NodeTools implements ToolExecutor {
                     }
                 }
 
-                // 添加组件（如果提供的话）
-                if (args.components && args.components.length > 0 && uuid) {
-                    try {
-                        await new Promise(resolve => setTimeout(resolve, 100)); // 等待节点创建完成
-                        for (const componentType of args.components) {
-                            try {
-                                const result = await this.componentTools.execute('add_component', {
-                                    nodeUuid: uuid,
-                                    componentType: componentType
-                                });
-                                if (result.success) {
-                                    console.log(`Component ${componentType} added successfully`);
-                                } else {
-                                    console.warn(`Failed to add component ${componentType}:`, result.error);
-                                }
-                            } catch (err) {
-                                console.warn(`Failed to add component ${componentType}:`, err);
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('Failed to add components:', err);
-                    }
-                }
+                // 组件已在 createNodeOptions.components 中传递给 create-node API，无需重复添加
 
                 // 设置初始变换（如果提供的话）
                 if (args.initialTransform && uuid) {
@@ -470,11 +445,11 @@ export class NodeTools implements ToolExecutor {
                     console.warn('Failed to get verification data:', err);
                 }
 
-                const successMessage = finalAssetUuid 
+                const successMessage = finalAssetUuid
                     ? `Node '${args.name}' instantiated from asset successfully`
                     : `Node '${args.name}' created successfully`;
 
-                resolve({
+                return {
                     success: true,
                     data: {
                         uuid: uuid,
@@ -486,15 +461,14 @@ export class NodeTools implements ToolExecutor {
                         message: successMessage
                     },
                     verificationData: verificationData
-                });
+                };
 
-            } catch (err: any) {
-                resolve({ 
-                    success: false, 
-                    error: `Failed to create node: ${err.message}. Args: ${JSON.stringify(args)}`
-                });
-            }
-        });
+        } catch (err: any) {
+            return {
+                success: false,
+                error: `Failed to create node: ${err.message}. Args: ${JSON.stringify(args)}`
+            };
+        }
     }
 
     private async getNodeInfo(uuid: string): Promise<ToolResponse> {
@@ -747,121 +721,117 @@ export class NodeTools implements ToolExecutor {
     }
 
     private async setNodeTransform(args: any): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            const { uuid, position, rotation, scale } = args;
-            const updatePromises: Promise<any>[] = [];
-            const updates: string[] = [];
-            const warnings: string[] = [];
-            
-            try {
-                // First get node info to determine if it's 2D or 3D
-                const nodeInfoResponse = await this.getNodeInfo(uuid);
-                if (!nodeInfoResponse.success || !nodeInfoResponse.data) {
-                    resolve({ success: false, error: 'Failed to get node information' });
-                    return;
-                }
-                
-                const nodeInfo = nodeInfoResponse.data;
-                const is2DNode = this.is2DNode(nodeInfo);
-                
-                if (position) {
-                    const normalizedPosition = this.normalizeTransformValue(position, 'position', is2DNode);
-                    if (normalizedPosition.warning) {
-                        warnings.push(normalizedPosition.warning);
-                    }
-                    
-                    updatePromises.push(
-                        Editor.Message.request('scene', 'set-property', {
-                            uuid: uuid,
-                            path: 'position',
-                            dump: { value: normalizedPosition.value }
-                        })
-                    );
-                    updates.push('position');
-                }
-                
-                if (rotation) {
-                    const normalizedRotation = this.normalizeTransformValue(rotation, 'rotation', is2DNode);
-                    if (normalizedRotation.warning) {
-                        warnings.push(normalizedRotation.warning);
-                    }
-                    
-                    updatePromises.push(
-                        Editor.Message.request('scene', 'set-property', {
-                            uuid: uuid,
-                            path: 'rotation',
-                            dump: { value: normalizedRotation.value }
-                        })
-                    );
-                    updates.push('rotation');
-                }
-                
-                if (scale) {
-                    const normalizedScale = this.normalizeTransformValue(scale, 'scale', is2DNode);
-                    if (normalizedScale.warning) {
-                        warnings.push(normalizedScale.warning);
-                    }
-                    
-                    updatePromises.push(
-                        Editor.Message.request('scene', 'set-property', {
-                            uuid: uuid,
-                            path: 'scale',
-                            dump: { value: normalizedScale.value }
-                        })
-                    );
-                    updates.push('scale');
-                }
-                
-                if (updatePromises.length === 0) {
-                    resolve({ success: false, error: 'No transform properties specified' });
-                    return;
-                }
-                
-                await Promise.all(updatePromises);
-                
-                // Verify the changes by getting updated node info
-                const updatedNodeInfo = await this.getNodeInfo(uuid);
-                const response: any = {
-                    success: true,
-                    message: `Transform properties updated: ${updates.join(', ')} ${is2DNode ? '(2D node)' : '(3D node)'}`,
-                    updatedProperties: updates,
-                    data: {
-                        nodeUuid: uuid,
-                        nodeType: is2DNode ? '2D' : '3D',
-                        appliedChanges: updates,
-                        transformConstraints: {
-                            position: is2DNode ? 'x, y only (z ignored)' : 'x, y, z all used',
-                            rotation: is2DNode ? 'z only (x, y ignored)' : 'x, y, z all used',
-                            scale: is2DNode ? 'x, y main, z typically 1' : 'x, y, z all used'
-                        }
-                    },
-                    verificationData: {
-                        nodeInfo: updatedNodeInfo.data,
-                        transformDetails: {
-                            originalNodeType: is2DNode ? '2D' : '3D',
-                            appliedTransforms: updates,
-                            timestamp: new Date().toISOString()
-                        },
-                        beforeAfterComparison: {
-                            before: nodeInfo,
-                            after: updatedNodeInfo.data
-                        }
-                    }
-                };
-                
-                if (warnings.length > 0) {
-                    response.warning = warnings.join('; ');
-                }
-                
-                resolve(response);
-                
-            } catch (err: any) {
-                resolve({ 
-                    success: false, 
-                    error: `Failed to update transform: ${err.message}` 
-                });
+        const { uuid, position, rotation, scale } = args;
+        const updatePromises: Promise<any>[] = [];
+        const updates: string[] = [];
+        const warnings: string[] = [];
+
+        try {
+            // First get node info to determine if it's 2D or 3D
+            const nodeInfoResponse = await this.getNodeInfo(uuid);
+            if (!nodeInfoResponse.success || !nodeInfoResponse.data) {
+                return { success: false, error: 'Failed to get node information' };
             }
-        });
+
+            const nodeInfo = nodeInfoResponse.data;
+            const is2DNode = this.is2DNode(nodeInfo);
+
+            if (position) {
+                const normalizedPosition = this.normalizeTransformValue(position, 'position', is2DNode);
+                if (normalizedPosition.warning) {
+                    warnings.push(normalizedPosition.warning);
+                }
+
+                updatePromises.push(
+                    Editor.Message.request('scene', 'set-property', {
+                        uuid: uuid,
+                        path: 'position',
+                        dump: { value: normalizedPosition.value }
+                    })
+                );
+                updates.push('position');
+            }
+
+            if (rotation) {
+                const normalizedRotation = this.normalizeTransformValue(rotation, 'rotation', is2DNode);
+                if (normalizedRotation.warning) {
+                    warnings.push(normalizedRotation.warning);
+                }
+
+                updatePromises.push(
+                    Editor.Message.request('scene', 'set-property', {
+                        uuid: uuid,
+                        path: 'rotation',
+                        dump: { value: normalizedRotation.value }
+                    })
+                );
+                updates.push('rotation');
+            }
+
+            if (scale) {
+                const normalizedScale = this.normalizeTransformValue(scale, 'scale', is2DNode);
+                if (normalizedScale.warning) {
+                    warnings.push(normalizedScale.warning);
+                }
+
+                updatePromises.push(
+                    Editor.Message.request('scene', 'set-property', {
+                        uuid: uuid,
+                        path: 'scale',
+                        dump: { value: normalizedScale.value }
+                    })
+                );
+                updates.push('scale');
+            }
+
+            if (updatePromises.length === 0) {
+                return { success: false, error: 'No transform properties specified' };
+            }
+
+            await Promise.all(updatePromises);
+
+            // Verify the changes by getting updated node info
+            const updatedNodeInfo = await this.getNodeInfo(uuid);
+            const response: any = {
+                success: true,
+                message: `Transform properties updated: ${updates.join(', ')} ${is2DNode ? '(2D node)' : '(3D node)'}`,
+                updatedProperties: updates,
+                data: {
+                    nodeUuid: uuid,
+                    nodeType: is2DNode ? '2D' : '3D',
+                    appliedChanges: updates,
+                    transformConstraints: {
+                        position: is2DNode ? 'x, y only (z ignored)' : 'x, y, z all used',
+                        rotation: is2DNode ? 'z only (x, y ignored)' : 'x, y, z all used',
+                        scale: is2DNode ? 'x, y main, z typically 1' : 'x, y, z all used'
+                    }
+                },
+                verificationData: {
+                    nodeInfo: updatedNodeInfo.data,
+                    transformDetails: {
+                        originalNodeType: is2DNode ? '2D' : '3D',
+                        appliedTransforms: updates,
+                        timestamp: new Date().toISOString()
+                    },
+                    beforeAfterComparison: {
+                        before: nodeInfo,
+                        after: updatedNodeInfo.data
+                    }
+                }
+            };
+
+            if (warnings.length > 0) {
+                response.warning = warnings.join('; ');
+            }
+
+            return response;
+
+        } catch (err: any) {
+            return {
+                success: false,
+                error: `Failed to update transform: ${err.message}`
+            };
+        }
     }
 
     private is2DNode(nodeInfo: any): boolean {
@@ -1004,93 +974,90 @@ export class NodeTools implements ToolExecutor {
     }
 
     private async detectNodeType(uuid: string): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
-                const nodeInfoResponse = await this.getNodeInfo(uuid);
-                if (!nodeInfoResponse.success || !nodeInfoResponse.data) {
-                    resolve({ success: false, error: 'Failed to get node information' });
-                    return;
-                }
-
-                const nodeInfo = nodeInfoResponse.data;
-                const is2D = this.is2DNode(nodeInfo);
-                const components = nodeInfo.components || [];
-                
-                // Collect detection reasons
-                const detectionReasons: string[] = [];
-                
-                // Check for 2D components
-                const twoDComponents = components.filter((comp: any) => 
-                    comp.type && (
-                        comp.type.includes('cc.Sprite') ||
-                        comp.type.includes('cc.Label') ||
-                        comp.type.includes('cc.Button') ||
-                        comp.type.includes('cc.Layout') ||
-                        comp.type.includes('cc.Widget') ||
-                        comp.type.includes('cc.Mask') ||
-                        comp.type.includes('cc.Graphics')
-                    )
-                );
-                
-                // Check for 3D components
-                const threeDComponents = components.filter((comp: any) =>
-                    comp.type && (
-                        comp.type.includes('cc.MeshRenderer') ||
-                        comp.type.includes('cc.Camera') ||
-                        comp.type.includes('cc.Light') ||
-                        comp.type.includes('cc.DirectionalLight') ||
-                        comp.type.includes('cc.PointLight') ||
-                        comp.type.includes('cc.SpotLight')
-                    )
-                );
-
-                if (twoDComponents.length > 0) {
-                    detectionReasons.push(`Has 2D components: ${twoDComponents.map((c: any) => c.type).join(', ')}`);
-                }
-                
-                if (threeDComponents.length > 0) {
-                    detectionReasons.push(`Has 3D components: ${threeDComponents.map((c: any) => c.type).join(', ')}`);
-                }
-                
-                // Check position for heuristic
-                const position = nodeInfo.position;
-                if (position && Math.abs(position.z) < 0.001) {
-                    detectionReasons.push('Z position is ~0 (likely 2D)');
-                } else if (position && Math.abs(position.z) > 0.001) {
-                    detectionReasons.push(`Z position is ${position.z} (likely 3D)`);
-                }
-
-                if (detectionReasons.length === 0) {
-                    detectionReasons.push('No specific indicators found, defaulting based on heuristics');
-                }
-
-                resolve({
-                    success: true,
-                    data: {
-                        nodeUuid: uuid,
-                        nodeName: nodeInfo.name,
-                        nodeType: is2D ? '2D' : '3D',
-                        detectionReasons: detectionReasons,
-                        components: components.map((comp: any) => ({
-                            type: comp.type,
-                            category: this.getComponentCategory(comp.type)
-                        })),
-                        position: nodeInfo.position,
-                        transformConstraints: {
-                            position: is2D ? 'x, y only (z ignored)' : 'x, y, z all used',
-                            rotation: is2D ? 'z only (x, y ignored)' : 'x, y, z all used',
-                            scale: is2D ? 'x, y main, z typically 1' : 'x, y, z all used'
-                        }
-                    }
-                });
-                
-            } catch (err: any) {
-                resolve({ 
-                    success: false, 
-                    error: `Failed to detect node type: ${err.message}` 
-                });
+        try {
+            const nodeInfoResponse = await this.getNodeInfo(uuid);
+            if (!nodeInfoResponse.success || !nodeInfoResponse.data) {
+                return { success: false, error: 'Failed to get node information' };
             }
-        });
+
+            const nodeInfo = nodeInfoResponse.data;
+            const is2D = this.is2DNode(nodeInfo);
+            const components = nodeInfo.components || [];
+
+            // Collect detection reasons
+            const detectionReasons: string[] = [];
+
+            // Check for 2D components
+            const twoDComponents = components.filter((comp: any) =>
+                comp.type && (
+                    comp.type.includes('cc.Sprite') ||
+                    comp.type.includes('cc.Label') ||
+                    comp.type.includes('cc.Button') ||
+                    comp.type.includes('cc.Layout') ||
+                    comp.type.includes('cc.Widget') ||
+                    comp.type.includes('cc.Mask') ||
+                    comp.type.includes('cc.Graphics')
+                )
+            );
+
+            // Check for 3D components
+            const threeDComponents = components.filter((comp: any) =>
+                comp.type && (
+                    comp.type.includes('cc.MeshRenderer') ||
+                    comp.type.includes('cc.Camera') ||
+                    comp.type.includes('cc.Light') ||
+                    comp.type.includes('cc.DirectionalLight') ||
+                    comp.type.includes('cc.PointLight') ||
+                    comp.type.includes('cc.SpotLight')
+                )
+            );
+
+            if (twoDComponents.length > 0) {
+                detectionReasons.push(`Has 2D components: ${twoDComponents.map((c: any) => c.type).join(', ')}`);
+            }
+
+            if (threeDComponents.length > 0) {
+                detectionReasons.push(`Has 3D components: ${threeDComponents.map((c: any) => c.type).join(', ')}`);
+            }
+
+            // Check position for heuristic
+            const position = nodeInfo.position;
+            if (position && Math.abs(position.z) < 0.001) {
+                detectionReasons.push('Z position is ~0 (likely 2D)');
+            } else if (position && Math.abs(position.z) > 0.001) {
+                detectionReasons.push(`Z position is ${position.z} (likely 3D)`);
+            }
+
+            if (detectionReasons.length === 0) {
+                detectionReasons.push('No specific indicators found, defaulting based on heuristics');
+            }
+
+            return {
+                success: true,
+                data: {
+                    nodeUuid: uuid,
+                    nodeName: nodeInfo.name,
+                    nodeType: is2D ? '2D' : '3D',
+                    detectionReasons: detectionReasons,
+                    components: components.map((comp: any) => ({
+                        type: comp.type,
+                        category: this.getComponentCategory(comp.type)
+                    })),
+                    position: nodeInfo.position,
+                    transformConstraints: {
+                        position: is2D ? 'x, y only (z ignored)' : 'x, y, z all used',
+                        rotation: is2D ? 'z only (x, y ignored)' : 'x, y, z all used',
+                        scale: is2D ? 'x, y main, z typically 1' : 'x, y, z all used'
+                    }
+                }
+            };
+
+        } catch (err: any) {
+            return {
+                success: false,
+                error: `Failed to detect node type: ${err.message}`
+            };
+        }
     }
 
     private getComponentCategory(componentType: string): string {

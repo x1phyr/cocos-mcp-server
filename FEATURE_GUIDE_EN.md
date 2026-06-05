@@ -8,7 +8,7 @@ This document provides detailed information about all available MCP tools and th
 
 ## Tool Categories
 
-The MCP server provides **158 tools** organized into 13 main categories by functionality:
+The MCP server provides **157 tools** organized into 14 main categories by functionality:
 
 1. [Scene Tools](#1-scene-tools)
 2. [Node Tools](#2-node-tools)
@@ -19,10 +19,11 @@ The MCP server provides **158 tools** organized into 13 main categories by funct
 7. [Preferences Tools](#7-preferences-tools)
 8. [Server Tools](#8-server-tools)
 9. [Broadcast Tools](#9-broadcast-tools)
-10. [Asset Advanced Tools](#10-asset-advanced-tools)
-11. [Reference Image Tools](#11-reference-image-tools)
-12. [Scene Advanced Tools](#12-scene-advanced-tools)
-13. [Scene View Tools](#13-scene-view-tools)
+10. [Scene Advanced Tools](#10-scene-advanced-tools)
+11. [Scene View Tools](#11-scene-view-tools)
+12. [Reference Image Tools](#12-reference-image-tools)
+13. [Asset Advanced Tools](#13-asset-advanced-tools)
+14. [Validation Tools](#14-validation-tools)
 
 ---
 
@@ -1422,25 +1423,517 @@ Get list of active broadcast listeners
 
 ---
 
-## Usage Guidelines
+## 10. Scene Advanced Tools
 
-### 1. Tool Call Format
+Advanced scene operation tools providing node property reset, array operations, copy-paste, undo recording, and other advanced features.
 
-All tool calls use JSON-RPC 2.0 format:
+### 10.1 scene-advanced_reset_node_property
+Reset node property to default value
 
+**Parameters**:
+- `uuid` (string, required): Node UUID
+- `path` (string, required): Property path (e.g., position, rotation, scale)
+
+**Example**:
 ```json
 {
-  "jsonrpc": "2.0",
-  "method": "tools/call",
-  "params": {
-    "name": "tool_name",
-    "arguments": {
-      // Tool parameters
-    }
-  },
-  "id": 1
+  "tool": "scene-advanced_reset_node_property",
+  "arguments": {
+    "uuid": "node-uuid-here",
+    "path": "position"
+  }
 }
 ```
+
+### 10.2 scene-advanced_move_array_element
+Move array element position
+
+**Parameters**:
+- `uuid` (string, required): Node UUID
+- `path` (string, required): Array property path (e.g., __comps__)
+- `target` (number, required): Target item original index
+- `offset` (number, required): Offset amount (positive or negative)
+
+### 10.3 scene-advanced_remove_array_element
+Remove array element
+
+**Parameters**:
+- `uuid` (string, required): Node UUID
+- `path` (string, required): Array property path
+- `target` (number, required): Index of item to remove
+
+### 10.4 scene-advanced_copy_node
+Copy node
+
+**Parameters**:
+- `uuid` (string, required): UUID of node to copy
+
+### 10.5 scene-advanced_paste_node
+Paste node
+
+**Parameters**:
+- `parentUuid` (string, optional): Parent node UUID, paste to scene root if not specified
+
+### 10.6 scene-advanced_cut_node
+Cut node
+
+**Parameters**:
+- `uuid` (string, required): UUID of node to cut
+
+### 10.7 scene-advanced_reset_node_transform
+Reset node transform (position, rotation, scale) to default values
+
+**Parameters**:
+- `uuid` (string, required): Node UUID
+
+### 10.8 scene-advanced_reset_component
+Reset component properties to default values
+
+**Parameters**:
+- `uuid` (string, required): Node UUID
+- `component` (string, required): Component type name
+
+### 10.9 scene-advanced_restore_prefab
+Restore prefab instance
+
+**Parameters**:
+- `uuid` (string, required): Prefab instance node UUID
+
+### 10.10 scene-advanced_execute_component_method
+Execute component method
+
+**Parameters**:
+- `uuid` (string, required): Node UUID
+- `component` (string, required): Component type
+- `method` (string, required): Method name
+- `args` (array, optional): Method arguments array
+
+### 10.11 scene-advanced_execute_scene_script
+Execute scene script
+
+**Parameters**:
+- `script` (string, required): Script content
+- `args` (object, optional): Script arguments
+
+### 10.12 scene-advanced_scene_snapshot
+Create scene snapshot
+
+**Parameters**:
+- `name` (string, optional): Snapshot name
+
+### 10.13 scene-advanced_scene_snapshot_abort
+Abort current scene snapshot operation
+
+**Parameters**: None
+
+### 10.14 scene-advanced_begin_undo_recording
+Begin undo recording
+
+**Parameters**:
+- `name` (string, optional): Undo operation name
+
+### 10.15 scene-advanced_end_undo_recording
+End undo recording
+
+**Parameters**: None
+
+### 10.16 scene-advanced_cancel_undo_recording
+Cancel undo recording
+
+**Parameters**: None
+
+### 10.17 scene-advanced_soft_reload_scene
+Soft reload scene (without losing editor state)
+
+**Parameters**: None
+
+### 10.18 scene-advanced_query_scene_ready
+Query if scene is ready
+
+**Parameters**: None
+
+### 10.19 scene-advanced_query_scene_dirty
+Query if scene has been modified
+
+**Parameters**: None
+
+### 10.20 scene-advanced_query_scene_classes
+Query available scene classes
+
+**Parameters**: None
+
+### 10.21 scene-advanced_query_scene_components
+Query all components in scene
+
+**Parameters**: None
+
+### 10.22 scene-advanced_query_component_has_script
+Query if component has script
+
+**Parameters**:
+- `component` (string, required): Component type
+
+### 10.23 scene-advanced_query_nodes_by_asset_uuid
+Query nodes using specific asset by asset UUID
+
+**Parameters**:
+- `assetUuid` (string, required): Asset UUID
+
+---
+
+## 11. Scene View Tools
+
+Scene view control tools providing Gizmo tool switching, view modes, grid display, camera control, and other features.
+
+### 11.1 scene-view_change_gizmo_tool
+Change Gizmo tool
+
+**Parameters**:
+- `name` (string, required): Tool name, options: position, rotation, scale, rect
+
+### 11.2 scene-view_query_gizmo_tool_name
+Query current Gizmo tool name
+
+**Parameters**: None
+
+### 11.3 scene-view_change_gizmo_pivot
+Change transform pivot point
+
+**Parameters**:
+- `name` (string, required): Pivot point, options: pivot, center
+
+### 11.4 scene-view_query_gizmo_pivot
+Query current Gizmo pivot point
+
+**Parameters**: None
+
+### 11.5 scene-view_query_gizmo_view_mode
+Query Gizmo view mode
+
+**Parameters**: None
+
+### 11.6 scene-view_change_gizmo_coordinate
+Change Gizmo coordinate system
+
+**Parameters**:
+- `name` (string, required): Coordinate system, options: local, world
+
+### 11.7 scene-view_query_gizmo_coordinate
+Query current Gizmo coordinate system
+
+**Parameters**: None
+
+### 11.8 scene-view_change_view_mode_2d_3d
+Switch 2D/3D view mode
+
+**Parameters**:
+- `mode` (string, required): View mode, options: 2d, 3d
+
+### 11.9 scene-view_query_view_mode_2d_3d
+Query current 2D/3D view mode
+
+**Parameters**: None
+
+### 11.10 scene-view_set_grid_visible
+Set grid visibility
+
+**Parameters**:
+- `visible` (boolean, required): Whether to show grid
+
+### 11.11 scene-view_query_grid_visible
+Query grid visibility
+
+**Parameters**: None
+
+### 11.12 scene-view_set_icon_gizmo_3d
+Set 3D icon Gizmo display
+
+**Parameters**:
+- `visible` (boolean, required): Whether to show
+
+### 11.13 scene-view_query_icon_gizmo_3d
+Query 3D icon Gizmo display status
+
+**Parameters**: None
+
+### 11.14 scene-view_set_icon_gizmo_size
+Set icon Gizmo size
+
+**Parameters**:
+- `size` (number, required): Icon size
+
+### 11.15 scene-view_query_icon_gizmo_size
+Query icon Gizmo size
+
+**Parameters**: None
+
+### 11.16 scene-view_focus_camera_on_nodes
+Focus camera on specified nodes
+
+**Parameters**:
+- `uuids` (array, required): Array of node UUIDs
+
+### 11.17 scene-view_align_camera_with_view
+Align camera with current view
+
+**Parameters**: None
+
+### 11.18 scene-view_align_view_with_node
+Align view with node
+
+**Parameters**:
+- `uuid` (string, required): Node UUID
+
+### 11.19 scene-view_get_scene_view_status
+Get scene view status
+
+**Parameters**: None
+
+### 11.20 scene-view_reset_scene_view
+Reset scene view
+
+**Parameters**: None
+
+---
+
+## 12. Reference Image Tools
+
+Reference image management tools for adding, managing, and controlling reference images in scenes.
+
+### 12.1 reference-image_add_reference_image
+Add reference image(s) to scene
+
+**Parameters**:
+- `paths` (array, required): Array of reference image absolute paths
+
+**Example**:
+```json
+{
+  "tool": "reference-image_add_reference_image",
+  "arguments": {
+    "paths": ["/path/to/image1.png", "/path/to/image2.png"]
+  }
+}
+```
+
+### 12.2 reference-image_remove_reference_image
+Remove reference image(s)
+
+**Parameters**:
+- `paths` (array, optional): Array of reference image paths to remove, empty array removes current reference image
+
+### 12.3 reference-image_switch_reference_image
+Switch to specified reference image
+
+**Parameters**:
+- `path` (string, required): Reference image absolute path
+- `sceneUUID` (string, optional): Specific scene UUID
+
+### 12.4 reference-image_set_reference_image_data
+Set reference image data
+
+**Parameters**:
+- `path` (string, required): Reference image path
+- `data` (object, required): Image data (position, scale, opacity, etc.)
+
+### 12.5 reference-image_query_reference_image_config
+Query reference image configuration
+
+**Parameters**: None
+
+### 12.6 reference-image_query_current_reference_image
+Query current reference image
+
+**Parameters**: None
+
+### 12.7 reference-image_refresh_reference_image
+Refresh reference image
+
+**Parameters**: None
+
+### 12.8 reference-image_set_reference_image_position
+Set reference image position
+
+**Parameters**:
+- `path` (string, required): Reference image path
+- `position` (object, required): Position object {x, y, z}
+
+### 12.9 reference-image_set_reference_image_scale
+Set reference image scale
+
+**Parameters**:
+- `path` (string, required): Reference image path
+- `scale` (object, required): Scale object {x, y, z}
+
+### 12.10 reference-image_set_reference_image_opacity
+Set reference image opacity
+
+**Parameters**:
+- `path` (string, required): Reference image path
+- `opacity` (number, required): Opacity value (0-1)
+
+### 12.11 reference-image_list_reference_images
+List all reference images
+
+**Parameters**: None
+
+### 12.12 reference-image_clear_all_reference_images
+Clear all reference images
+
+**Parameters**: None
+
+---
+
+## 13. Asset Advanced Tools
+
+Advanced asset management tools providing batch import/delete, dependency analysis, asset validation, and other features.
+
+### 13.1 asset-advanced_save_asset_meta
+Save asset meta information
+
+**Parameters**:
+- `urlOrUUID` (string, required): Asset URL or UUID
+- `content` (string, required): Asset meta serialized content string
+
+### 13.2 asset-advanced_generate_available_url
+Generate available URL based on input URL
+
+**Parameters**:
+- `url` (string, required): Asset URL to generate available URL for
+
+### 13.3 asset-advanced_query_asset_db_ready
+Query if asset database is ready
+
+**Parameters**: None
+
+### 13.4 asset-advanced_open_asset_external
+Open asset with external program
+
+**Parameters**:
+- `urlOrUUID` (string, required): Asset URL or UUID to open
+
+### 13.5 asset-advanced_batch_import_assets
+Batch import assets
+
+**Parameters**:
+- `sourceDir` (string, required): Source directory path
+- `targetDir` (string, required): Target directory path
+- `overwrite` (boolean, optional): Whether to overwrite existing assets
+
+### 13.6 asset-advanced_batch_delete_assets
+Batch delete assets
+
+**Parameters**:
+- `urls` (array, required): Array of asset URLs to delete
+
+### 13.7 asset-advanced_validate_asset_references
+Validate asset references
+
+**Parameters**: None
+
+### 13.8 asset-advanced_get_asset_dependencies [Unavailable]
+Get asset dependency relationships
+
+**Status**: This tool is currently unavailable, requires additional dependency analysis APIs from Cocos Creator.
+
+**Parameters**:
+- `urlOrUUID` (string, required): Asset URL or UUID
+
+### 13.9 asset-advanced_get_unused_assets [Unavailable]
+Get unused assets
+
+**Status**: This tool is currently unavailable, requires comprehensive project analysis capabilities.
+
+**Parameters**: None
+
+### 13.10 asset-advanced_compress_textures [Unavailable]
+Batch compress textures
+
+**Status**: This tool is currently unavailable, requires image processing capabilities.
+
+**Parameters**:
+- `directory` (string, required): Texture asset directory
+- `quality` (number, optional): Compression quality (0-1)
+
+### 13.11 asset-advanced_export_asset_manifest [Unavailable]
+Export asset manifest
+
+**Status**: This tool is currently unavailable.
+
+**Parameters**: None
+
+---
+
+## 14. Validation Tools
+
+Validation tools for validating JSON parameters, creating safe string values, formatting MCP requests, etc.
+
+### 14.1 validation_validate_json_params
+Validate and fix JSON parameters
+
+**Parameters**:
+- `jsonString` (string, required): JSON string to validate and fix
+- `expectedSchema` (object, optional): Expected parameter schema
+
+**Example**:
+```json
+{
+  "tool": "validation_validate_json_params",
+  "arguments": {
+    "jsonString": "{\"name\": \"test\"}",
+    "expectedSchema": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"}
+      }
+    }
+  }
+}
+```
+
+### 14.2 validation_safe_string_value
+Create safe string value
+
+**Parameters**:
+- `value` (string, required): Value to convert to safe string
+
+### 14.3 validation_format_mcp_request
+Format complete MCP request
+
+**Parameters**:
+- `toolName` (string, required): Tool name
+- `arguments` (object, required): Tool arguments
+
+---
+
+## Third-Party Tool Registration
+
+This plugin supports third-party extensions to dynamically register additional MCP tools via `Editor.Message`.
+
+### Registration Process
+
+1. Call `Editor.Message.request('cocos-mcp-server', 'mcp-register-tools', { providerId, invokeMessage, tools })` in provider extension's `load`.
+2. Handle `{ tool, args }` in the method bound to `invokeMessage` and return `{ success, data?, error? }`.
+3. Call `mcp-unregister-tools` on `unload`.
+
+Complete instructions and examples: [MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md), [DEV.md § Third-Party Extension Integration](./DEV.md#third-party-extension-integration), [examples/mcp-provider-demo](./examples/mcp-provider-demo).
+
+---
+
+## Technical Support
+
+If you encounter issues during use, you can:
+
+1. Use `debug_get_console_logs` to view detailed error logs
+2. Use `debug_validate_scene` to check if the scene has issues
+3. Use `debug_get_editor_info` to get environment information
+4. Check the MCP server's running status and logs
+
+---
+
+*This document is based on Cocos Creator MCP Server v1.7.4. See [README Changelog](./README.EN.md#changelog) for updates.*
+
+For third-party extension tool registration (v1.5.0+), see **[MCP_EXTERNAL_TOOL_REGISTRATION.md](./MCP_EXTERNAL_TOOL_REGISTRATION.md)** (step-by-step guide for AI and integrators).
 
 ### 2. Common UUID Retrieval Methods
 

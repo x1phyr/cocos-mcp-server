@@ -959,17 +959,15 @@ export class ProjectTools implements ToolExecutor {
 
     private async findAssetByName(args: any): Promise<ToolResponse> {
         const { name, exactMatch = false, assetType = 'all', folder = 'db://assets', maxResults = 20 } = args;
-        
-        return new Promise(async (resolve) => {
-            try {
+
+        try {
                 // Get all assets in the specified folder
                 const allAssetsResponse = await this.getAssets(assetType, folder);
                 if (!allAssetsResponse.success || !allAssetsResponse.data) {
-                    resolve({
+                    return {
                         success: false,
                         error: `Failed to get assets: ${allAssetsResponse.error}`
-                    });
-                    return;
+                    };
                 }
                 
                 const allAssets = allAssetsResponse.data.assets as any[];
@@ -1008,7 +1006,7 @@ export class ProjectTools implements ToolExecutor {
                     }
                 }
                 
-                resolve({
+                return {
                     success: true,
                     data: {
                         searchTerm: name,
@@ -1020,25 +1018,22 @@ export class ProjectTools implements ToolExecutor {
                         assets: matchedAssets,
                         message: `Found ${matchedAssets.length} assets matching '${name}'`
                     }
-                });
-                
+                };
+
             } catch (error: any) {
-                resolve({
+                return {
                     success: false,
                     error: `Asset search failed: ${error.message}`
-                });
+                };
             }
-        });
     }
     
     private async getAssetDetails(assetPath: string, includeSubAssets: boolean = true): Promise<ToolResponse> {
-        return new Promise(async (resolve) => {
-            try {
+        try {
                 // Get basic asset info
                 const assetInfoResponse = await this.getAssetInfo(assetPath);
                 if (!assetInfoResponse.success) {
-                    resolve(assetInfoResponse);
-                    return;
+                    return assetInfoResponse;
                 }
                 
                 const assetInfo = assetInfoResponse.data;
@@ -1077,7 +1072,7 @@ export class ProjectTools implements ToolExecutor {
                     }
                 }
                 
-                resolve({
+                return {
                     success: true,
                     data: {
                         assetPath,
@@ -1085,14 +1080,13 @@ export class ProjectTools implements ToolExecutor {
                         ...detailedInfo,
                         message: `Asset details retrieved. Found ${detailedInfo.subAssets.length} sub-assets.`
                     }
-                });
-                
+                };
+
             } catch (error: any) {
-                resolve({
+                return {
                     success: false,
                     error: `Failed to get asset details: ${error.message}`
-                });
+                };
             }
-        });
     }
 }

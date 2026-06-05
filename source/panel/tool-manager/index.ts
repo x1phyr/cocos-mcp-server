@@ -100,42 +100,61 @@ module.exports = Editor.Panel.define({
             });
 
             container.innerHTML = '';
-            
+
             Object.entries(toolsByCategory).forEach(([category, tools]: [string, any]) => {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'tool-category';
-                
+
                 const enabledCount = tools.filter((t: any) => t.enabled).length;
                 const totalCount = tools.length;
-                
+
+                const escapedCategory = this.escapeHtml(this.getCategoryDisplayName(category));
                 categoryDiv.innerHTML = `
                     <div class="category-header">
-                        <div class="category-name">${this.getCategoryDisplayName(category)}</div>
+                        <div class="category-name">${escapedCategory}</div>
                         <div class="category-toggle">
                             <span>${enabledCount}/${totalCount}</span>
-                            <input type="checkbox" class="checkbox category-checkbox" 
-                                   data-category="${category}" 
+                            <input type="checkbox" class="checkbox category-checkbox"
+                                   data-category="${this.escapeHtml(category)}"
                                    ${enabledCount === totalCount ? 'checked' : ''}>
                         </div>
                     </div>
-                    <div class="tool-list">
-                        ${tools.map((tool: any) => `
-                            <div class="tool-item">
-                                <div class="tool-info">
-                                    <div class="tool-name">${tool.name}</div>
-                                    <div class="tool-description">${tool.description}</div>
-                                </div>
-                                <div class="tool-toggle">
-                                    <input type="checkbox" class="checkbox tool-checkbox" 
-                                           data-category="${tool.category}" 
-                                           data-name="${tool.name}" 
-                                           ${tool.enabled ? 'checked' : ''}>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <div class="tool-list"></div>
                 `;
-                
+
+                const toolList = categoryDiv.querySelector('.tool-list');
+                tools.forEach((tool: any) => {
+                    const toolItem = document.createElement('div');
+                    toolItem.className = 'tool-item';
+
+                    const toolInfo = document.createElement('div');
+                    toolInfo.className = 'tool-info';
+
+                    const toolNameDiv = document.createElement('div');
+                    toolNameDiv.className = 'tool-name';
+                    toolNameDiv.textContent = tool.name;
+
+                    const toolDescDiv = document.createElement('div');
+                    toolDescDiv.className = 'tool-description';
+                    toolDescDiv.textContent = tool.description;
+
+                    toolInfo.appendChild(toolNameDiv);
+                    toolInfo.appendChild(toolDescDiv);
+
+                    const toolToggle = document.createElement('div');
+                    toolToggle.className = 'tool-toggle';
+                    toolToggle.innerHTML = `
+                        <input type="checkbox" class="checkbox tool-checkbox"
+                               data-category="${this.escapeHtml(tool.category)}"
+                               data-name="${this.escapeHtml(tool.name)}"
+                               ${tool.enabled ? 'checked' : ''}>
+                    `;
+
+                    toolItem.appendChild(toolInfo);
+                    toolItem.appendChild(toolToggle);
+                    toolList?.appendChild(toolItem);
+                });
+
                 container.appendChild(categoryDiv);
             });
 
@@ -432,27 +451,33 @@ module.exports = Editor.Panel.define({
                 enabled: true
             }));
 
+            // 保存先前的 enabled 状态以便回滚
+            const priorStates = this.currentConfiguration.tools.map((tool: any) => ({
+                tool: tool,
+                enabled: tool.enabled
+            }));
+
             try {
                 // 先更新本地状态
                 this.currentConfiguration.tools.forEach((tool: any) => {
                     tool.enabled = true;
                 });
                 console.log('Updated local state: all tools enabled');
-                
+
                 // 立即更新UI
                 this.updateStatusBar();
                 this.updateToolsDisplay();
 
                 // 然后发送到后端
                 await Editor.Message.request('cocos-mcp-server', 'updateToolStatusBatch', updates);
-                
+
             } catch (error) {
                 console.error('Failed to select all tools:', error);
                 this.showError('全选工具失败');
-                
-                // 如果后端更新失败，回滚本地状态
-                this.currentConfiguration.tools.forEach((tool: any) => {
-                    tool.enabled = false;
+
+                // 如果后端更新失败，恢复先前的状态
+                priorStates.forEach((entry: any) => {
+                    entry.tool.enabled = entry.enabled;
                 });
                 this.updateStatusBar();
                 this.updateToolsDisplay();
@@ -470,27 +495,33 @@ module.exports = Editor.Panel.define({
                 enabled: false
             }));
 
+            // 保存先前的 enabled 状态以便回滚
+            const priorStates = this.currentConfiguration.tools.map((tool: any) => ({
+                tool: tool,
+                enabled: tool.enabled
+            }));
+
             try {
                 // 先更新本地状态
                 this.currentConfiguration.tools.forEach((tool: any) => {
                     tool.enabled = false;
                 });
                 console.log('Updated local state: all tools disabled');
-                
+
                 // 立即更新UI
                 this.updateStatusBar();
                 this.updateToolsDisplay();
 
                 // 然后发送到后端
                 await Editor.Message.request('cocos-mcp-server', 'updateToolStatusBatch', updates);
-                
+
             } catch (error) {
                 console.error('Failed to deselect all tools:', error);
                 this.showError('取消全选工具失败');
-                
-                // 如果后端更新失败，回滚本地状态
-                this.currentConfiguration.tools.forEach((tool: any) => {
-                    tool.enabled = true;
+
+                // 如果后端更新失败，恢复先前的状态
+                priorStates.forEach((entry: any) => {
+                    entry.tool.enabled = entry.enabled;
                 });
                 this.updateStatusBar();
                 this.updateToolsDisplay();
